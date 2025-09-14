@@ -70,12 +70,12 @@ window.fiches = {
             'releve_existant': 'Relevé Existant', 
             'installation': 'Installation',
             'maintenance': 'Maintenance',
-            'complete': 'Salle de bain complète',
+            'complete': 'Fiche Complète',
             'douche': 'Douche',
             'wc': 'WC',
             'mixte': 'Mixte'
         };
-        return types[type] || type;
+        return types[type] || 'Fiche Chantier';
     },
 
     showAddModal() {
