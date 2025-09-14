@@ -834,19 +834,56 @@ class FicheSDBUpdate(BaseModel):
 
 # Calcul PAC Models - Version étendue
 class Piece(BaseModel):
-    id: str
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     nom: str
     type: str = "salon"
-    surface: str = ""
-    hauteur_plafond: str = "2.5"
+    
+    # Dimensions et calculs automatiques
+    longueur: str = ""  # Longueur en mètres
+    largeur: str = ""   # Largeur en mètres
+    hauteur: str = "2.5"  # Hauteur en mètres
+    surface: str = ""   # Surface auto-calculée (L×l)
+    volume: str = ""    # Volume auto-calculé (L×l×h)
+    
+    # Températures et deltas
+    temperature_souhaitee: str = "20"
+    temperature_exterieure: str = "-7"
+    delta_t: str = ""   # Auto-calculé (T_int - T_ext)
+    
+    # Calculs techniques
+    coefficient_g: str = "1.0"  # Selon isolation et zone
+    ratio_norme_energetique: str = "1.0"
+    puissance_calculee: str = ""  # Auto-calculée (Surface × Coeff G × ΔT × Ratio)
+    
+    # Caractéristiques thermiques
     orientation: str = "sud"
-    nombre_facades_exterieures: str = "1"
-    isolation_murs: str = "moyenne"
+    isolation_mur: str = "bonne"
+    isolation_sol: str = "bonne"
+    isolation_plafond: str = "bonne"
+    
+    # Ouvertures
+    nombre_fenetres: int = 1
+    surface_fenetres: str = ""
     type_vitrage: str = "double"
     surface_vitree: str = ""
-    puissance_necessaire: str = ""
-    type_unite_interieure: str = "murale"  # Pour Air/Air
+    
+    # Radiateurs existants (pour Air/Eau)
+    radiateurs_existants: str = ""
+    type_materiau_radiateur: str = "fonte"  # fonte, acier, aluminium
+    dimensions_radiateur: str = ""  # Format: H×L×P (ex: 60×120×10)
+    nombre_radiateurs: int = 0
+    
+    # Unités intérieures (pour Air/Air)
+    type_unite_interieure: str = "murale"  # murale, cassette, gainable, console
+    puissance_unite: str = ""  # Puissance de l'unité intérieure
     temperature_depart: str = "35"  # Pour Air/Eau
+    
+    # Commentaires
+    commentaires: str = ""
+    
+    # Résultats de calculs
+    besoin_chauffage: str = ""
+    besoin_climatisation: str = ""
 
 class CalculPACExtended(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
