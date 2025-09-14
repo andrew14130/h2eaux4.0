@@ -650,13 +650,16 @@
 
                 <div id="calculs-pacModule" class="module">
                     <div class="module-header">
-                        <h2>🌡️ Calculs PAC</h2>
-                        <p>Dimensionnement des pompes à chaleur</p>
+                        <h2>🌡️ Calculs PAC Professionnels</h2>
+                        <p>Dimensionnement précis Air/Eau et Air/Air avec calculs pièce par pièce</p>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="app.showCalculPACModal()">+ Nouveau Calcul</button>
+                            <button class="btn-secondary" onclick="app.openCalculPACAdvanced()">🧮 Module Avancé</button>
+                        </div>
                     </div>
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🌡️</div>
-                        <h3>Module Calculs PAC</h3>
-                        <p>Fonctionnalité disponible - API opérationnelle</p>
+                    
+                    <div id="calculsPACList" class="items-list">
+                        <!-- Calculs PAC will be loaded here -->
                     </div>
                 </div>
 
