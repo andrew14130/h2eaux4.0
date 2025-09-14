@@ -19,7 +19,7 @@ window.fiches = {
 
     async load() {
         try {
-            this.data = await app.apiCall('/fiches-sdb'); // Réutilise l'endpoint SDB
+            this.data = await app.apiCall('/fiches-chantier'); // Utilise le bon endpoint
             this.render();
         } catch (error) {
             console.error('Error loading fiches:', error);
