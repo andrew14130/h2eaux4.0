@@ -1628,9 +1628,221 @@
             }
         }
         
-        function hideCalculPacModal() {
-            document.getElementById('calculPacModal').classList.add('hidden');
+        // AIR/EAU FUNCTIONS
+        function showAddCalculAirEau() {
             currentEditingCalcul = null;
+            document.getElementById('calculAirEauModalTitle').textContent = 'Nouveau Calcul PAC Air/Eau';
+            document.getElementById('calculAirEauForm').reset();
+            document.getElementById('piecesAirEauContainer').innerHTML = '';
+            piecesAirEauCounter = 0;
+            document.getElementById('calculAirEauModal').classList.remove('hidden');
+        }
+
+        function hideCalculAirEauModal() {
+            document.getElementById('calculAirEauModal').classList.add('hidden');
+            currentEditingCalcul = null;
+        }
+
+        function toggleEcsFieldsAirEau() {
+            const productionEcs = document.getElementById('airEauProductionEcs').value;
+            const ecsVolumeGroup = document.getElementById('ecsVolumeGroup');
+            
+            if (productionEcs === 'true') {
+                ecsVolumeGroup.style.display = 'block';
+            } else {
+                ecsVolumeGroup.style.display = 'none';
+            }
+        }
+
+        function addPieceAirEau() {
+            piecesAirEauCounter++;
+            const container = document.getElementById('piecesAirEauContainer');
+            
+            const pieceHtml = `
+                <div class="piece-card" id="pieceAirEau${piecesAirEauCounter}">
+                    <div class="piece-header">
+                        <span class="piece-name">Pièce ${piecesAirEauCounter}</span>
+                        <button type="button" class="btn-delete" onclick="removePieceAirEau(${piecesAirEauCounter})">Supprimer</button>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nom de la pièce</label>
+                            <input type="text" id="pieceAirEauNom${piecesAirEauCounter}" value="Pièce ${piecesAirEauCounter}">
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select id="pieceAirEauType${piecesAirEauCounter}">
+                                <option value="salon">Salon</option>
+                                <option value="cuisine">Cuisine</option>
+                                <option value="chambre">Chambre</option>
+                                <option value="salle_de_bain">Salle de bain</option>
+                                <option value="bureau">Bureau</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Longueur (m)</label>
+                            <input type="number" id="pieceAirEauLongueur${piecesAirEauCounter}" step="0.1" onchange="calculateSurfacePieceAirEau(${piecesAirEauCounter})">
+                        </div>
+                        <div class="form-group">
+                            <label>Largeur (m)</label>
+                            <input type="number" id="pieceAirEauLargeur${piecesAirEauCounter}" step="0.1" onchange="calculateSurfacePieceAirEau(${piecesAirEauCounter})">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Surface (m²)</label>
+                            <input type="number" id="pieceAirEauSurface${piecesAirEauCounter}" step="0.1" readonly style="background: #e8f5e8; color: #2d5a2d;">
+                        </div>
+                        <div class="form-group">
+                            <label>Hauteur plafond (m)</label>
+                            <input type="number" id="pieceAirEauHauteur${piecesAirEauCounter}" value="2.5" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Isolation murs</label>
+                            <select id="pieceAirEauIsolation${piecesAirEauCounter}">
+                                <option value="faible">Faible</option>
+                                <option value="moyenne">Moyenne</option>
+                                <option value="bonne">Bonne</option>
+                                <option value="rt2012">RT 2012+</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Puissance nécessaire (W)</label>
+                            <input type="number" id="pieceAirEauPuissance${piecesAirEauCounter}" readonly style="background: #e8f5e8; color: #2d5a2d;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Commentaires</label>
+                        <textarea id="pieceAirEauCommentaires${piecesAirEauCounter}" rows="2"></textarea>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', pieceHtml);
+        }
+
+        function removePieceAirEau(pieceId) {
+            document.getElementById(`pieceAirEau${pieceId}`).remove();
+            calculateTotalPuissanceAirEau();
+        }
+
+        function calculateSurfacePieceAirEau(pieceId) {
+            const longueur = parseFloat(document.getElementById(`pieceAirEauLongueur${pieceId}`).value) || 0;
+            const largeur = parseFloat(document.getElementById(`pieceAirEauLargeur${pieceId}`).value) || 0;
+            const surface = longueur * largeur;
+            
+            document.getElementById(`pieceAirEauSurface${pieceId}`).value = surface.toFixed(1);
+            
+            // Calcul puissance approximative (80W/m² pour moyenne isolation)
+            const puissance = Math.round(surface * 80);
+            document.getElementById(`pieceAirEauPuissance${pieceId}`).value = puissance;
+            
+            calculateTotalPuissanceAirEau();
+        }
+
+        function calculateTotalPuissanceAirEau() {
+            let totalPuissance = 0;
+            for (let i = 1; i <= piecesAirEauCounter; i++) {
+                const pieceElement = document.getElementById(`pieceAirEau${i}`);
+                if (pieceElement) {
+                    const puissance = parseFloat(document.getElementById(`pieceAirEauPuissance${i}`).value) || 0;
+                    totalPuissance += puissance;
+                }
+            }
+            const totalKw = (totalPuissance / 1000).toFixed(1);
+            document.getElementById('airEauPuissanceTotale').value = totalKw;
+        }
+
+        // AIR/AIR FUNCTIONS
+        function showAddCalculAirAir() {
+            currentEditingCalcul = null;
+            document.getElementById('calculAirAirModalTitle').textContent = 'Nouveau Calcul PAC Air/Air';
+            document.getElementById('calculAirAirForm').reset();
+            document.getElementById('piecesAirAirContainer').innerHTML = '';
+            piecesAirAirCounter = 0;
+            document.getElementById('calculAirAirModal').classList.remove('hidden');
+        }
+
+        function hideCalculAirAirModal() {
+            document.getElementById('calculAirAirModal').classList.add('hidden');
+            currentEditingCalcul = null;
+        }
+
+        function addPieceAirAir() {
+            piecesAirAirCounter++;
+            const container = document.getElementById('piecesAirAirContainer');
+            
+            const pieceHtml = `
+                <div class="piece-card" id="pieceAirAir${piecesAirAirCounter}">
+                    <div class="piece-header">
+                        <span class="piece-name">Unité ${piecesAirAirCounter}</span>
+                        <button type="button" class="btn-delete" onclick="removePieceAirAir(${piecesAirAirCounter})">Supprimer</button>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nom de la pièce</label>
+                            <input type="text" id="pieceAirAirNom${piecesAirAirCounter}" value="Pièce ${piecesAirAirCounter}">
+                        </div>
+                        <div class="form-group">
+                            <label>Type unité intérieure</label>
+                            <select id="pieceAirAirTypeUnite${piecesAirAirCounter}">
+                                <option value="murale">Murale</option>
+                                <option value="cassette">Cassette</option>
+                                <option value="gainable">Gainable</option>
+                                <option value="console">Console</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Surface (m²)</label>
+                            <input type="number" id="pieceAirAirSurface${piecesAirAirCounter}" step="0.1" onchange="calculatePuissanceAirAir(${piecesAirAirCounter})">
+                        </div>
+                        <div class="form-group">
+                            <label>Puissance nécessaire (kW)</label>
+                            <input type="number" id="pieceAirAirPuissance${piecesAirAirCounter}" step="0.1" readonly style="background: #e8f5e8; color: #2d5a2d;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Commentaires</label>
+                        <textarea id="pieceAirAirCommentaires${piecesAirAirCounter}" rows="2"></textarea>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', pieceHtml);
+        }
+
+        function removePieceAirAir(pieceId) {
+            document.getElementById(`pieceAirAir${pieceId}`).remove();
+            calculateTotalPuissanceAirAir();
+        }
+
+        function calculatePuissanceAirAir(pieceId) {
+            const surface = parseFloat(document.getElementById(`pieceAirAirSurface${pieceId}`).value) || 0;
+            
+            // Calcul puissance approximative (100W/m² pour clim réversible)
+            const puissance = (surface * 0.1).toFixed(1);
+            document.getElementById(`pieceAirAirPuissance${pieceId}`).value = puissance;
+            
+            calculateTotalPuissanceAirAir();
+        }
+
+        function calculateTotalPuissanceAirAir() {
+            let totalPuissance = 0;
+            for (let i = 1; i <= piecesAirAirCounter; i++) {
+                const pieceElement = document.getElementById(`pieceAirAir${i}`);
+                if (pieceElement) {
+                    const puissance = parseFloat(document.getElementById(`pieceAirAirPuissance${i}`).value) || 0;
+                    totalPuissance += puissance;
+                }
+            }
+            document.getElementById('airAirPuissanceTotale').value = totalPuissance.toFixed(1);
         }
         
         // Client form submission
