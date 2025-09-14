@@ -3,7 +3,7 @@ import {
   View, 
   Text, 
   StyleSheet, 
-  TouchableOpacity, 
+  Pressable,
   Alert, 
   Image,
   KeyboardAvoidingView,
