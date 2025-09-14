@@ -1552,6 +1552,374 @@
         </div>
     </div>
 
+    <!-- MODULE FICHES CHANTIER/RELEVÉ + PLANS 2D -->
+    <div id="fichesChantierScreen" class="module-screen hidden">
+        <div class="module-header">
+            <button onclick="showDashboard()" class="back-button">← Retour Dashboard</button>
+            <h2>📋 Fiches Chantier / Relevés</h2>
+            <button onclick="showAddFicheChantier()" class="add-button">+ Nouvelle Fiche</button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="searchFichesChantier" placeholder="Rechercher une fiche..." onkeyup="filterFichesChantier()">
+        </div>
+
+        <div id="fichesChantierList" class="items-list">
+            <!-- Les fiches seront chargées ici -->
+        </div>
+
+        <!-- Modal Fiche Chantier avec Onglets -->
+        <div id="ficheChantierModal" class="modal hidden">
+            <div class="modal-content extra-large-modal">
+                <div class="modal-header">
+                    <h3 id="ficheChantierModalTitle">📋 Nouvelle Fiche de Relevé Chantier</h3>
+                    <button onclick="hideFicheChantierModal()" class="close-button">×</button>
+                </div>
+
+                <!-- Navigation par Onglets -->
+                <div class="tabs-navigation">
+                    <button class="tab-btn active" onclick="showTab('general')">📋 Général</button>
+                    <button class="tab-btn" onclick="showTab('client')">👤 Client</button>
+                    <button class="tab-btn" onclick="showTab('logement')">🏠 Logement</button>
+                    <button class="tab-btn" onclick="showTab('existant')">🔧 Existant</button>
+                    <button class="tab-btn" onclick="showTab('besoins')">💡 Besoins</button>
+                    <button class="tab-btn" onclick="showTab('technique')">⚙️ Technique</button>
+                    <button class="tab-btn" onclick="showTab('plan2d')">📐 Plan 2D</button>
+                    <button class="tab-btn" onclick="showTab('notes')">📝 Notes</button>
+                </div>
+
+                <form id="ficheChantierForm">
+                    <!-- ONGLET GÉNÉRAL -->
+                    <div id="tab-general" class="tab-content active">
+                        <h4>📋 Informations générales</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nom de la fiche *</label>
+                                <input type="text" id="ficheNom" required placeholder="Ex: Relevé Villa Dupont">
+                            </div>
+                            <div class="form-group">
+                                <label>Date du rendez-vous *</label>
+                                <input type="datetime-local" id="ficheDateRendezVous" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Type d'intervention</label>
+                                <select id="ficheTypeIntervention">
+                                    <option value="releve_devis">Relevé pour devis</option>
+                                    <option value="diagnostic">Diagnostic</option>
+                                    <option value="etude_faisabilite">Étude de faisabilité</option>
+                                    <option value="visite_technique">Visite technique</option>
+                                    <option value="controle_reception">Contrôle réception</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Statut de la fiche</label>
+                                <select id="ficheStatut">
+                                    <option value="en_cours">En cours</option>
+                                    <option value="complete">Terminée</option>
+                                    <option value="a_revoir">À revoir</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ONGLET CLIENT -->
+                    <div id="tab-client" class="tab-content hidden">
+                        <h4>👤 Informations client</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nom complet *</label>
+                                <input type="text" id="ficheClientNom" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Téléphone *</label>
+                                <input type="tel" id="ficheClientTelephone" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="ficheClientEmail">
+                            </div>
+                            <div class="form-group">
+                                <label>Profession</label>
+                                <input type="text" id="ficheClientProfession">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Adresse complète</label>
+                            <textarea id="ficheClientAdresse" rows="2"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre de personnes</label>
+                                <input type="number" id="ficheClientNbPersonnes" min="1" value="2">
+                            </div>
+                            <div class="form-group">
+                                <label>Budget indicatif (€)</label>
+                                <input type="number" id="ficheClientBudget" step="500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ONGLET LOGEMENT -->
+                    <div id="tab-logement" class="tab-content hidden">
+                        <h4>🏠 Caractéristiques du logement</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Type de logement</label>
+                                <select id="ficheLogementType">
+                                    <option value="maison">Maison individuelle</option>
+                                    <option value="appartement">Appartement</option>
+                                    <option value="local_commercial">Local commercial</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Année de construction</label>
+                                <input type="number" id="ficheLogementAnnee" min="1900" max="2025">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Surface habitable (m²)</label>
+                                <input type="number" id="ficheLogementSurface" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Nombre de niveaux</label>
+                                <input type="number" id="ficheLogementNiveaux" min="1" value="1">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Isolation générale</label>
+                                <select id="ficheLogementIsolation">
+                                    <option value="faible">Faible (avant 1975)</option>
+                                    <option value="moyenne">Moyenne (1975-2000)</option>
+                                    <option value="bonne">Bonne (après 2000)</option>
+                                    <option value="rt2012">RT 2012+</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Type de menuiseries</label>
+                                <select id="ficheLogementMenuiseries">
+                                    <option value="simple_vitrage">Simple vitrage</option>
+                                    <option value="double_vitrage">Double vitrage</option>
+                                    <option value="triple_vitrage">Triple vitrage</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ONGLET EXISTANT -->
+                    <div id="tab-existant" class="tab-content hidden">
+                        <h4>🔧 Installation existante</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Énergie actuelle</label>
+                                <select id="ficheExistantEnergie">
+                                    <option value="gaz">Gaz naturel</option>
+                                    <option value="fioul">Fioul</option>
+                                    <option value="electrique">Électrique</option>
+                                    <option value="bois">Bois</option>
+                                    <option value="pac">Pompe à chaleur</option>
+                                    <option value="autre">Autre</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Type de chauffage</label>
+                                <select id="ficheExistantChauffage">
+                                    <option value="chaudiere">Chaudière</option>
+                                    <option value="radiateurs_electriques">Radiateurs électriques</option>
+                                    <option value="poele">Poêle</option>
+                                    <option value="plancher_chauffant">Plancher chauffant</option>
+                                    <option value="climatisation">Climatisation</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Âge de l'installation (années)</label>
+                                <input type="number" id="ficheExistantAge" min="0" max="50">
+                            </div>
+                            <div class="form-group">
+                                <label>État général</label>
+                                <select id="ficheExistantEtat">
+                                    <option value="bon">Bon état</option>
+                                    <option value="moyen">État moyen</option>
+                                    <option value="mauvais">Mauvais état</option>
+                                    <option value="a_changer">À changer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Production ECS actuelle</label>
+                            <select id="ficheExistantEcs">
+                                <option value="integree">Intégrée à la chaudière</option>
+                                <option value="ballon_independant">Ballon indépendant</option>
+                                <option value="chauffe_eau_electrique">Chauffe-eau électrique</option>
+                                <option value="pas_d_ecs">Pas d'ECS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Observations sur l'existant</label>
+                            <textarea id="ficheExistantObservations" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ONGLET BESOINS -->
+                    <div id="tab-besoins" class="tab-content hidden">
+                        <h4>💡 Besoins et attentes client</h4>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="besoinChauffage"> Améliorer le chauffage</label>
+                            <label><input type="checkbox" id="besoinEcs"> Améliorer la production ECS</label>
+                            <label><input type="checkbox" id="besoinClimatisation"> Ajouter climatisation</label>
+                            <label><input type="checkbox" id="besoinEconomies"> Réduire les factures</label>
+                            <label><input type="checkbox" id="besoinConfort"> Améliorer le confort</label>
+                            <label><input type="checkbox" id="besoinEcologie"> Solution écologique</label>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Priorité n°1</label>
+                                <input type="text" id="ficheBesoinPriorite1">
+                            </div>
+                            <div class="form-group">
+                                <label>Délai souhaité</label>
+                                <select id="ficheBesoinDelai">
+                                    <option value="urgent">Urgent (< 1 mois)</option>
+                                    <option value="court">Court terme (1-3 mois)</option>
+                                    <option value="moyen">Moyen terme (3-6 mois)</option>
+                                    <option value="long">Long terme (> 6 mois)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Contraintes particulières</label>
+                            <textarea id="ficheBesoinContraintes" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ONGLET TECHNIQUE -->
+                    <div id="tab-technique" class="tab-content hidden">
+                        <h4>⚙️ Données techniques</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Compteur électrique (kVA)</label>
+                                <input type="number" id="ficheTechCompteur" min="3" max="36">
+                            </div>
+                            <div class="form-group">
+                                <label>Alimentation gaz disponible</label>
+                                <select id="ficheTechGaz">
+                                    <option value="oui">Oui</option>
+                                    <option value="non">Non</option>
+                                    <option value="a_verifier">À vérifier</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Évacuation disponible</label>
+                                <select id="ficheTechEvacuation">
+                                    <option value="conduit_existant">Conduit existant</option>
+                                    <option value="ventouse">Ventouse possible</option>
+                                    <option value="a_creer">À créer</option>
+                                    <option value="non_necessaire">Non nécessaire</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Emplacement technique disponible</label>
+                                <select id="ficheTechEmplacement">
+                                    <option value="oui">Oui</option>
+                                    <option value="limite">Limité</option>
+                                    <option value="non">Non</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Contraintes techniques</label>
+                            <textarea id="ficheTechContraintes" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ONGLET PLAN 2D -->
+                    <div id="tab-plan2d" class="tab-content hidden">
+                        <h4>📐 Plan 2D (Style MagicPlan)</h4>
+                        <div class="plan-container">
+                            <div class="plan-toolbar">
+                                <button type="button" class="plan-btn" onclick="startDrawing()">✏️ Dessiner</button>
+                                <button type="button" class="plan-btn" onclick="addRoom()">🏠 Ajouter pièce</button>
+                                <button type="button" class="plan-btn" onclick="addMeasure()">📏 Coter</button>
+                                <button type="button" class="plan-btn" onclick="clearPlan()">🗑️ Effacer</button>
+                                <button type="button" class="plan-btn" onclick="savePlan()">💾 Sauvegarder</button>
+                            </div>
+                            <canvas id="planCanvas" width="800" height="600"></canvas>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Échelle du plan</label>
+                                <select id="planEchelle">
+                                    <option value="1:50">1:50</option>
+                                    <option value="1:100" selected>1:100</option>
+                                    <option value="1:200">1:200</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Nord géographique</label>
+                                <select id="planNord">
+                                    <option value="haut">En haut</option>
+                                    <option value="droite">À droite</option>
+                                    <option value="bas">En bas</option>
+                                    <option value="gauche">À gauche</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Légende du plan</label>
+                            <textarea id="planLegende" rows="2" placeholder="Indications sur le plan..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ONGLET NOTES -->
+                    <div id="tab-notes" class="tab-content hidden">
+                        <h4>📝 Notes et conclusion</h4>
+                        <div class="form-group">
+                            <label>Solution recommandée</label>
+                            <textarea id="ficheNotesRecommandation" rows="4" placeholder="Solution technique recommandée..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Points d'attention</label>
+                            <textarea id="ficheNotesAttention" rows="3" placeholder="Points importants à retenir..."></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Estimation budget (€)</label>
+                                <input type="number" id="ficheNotesEstimation" step="500">
+                            </div>
+                            <div class="form-group">
+                                <label>Prochaine étape</label>
+                                <select id="ficheNotesEtape">
+                                    <option value="devis">Établir devis</option>
+                                    <option value="etude_complementaire">Étude complémentaire</option>
+                                    <option value="visite_technique">Nouvelle visite</option>
+                                    <option value="attente_client">Attente réponse client</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Observations générales</label>
+                            <textarea id="ficheNotesObservations" rows="4" placeholder="Toutes observations utiles..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" onclick="hideFicheChantierModal()">Annuler</button>
+                        <button type="submit">Enregistrer la fiche</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         const BACKEND_URL = 'https://h2eaux-gestion-1.preview.emergentagent.com';
         
