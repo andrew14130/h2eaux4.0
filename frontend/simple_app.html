@@ -671,15 +671,38 @@
         <div class="module-header">
             <button onclick="showDashboard()" class="back-button">← Retour Dashboard</button>
             <h2>🌡️ Calculs PAC</h2>
-            <button onclick="showAddCalculPac()" class="add-button">+ Nouveau Calcul</button>
+            <div class="pac-type-buttons">
+                <button onclick="showPacAirEau()" id="btnAirEau" class="pac-type-btn active">Air/Eau (Chauffage + ECS)</button>
+                <button onclick="showPacAirAir()" id="btnAirAir" class="pac-type-btn">Air/Air (Climatisation)</button>
+            </div>
         </div>
 
-        <div class="search-bar">
-            <input type="text" id="searchCalculsPac" placeholder="Rechercher un calcul..." onkeyup="filterCalculsPac()">
+        <!-- PAC AIR/EAU -->
+        <div id="pacAirEauSection">
+            <div class="section-header">
+                <h3>🌡️ PAC Air/Eau - Chauffage + ECS</h3>
+                <button onclick="showAddCalculAirEau()" class="add-button">+ Nouveau Calcul Air/Eau</button>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="searchAirEau" placeholder="Rechercher un calcul Air/Eau..." onkeyup="filterAirEau()">
+            </div>
+            <div id="airEauList" class="items-list">
+                <!-- Les calculs Air/Eau seront chargés ici -->
+            </div>
         </div>
 
-        <div id="calculsPacList" class="items-list">
-            <!-- Les calculs PAC seront chargés ici -->
+        <!-- PAC AIR/AIR -->
+        <div id="pacAirAirSection" class="hidden">
+            <div class="section-header">
+                <h3>❄️ PAC Air/Air - Climatisation Réversible</h3>
+                <button onclick="showAddCalculAirAir()" class="add-button">+ Nouveau Calcul Air/Air</button>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="searchAirAir" placeholder="Rechercher un calcul Air/Air..." onkeyup="filterAirAir()">
+            </div>
+            <div id="airAirList" class="items-list">
+                <!-- Les calculs Air/Air seront chargés ici -->
+            </div>
         </div>
 
         <!-- Modal Ajout/Édition Calcul PAC -->
