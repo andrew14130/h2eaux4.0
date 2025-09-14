@@ -854,22 +854,22 @@ window.fiches = {
         };
     },
 
-    createFicheModal() {
+    createFicheModal(doc = null) {
         return `
             <div id="ficheModal" class="modal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h2>Nouvelle Fiche de Relevé</h2>
+                        <h2>${doc ? 'Modifier Fiche' : 'Nouvelle Fiche de Relevé'}</h2>
                         <button class="btn-close" onclick="fiches.closeModal()">&times;</button>
                     </div>
                     <form id="ficheForm" onsubmit="fiches.handleSubmit(event)">
                         <div class="form-group">
                             <label>Nom de la fiche</label>
-                            <input type="text" name="nom" required placeholder="Ex: Relevé SDB Dupont">
+                            <input type="text" name="nom" required placeholder="Ex: Relevé chantier Dupont">
                         </div>
                         <div class="form-group">
                             <label>Client</label>
-                            <input type="text" name="client_nom" required placeholder="Nom du client">
+                            <input type="text" name="client_nom" placeholder="Nom du client (optionnel)">
                         </div>
                         <div class="form-group">
                             <label>Adresse</label>
@@ -877,7 +877,7 @@ window.fiches = {
                         </div>
                         <div class="form-group">
                             <label>Type d'intervention</label>
-                            <select name="type_sdb" required>
+                            <select name="type_sdb">
                                 <option value="visite_technique">Visite Technique</option>
                                 <option value="releve_existant">Relevé Existant</option>
                                 <option value="installation">Installation</option>
