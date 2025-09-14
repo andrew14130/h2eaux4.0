@@ -128,48 +128,22 @@ export default function LoginScreen() {
               />
             </View>
 
-            {/* Web-compatible button */}
-            {Platform.OS === 'web' ? (
-              <button
-                style={{
-                  backgroundColor: loading ? '#007AFF80' : '#007AFF',
-                  borderRadius: 12,
-                  height: 56,
-                  border: 'none',
-                  color: '#fff',
-                  fontSize: 18,
-                  fontWeight: '600',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  width: '100%',
-                  marginTop: 8,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: '0 2px 4px rgba(0, 122, 255, 0.3)',
-                }}
-                onClick={handleLogin}
-                disabled={loading}
-                type="button"
-              >
-                {loading ? 'Connexion...' : 'Se connecter'}
-              </button>
-            ) : (
-              <TouchableOpacity 
-                style={[styles.loginButton, loading && styles.loginButtonDisabled]}
-                onPress={handleLogin}
-                disabled={loading}
-                testID="login-button"
-                activeOpacity={0.8}
-                accessible={true}
-                accessibilityRole="button"
-              >
-                {loading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.loginButtonText}>Se connecter</Text>
-                )}
-              </TouchableOpacity>
-            )}
+            <Pressable 
+              style={({ pressed }) => [
+                styles.loginButton, 
+                loading && styles.loginButtonDisabled,
+                pressed && styles.loginButtonPressed
+              ]}
+              onPress={handleLogin}
+              disabled={loading}
+              testID="login-button"
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.loginButtonText}>Se connecter</Text>
+              )}
+            </Pressable>
             
             <View style={styles.instructionsContainer}>
               <Text style={styles.instructionsTitle}>Identifiants de test :</Text>
