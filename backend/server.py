@@ -583,6 +583,107 @@ async def delete_document(document_id: str, current_user: User = Depends(get_cur
         )
     return {"message": "Document deleted successfully"}
 
+# User management routes
+@api_router.get("/users", response_model=List[UserResponse])
+async def get_users(current_user: User = Depends(get_current_user)):
+    if not current_user.permissions.get("parametres", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access to user management not permitted"
+        )
+    
+    users = await db.users.find().sort("created_at", -1).to_list(1000)
+    return [UserResponse(
+        id=user["id"],
+        username=user["username"],
+        role=user["role"],
+        permissions=user["permissions"],
+        created_at=user["created_at"].isoformat()
+    ) for user in users]
+
+@api_router.get("/users/{user_id}", response_model=UserResponse)
+async def get_user(user_id: str, current_user: User = Depends(get_current_user)):
+    if not current_user.permissions.get("parametres", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access to user management not permitted"
+        )
+    
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    return UserResponse(
+        id=user["id"],
+        username=user["username"],
+        role=user["role"],
+        permissions=user["permissions"],
+        created_at=user["created_at"].isoformat()
+    )
+
+class UserUpdate(BaseModel):
+    role: Optional[str] = None
+    permissions: Optional[dict] = None
+
+@api_router.put("/users/{user_id}", response_model=UserResponse)
+async def update_user(
+    user_id: str, 
+    user_data: UserUpdate, 
+    current_user: User = Depends(get_current_user)
+):
+    if not current_user.permissions.get("parametres", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access to user management not permitted"
+        )
+    
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    update_data = {k: v for k, v in user_data.dict().items() if v is not None}
+    
+    if update_data:
+        await db.users.update_one({"id": user_id}, {"$set": update_data})
+    
+    updated_user = await db.users.find_one({"id": user_id})
+    return UserResponse(
+        id=updated_user["id"],
+        username=updated_user["username"],
+        role=updated_user["role"],
+        permissions=updated_user["permissions"],
+        created_at=updated_user["created_at"].isoformat()
+    )
+
+@api_router.delete("/users/{user_id}")
+async def delete_user(user_id: str, current_user: User = Depends(get_current_user)):
+    if not current_user.permissions.get("parametres", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access to user management not permitted"
+        )
+    
+    # Prevent deletion of current user
+    if user_id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete your own account"
+        )
+    
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    return {"message": "User deleted successfully"}
+
 # Fiche SDB Models
 class FicheSDB(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
