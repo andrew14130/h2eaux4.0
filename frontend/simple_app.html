@@ -6005,6 +6005,301 @@ Document généré par H2EAUX GESTION - ${date}
             }
         }
 
+        // GESTION DES UTILISATEURS (MODULE PARAMÈTRES)
+        let users = [];
+        let currentEditingUser = null;
+
+        async function loadUsersManagement() {
+            if (!currentUser || !currentUser.permissions.parametres) {
+                showMessage('Accès non autorisé');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    users = await response.json();
+                    displayUsers();
+                } else {
+                    showMessage('Erreur lors du chargement des utilisateurs');
+                }
+            } catch (error) {
+                console.error('Erreur loadUsersManagement:', error);
+                showMessage('Erreur de connexion lors du chargement des utilisateurs');
+            }
+        }
+
+        function displayUsers() {
+            const usersList = document.getElementById('usersList');
+            
+            if (users.length === 0) {
+                usersList.innerHTML = '<div class="empty-state"><p>Aucun utilisateur trouvé</p></div>';
+                return;
+            }
+
+            usersList.innerHTML = users.map(user => `
+                <div class="user-card">
+                    <div class="user-header">
+                        <div class="user-info">
+                            <h4>${user.username}</h4>
+                            <span class="user-role ${user.role}">${user.role === 'admin' ? 'Administrateur' : 'Employé'}</span>
+                        </div>
+                    </div>
+                    <div class="user-permissions">
+                        ${Object.entries(user.permissions).map(([perm, active]) => 
+                            `<span class="permission-badge ${active ? 'active' : ''}">${getPermissionLabel(perm)}</span>`
+                        ).join('')}
+                    </div>
+                    <div class="user-actions">
+                        <button class="edit-user-btn" onclick="editUser('${user.id}')">Modifier</button>
+                        ${user.id !== currentUser.id ? `<button class="delete-user-btn" onclick="deleteUser('${user.id}', '${user.username}')">Supprimer</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getPermissionLabel(permission) {
+            const labels = {
+                'clients': '👥 Clients',
+                'chantiers': '🏗️ Chantiers', 
+                'documents': '📄 Documents',
+                'calculs_pac': '🌡️ Calculs PAC',
+                'catalogues': '📦 Catalogues',
+                'chat': '💬 Chat',
+                'parametres': '⚙️ Paramètres'
+            };
+            return labels[permission] || permission;
+        }
+
+        function showAddUser() {
+            currentEditingUser = null;
+            document.getElementById('userModalTitle').textContent = '👤 Nouvel Utilisateur';
+            document.getElementById('userName').value = '';
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userRole').value = 'employee';
+            document.getElementById('passwordGroup').style.display = 'block';
+            
+            // Reset permissions to default
+            updatePermissionsDisplay();
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+
+        function editUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            currentEditingUser = user;
+            document.getElementById('userModalTitle').textContent = '✏️ Modifier Utilisateur';
+            document.getElementById('userName').value = user.username;
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userRole').value = user.role;
+            document.getElementById('passwordGroup').style.display = 'none';
+
+            // Set permissions
+            Object.entries(user.permissions).forEach(([perm, active]) => {
+                const checkbox = document.getElementById(`perm_${perm}`);
+                if (checkbox) checkbox.checked = active;
+            });
+
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+
+        function hideUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+            currentEditingUser = null;
+        }
+
+        function updatePermissionsDisplay() {
+            const role = document.getElementById('userRole').value;
+            const parametresCheckbox = document.getElementById('perm_parametres');
+            
+            if (role === 'admin') {
+                // Admin a tous les droits par défaut
+                document.querySelectorAll('.permission-item input[type="checkbox"]').forEach(cb => {
+                    cb.checked = true;
+                });
+            } else {
+                // Employé a tous les droits sauf paramètres
+                document.querySelectorAll('.permission-item input[type="checkbox"]').forEach(cb => {
+                    cb.checked = cb.id !== 'perm_parametres';
+                });
+            }
+            
+            // Paramètres uniquement pour admin
+            parametresCheckbox.disabled = role !== 'admin';
+            if (role !== 'admin') {
+                parametresCheckbox.checked = false;
+            }
+        }
+
+        async function handleUserForm(event) {
+            event.preventDefault();
+            
+            const formData = {
+                username: document.getElementById('userName').value.trim(),
+                role: document.getElementById('userRole').value,
+                permissions: {
+                    clients: document.getElementById('perm_clients').checked,
+                    chantiers: document.getElementById('perm_chantiers').checked,
+                    documents: document.getElementById('perm_documents').checked,
+                    calculs_pac: document.getElementById('perm_calculs_pac').checked,
+                    catalogues: document.getElementById('perm_catalogues').checked,
+                    chat: document.getElementById('perm_chat').checked,
+                    parametres: document.getElementById('perm_parametres').checked
+                }
+            };
+
+            if (!currentEditingUser) {
+                // Création d'utilisateur
+                const password = document.getElementById('userPassword').value.trim();
+                if (!password) {
+                    showMessage('Le mot de passe est requis pour un nouvel utilisateur');
+                    return;
+                }
+                formData.password = password;
+            }
+
+            try {
+                let response;
+                if (currentEditingUser) {
+                    // Modification
+                    response = await fetch(`${BACKEND_URL}/api/users/${currentEditingUser.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            role: formData.role,
+                            permissions: formData.permissions
+                        })
+                    });
+                } else {
+                    // Création
+                    response = await fetch(`${BACKEND_URL}/api/auth/register`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                }
+
+                if (response.ok) {
+                    hideUserModal();
+                    loadUsersManagement();
+                    showMessage(currentEditingUser ? 'Utilisateur modifié avec succès' : 'Utilisateur créé avec succès', 'success');
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Erreur lors de la sauvegarde');
+                }
+            } catch (error) {
+                console.error('Erreur handleUserForm:', error);
+                showMessage('Erreur de connexion lors de la sauvegarde');
+            }
+        }
+
+        async function deleteUser(userId, username) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur "${username}" ?\n\nCette action est irréversible.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    loadUsersManagement();
+                    showMessage('Utilisateur supprimé avec succès', 'success');
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Erreur lors de la suppression');
+                }
+            } catch (error) {
+                console.error('Erreur deleteUser:', error);
+                showMessage('Erreur de connexion lors de la suppression');
+            }
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('searchUsers').value.toLowerCase();
+            const filteredUsers = users.filter(user => 
+                user.username.toLowerCase().includes(searchTerm) ||
+                user.role.toLowerCase().includes(searchTerm)
+            );
+
+            const usersList = document.getElementById('usersList');
+            
+            if (filteredUsers.length === 0) {
+                usersList.innerHTML = '<div class="empty-state"><p>Aucun utilisateur trouvé</p></div>';
+                return;
+            }
+
+            usersList.innerHTML = filteredUsers.map(user => `
+                <div class="user-card">
+                    <div class="user-header">
+                        <div class="user-info">
+                            <h4>${user.username}</h4>
+                            <span class="user-role ${user.role}">${user.role === 'admin' ? 'Administrateur' : 'Employé'}</span>
+                        </div>
+                    </div>
+                    <div class="user-permissions">
+                        ${Object.entries(user.permissions).map(([perm, active]) => 
+                            `<span class="permission-badge ${active ? 'active' : ''}">${getPermissionLabel(perm)}</span>`
+                        ).join('')}
+                    </div>
+                    <div class="user-actions">
+                        <button class="edit-user-btn" onclick="editUser('${user.id}')">Modifier</button>
+                        ${user.id !== currentUser.id ? `<button class="delete-user-btn" onclick="deleteUser('${user.id}', '${user.username}')">Supprimer</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Mise à jour de la fonction showDashboard pour afficher le module paramètres aux admins
+        function showDashboard() {
+            if (currentUser) {
+                userNameDisplay.textContent = currentUser.username;
+                userRoleDisplay.textContent = currentUser.role === 'admin' ? 'Administrateur' : 'Employé';
+                
+                // Afficher le module paramètres seulement aux admins
+                const parametresModule = document.getElementById('parametresModule');
+                if (currentUser.permissions.parametres) {
+                    parametresModule.style.display = 'block';
+                } else {
+                    parametresModule.style.display = 'none';
+                }
+                
+                loginScreen.classList.add('hidden');
+                dashboardScreen.classList.remove('hidden');
+            }
+        }
+
+        // Ajout de l'event listener pour le formulaire utilisateur
+        document.addEventListener('DOMContentLoaded', function() {
+            const userForm = document.getElementById('userForm');
+            if (userForm) {
+                userForm.addEventListener('submit', handleUserForm);
+            }
+            
+            const userRoleSelect = document.getElementById('userRole');
+            if (userRoleSelect) {
+                userRoleSelect.addEventListener('change', updatePermissionsDisplay);
+            }
+        });
+
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 H2EAUX GESTION initialisée');
