@@ -1438,6 +1438,120 @@
         </div>
     </div>
 
+    <!-- MODULE DOCUMENTS -->
+    <div id="documentsScreen" class="module-screen hidden">
+        <div class="module-header">
+            <button onclick="showDashboard()" class="back-button">← Retour Dashboard</button>
+            <h2>📄 Gestion des Documents</h2>
+            <button onclick="showAddDocument()" class="add-button">+ Nouveau Document</button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="searchDocuments" placeholder="Rechercher un document..." onkeyup="filterDocuments()">
+        </div>
+
+        <div class="filters-bar">
+            <select id="filterTypeDocuments" onchange="filterDocuments()">
+                <option value="">Tous les types</option>
+                <option value="facture">Facture 🧾</option>
+                <option value="devis">Devis 💰</option>
+                <option value="contrat">Contrat 📝</option>
+                <option value="fiche_technique">Fiche technique 🔧</option>
+                <option value="rapport">Rapport 📊</option>
+                <option value="autre">Autre 📄</option>
+            </select>
+        </div>
+
+        <div id="documentsList" class="items-list">
+            <!-- Les documents seront chargés ici -->
+        </div>
+
+        <!-- Modal Ajout/Édition Document -->
+        <div id="documentModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="documentModalTitle">📄 Nouveau Document</h3>
+                    <button onclick="hideDocumentModal()" class="close-button">×</button>
+                </div>
+                <form id="documentForm">
+                    <!-- Informations générales -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nom du document *</label>
+                            <input type="text" id="documentNom" required placeholder="Ex: Facture Villa Dupont">
+                        </div>
+                        <div class="form-group">
+                            <label>Type de document *</label>
+                            <select id="documentType" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="facture">🧾 Facture</option>
+                                <option value="devis">💰 Devis</option>
+                                <option value="contrat">📝 Contrat</option>
+                                <option value="fiche_technique">🔧 Fiche technique</option>
+                                <option value="rapport">📊 Rapport</option>
+                                <option value="autre">📄 Autre</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Associations -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Client associé</label>
+                            <input type="text" id="documentClientNom" placeholder="Nom du client">
+                        </div>
+                        <div class="form-group">
+                            <label>Chantier associé</label>
+                            <input type="text" id="documentChantierNom" placeholder="Nom du chantier">
+                        </div>
+                    </div>
+
+                    <!-- Description et tags -->
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="documentDescription" rows="3" placeholder="Description du document..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tags (séparés par des virgules)</label>
+                        <input type="text" id="documentTags" placeholder="Ex: pac, installation, villa">
+                    </div>
+
+                    <!-- Informations fichier (simulation) -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Chemin fichier (simulation)</label>
+                            <input type="text" id="documentFilePath" placeholder="/documents/facture_001.pdf">
+                        </div>
+                        <div class="form-group">
+                            <label>Taille fichier (Ko)</label>
+                            <input type="number" id="documentFileSize" placeholder="1024">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Type MIME</label>
+                        <select id="documentMimeType">
+                            <option value="application/pdf">PDF (application/pdf)</option>
+                            <option value="application/msword">Word (.doc)</option>
+                            <option value="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Word (.docx)</option>
+                            <option value="application/vnd.ms-excel">Excel (.xls)</option>
+                            <option value="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">Excel (.xlsx)</option>
+                            <option value="image/jpeg">Image JPEG</option>
+                            <option value="image/png">Image PNG</option>
+                            <option value="text/plain">Texte (.txt)</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" onclick="hideDocumentModal()">Annuler</button>
+                        <button type="submit">Enregistrer le document</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         const BACKEND_URL = 'https://h2eaux-gestion-1.preview.emergentagent.com';
         
