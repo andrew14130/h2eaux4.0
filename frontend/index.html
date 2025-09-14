@@ -2275,6 +2275,20 @@
                     hideClientModal();
                 }
             });
+
+            // Close PAC modal on outside click
+            document.getElementById('calculPacModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideCalculPacModal();
+                }
+            });
+
+            // Close chantier modal on outside click
+            document.getElementById('chantierModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideChantierModal();
+                }
+            });
         });
 
         // PWA Installation
