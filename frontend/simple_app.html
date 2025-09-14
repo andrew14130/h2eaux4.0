@@ -1170,6 +1170,163 @@
         </div>
     </div>
 
+    <!-- MODULE CHANTIERS -->
+    <div id="chantiersScreen" class="module-screen hidden">
+        <div class="module-header">
+            <button onclick="showDashboard()" class="back-button">← Retour Dashboard</button>
+            <h2>🏗️ Gestion des Chantiers</h2>
+            <button onclick="showAddChantier()" class="add-button">+ Nouveau Chantier</button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="searchChantiers" placeholder="Rechercher un chantier..." onkeyup="filterChantiers()">
+        </div>
+
+        <div class="filters-bar">
+            <select id="filterStatutChantiers" onchange="filterChantiers()">
+                <option value="">Tous les statuts</option>
+                <option value="en_attente">En attente</option>
+                <option value="en_cours">En cours</option>
+                <option value="termine">Terminé</option>
+                <option value="annule">Annulé</option>
+            </select>
+            <select id="filterTypeChantiers" onchange="filterChantiers()">
+                <option value="">Tous les types</option>
+                <option value="installation_pac">Installation PAC</option>
+                <option value="plomberie">Plomberie</option>
+                <option value="chauffage">Chauffage</option>
+                <option value="climatisation">Climatisation</option>
+                <option value="renovation_sdb">Rénovation SDB</option>
+                <option value="maintenance">Maintenance</option>
+            </select>
+        </div>
+
+        <div id="chantiersList" class="items-list">
+            <!-- Les chantiers seront chargés ici -->
+        </div>
+
+        <!-- Modal Ajout/Édition Chantier -->
+        <div id="chantierModal" class="modal hidden">
+            <div class="modal-content large-modal">
+                <div class="modal-header">
+                    <h3 id="chantierModalTitle">🏗️ Nouveau Chantier</h3>
+                    <button onclick="hideChantierModal()" class="close-button">×</button>
+                </div>
+                <form id="chantierForm">
+                    <!-- Informations générales -->
+                    <h4>📋 Informations générales</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nom du chantier *</label>
+                            <input type="text" id="chantierNom" required placeholder="Ex: Installation PAC Villa Dupont">
+                        </div>
+                        <div class="form-group">
+                            <label>Type de travaux *</label>
+                            <select id="chantierTypeTravaux" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="installation_pac">Installation PAC</option>
+                                <option value="plomberie">Plomberie</option>
+                                <option value="chauffage">Chauffage</option>
+                                <option value="climatisation">Climatisation</option>
+                                <option value="renovation_sdb">Rénovation SDB</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="depannage">Dépannage</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Client -->
+                    <h4>👤 Client</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nom du client *</label>
+                            <input type="text" id="chantierClientNom" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Téléphone client</label>
+                            <input type="tel" id="chantierClientTelephone">
+                        </div>
+                    </div>
+
+                    <!-- Adresse chantier -->
+                    <h4>📍 Localisation</h4>
+                    <div class="form-group">
+                        <label>Adresse du chantier *</label>
+                        <input type="text" id="chantierAdresse" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ville *</label>
+                            <input type="text" id="chantierVille" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Code postal</label>
+                            <input type="text" id="chantierCodePostal">
+                        </div>
+                    </div>
+
+                    <!-- Planning -->
+                    <h4>📅 Planning</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date de début</label>
+                            <input type="date" id="chantierDateDebut">
+                        </div>
+                        <div class="form-group">
+                            <label>Date de fin prévue</label>
+                            <input type="date" id="chantierDateFinPrevue">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Statut *</label>
+                            <select id="chantierStatut" required>
+                                <option value="en_attente">En attente</option>
+                                <option value="en_cours">En cours</option>
+                                <option value="termine">Terminé</option>
+                                <option value="annule">Annulé</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date de fin réelle</label>
+                            <input type="date" id="chantierDateFinReelle">
+                        </div>
+                    </div>
+
+                    <!-- Budget -->
+                    <h4>💰 Budget</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Budget estimé (€)</label>
+                            <input type="number" id="chantierBudgetEstime" step="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Budget final (€)</label>
+                            <input type="number" id="chantierBudgetFinal" step="100">
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label>Description des travaux</label>
+                        <textarea id="chantierDescription" rows="3" placeholder="Détails des travaux à effectuer..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="chantierNotes" rows="2" placeholder="Notes techniques, contraintes..."></textarea>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" onclick="hideChantierModal()">Annuler</button>
+                        <button type="submit">Enregistrer le chantier</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- MODULE CLIENTS -->
     <div id="clientsScreen" class="module-screen hidden">
         <div class="module-header">
