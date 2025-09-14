@@ -4136,15 +4136,17 @@
             drawGrid();
             
             // Redraw all paths
-            ctx.strokeStyle = '#007AFF';
-            ctx.lineWidth = 2;
-            
             allPaths.forEach(path => {
-                if (path.length > 1) {
+                const isSelected = selectedElement && selectedElement.type === 'path' && selectedElement.element === path;
+                
+                ctx.strokeStyle = isSelected ? '#FF9500' : '#007AFF';
+                ctx.lineWidth = isSelected ? 4 : 3;
+                
+                if (path.points && path.points.length > 1) {
                     ctx.beginPath();
-                    ctx.moveTo(path[0].x, path[0].y);
-                    for (let i = 1; i < path.length; i++) {
-                        ctx.lineTo(path[i].x, path[i].y);
+                    ctx.moveTo(path.points[0].x, path.points[0].y);
+                    for (let i = 1; i < path.points.length; i++) {
+                        ctx.lineTo(path.points[i].x, path.points[i].y);
                     }
                     ctx.stroke();
                 }
@@ -4152,12 +4154,46 @@
             
             // Draw rooms
             rooms.forEach(room => {
-                ctx.fillStyle = 'rgba(0, 122, 255, 0.1)';
-                ctx.fillRect(room.x - 30, room.y - 10, 60, 20);
-                ctx.fillStyle = '#007AFF';
-                ctx.font = '12px Arial';
+                const isSelected = selectedElement && selectedElement.type === 'room' && selectedElement.element === room;
+                
+                ctx.fillStyle = isSelected ? 'rgba(255, 149, 0, 0.2)' : 'rgba(0, 122, 255, 0.1)';
+                ctx.fillRect(room.x - 40, room.y - 15, 80, 30);
+                
+                ctx.strokeStyle = isSelected ? '#FF9500' : '#007AFF';
+                ctx.lineWidth = isSelected ? 3 : 1;
+                ctx.strokeRect(room.x - 40, room.y - 15, 80, 30);
+                
+                ctx.fillStyle = isSelected ? '#FF9500' : '#007AFF';
+                ctx.font = 'bold 14px Arial';
                 ctx.textAlign = 'center';
                 ctx.fillText(room.name, room.x, room.y + 3);
+            });
+            
+            // Draw measurements
+            measurements.forEach(measure => {
+                ctx.strokeStyle = '#E74C3C';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                
+                ctx.beginPath();
+                ctx.moveTo(measure.start.x, measure.start.y);
+                ctx.lineTo(measure.end.x, measure.end.y);
+                ctx.stroke();
+                
+                ctx.setLineDash([]);
+                
+                // Draw measurement text
+                const midX = (measure.start.x + measure.end.x) / 2;
+                const midY = (measure.start.y + measure.end.y) / 2;
+                const distance = Math.sqrt(
+                    Math.pow(measure.end.x - measure.start.x, 2) + 
+                    Math.pow(measure.end.y - measure.start.y, 2)
+                );
+                
+                ctx.fillStyle = '#E74C3C';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(Math.round(distance / 10) + 'cm', midX, midY - 5);
             });
         }
         
