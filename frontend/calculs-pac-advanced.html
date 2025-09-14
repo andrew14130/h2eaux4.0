@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H2EAUX GESTION - Calculs PAC Avancés</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .tab-btn.active {
+            background: white;
+            border-bottom: 3px solid #007AFF;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 2rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 1rem;
+            color: #007AFF;
+            border-bottom: 2px solid #007AFF;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007AFF;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .pieces-container {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .piece-item {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .piece-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .piece-title {
+            font-weight: 600;
+            color: #007AFF;
+        }
+
+        .btn-remove-piece {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .auto-calc {
+            background: #e7f3ff;
+            border: 1px solid #007AFF;
+            border-radius: 4px;
+            padding: 0.5rem;
+            font-weight: 600;
+            color: #007AFF;
+        }
+
+        .btn-primary {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0.5rem;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0.5rem;
+        }
+
+        .results-section {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+
+        .message-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌡️ Calculs PAC Professionnels</h1>
+            <p>Dimensionnement précis Air/Eau et Air/Air avec calculs pièce par pièce</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('general')">Informations Générales</button>
+            <button class="tab-btn" onclick="switchTab('pieces')">Pièces & Calculs</button>
+            <button class="tab-btn" onclick="switchTab('resultats')">Résultats</button>
+        </div>
+
+        <!-- ONGLET GÉNÉRAL -->
+        <div class="tab-content active" id="general">
+            <div class="form-section">
+                <h3>📋 Informations Projet</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nom du projet</label>
+                        <input type="text" id="nom" placeholder="Ex: PAC Maison Dupont">
+                    </div>
+                    <div class="form-group">
+                        <label>Client</label>
+                        <input type="text" id="client_nom" placeholder="Nom du client">
+                    </div>
+                    <div class="form-group">
+                        <label>Adresse</label>
+                        <input type="text" id="adresse" placeholder="Adresse complète">
+                    </div>
+                    <div class="form-group">
+                        <label>Bâtiment</label>
+                        <input type="text" id="batiment" placeholder="Type de bâtiment">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>🏠 Caractéristiques Bâtiment</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Surface totale (m²)</label>
+                        <input type="number" id="surface_totale" placeholder="150">
+                    </div>
+                    <div class="form-group">
+                        <label>Altitude (m)</label>
+                        <input type="number" id="altitude" placeholder="200">
+                    </div>
+                    <div class="form-group">
+                        <label>Zone climatique</label>
+                        <select id="zone_climatique">
+                            <option value="H1">H1 - Nord, Est</option>
+                            <option value="H2" selected>H2 - Centre</option>
+                            <option value="H3">H3 - Sud, Littoral</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Isolation</label>
+                        <select id="isolation">
+                            <option value="faible">Faible (avant 1975)</option>
+                            <option value="ancienne">Ancienne (1975-1988)</option>
+                            <option value="moyenne" selected>Moyenne (1989-2000)</option>
+                            <option value="bonne">Bonne (2001-2012)</option>
+                            <option value="rt2012">RT2012+ (après 2012)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Année construction</label>
+                        <input type="number" id="annee_construction" placeholder="2000" min="1900" max="2025">
+                    </div>
+                    <div class="form-group">
+                        <label>DPE</label>
+                        <select id="dpe">
+                            <option value="A">A - Très performant</option>
+                            <option value="B">B - Performant</option>
+                            <option value="C">C - Assez performant</option>
+                            <option value="D" selected>D - Peu performant</option>
+                            <option value="E">E - Passoire énergétique</option>
+                            <option value="F">F - Très passoire</option>
+                            <option value="G">G - Extrêmement passoire</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>🌡️ Type de PAC</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Type de PAC</label>
+                        <select id="type_pac" onchange="updatePACSpecific()">
+                            <option value="air_eau">PAC Air/Eau (Chauffage + ECS)</option>
+                            <option value="air_air">PAC Air/Air (Climatisation réversible)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Spécifique Air/Eau -->
+                <div id="airEauSpecific" class="form-grid">
+                    <div class="form-group">
+                        <label>Émetteurs</label>
+                        <select id="type_emetteur">
+                            <option value="plancher_chauffant">Plancher chauffant</option>
+                            <option value="radiateurs_bt">Radiateurs Basse Température</option>
+                            <option value="radiateurs_ht">Radiateurs Haute Température</option>
+                            <option value="ventilo_convecteurs">Ventilo-convecteurs</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Production ECS</label>
+                        <select id="production_ecs" onchange="toggleECS()">
+                            <option value="false">Non</option>
+                            <option value="true">Oui</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="volumeECSGroup" style="display: none;">
+                        <label>Volume ballon ECS (L)</label>
+                        <input type="number" id="volume_ballon_ecs" placeholder="200">
+                    </div>
+                </div>
+
+                <!-- Spécifique Air/Air -->
+                <div id="airAirSpecific" class="form-grid" style="display: none;">
+                    <div class="form-group">
+                        <label>Type installation</label>
+                        <select id="type_installation">
+                            <option value="mono_split">Mono-split</option>
+                            <option value="multi_split">Multi-split</option>
+                            <option value="gainable">Gainable</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>SCOP (Chauffage)</label>
+                        <input type="number" id="scop_estime" placeholder="4.0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>SEER (Climatisation)</label>
+                        <input type="number" id="seer_estime" placeholder="6.0" step="0.1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>🌡️ Températures de Base</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Température extérieure base (°C)</label>
+                        <input type="number" id="temperature_exterieure_base" placeholder="-7" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Température intérieure souhaitée (°C)</label>
+                        <input type="number" id="temperature_interieure_souhaitee" placeholder="20" step="0.1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ONGLET PIÈCES -->
+        <div class="tab-content" id="pieces">
+            <div class="form-section">
+                <h3>🏠 Gestion Pièce par Pièce</h3>
+                <button class="btn-primary" onclick="ajouterPiece()">+ Ajouter une pièce</button>
+                
+                <div class="pieces-container" id="piecesContainer">
+                    <!-- Les pièces seront ajoutées ici dynamiquement -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ONGLET RÉSULTATS -->
+        <div class="tab-content" id="resultats">
+            <div class="form-section">
+                <h3>📊 Résultats des Calculs</h3>
+                <button class="btn-success" onclick="calculerTout()">🧮 Calculer Tout</button>
+                <button class="btn-primary" onclick="sauvegarder()">💾 Sauvegarder</button>
+                <button class="btn-secondary" onclick="exporterPDF()">📄 Export PDF</button>
+            </div>
+            
+            <div class="results-section" id="resultatsSection" style="display: none;">
+                <h3>🎯 Puissances Calculées</h3>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-value" id="puissanceTotale">0 kW</div>
+                        <div class="result-label">Puissance Chauffage</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="puissanceECS">0 kW</div>
+                        <div class="result-label">Puissance ECS</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="puissanceFinale">0 kW</div>
+                        <div class="result-label">Puissance Finale</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="copEstime">0</div>
+                        <div class="result-label">COP Estimé</div>
+                    </div>
+                </div>
+                
+                <div id="detailsPieces"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="messages"></div>
+
+    <script>
+        // ===== VARIABLES GLOBALES =====
+        let pieces = [];
+        let currentCalcul = null;
+        const API_URL = 'https://h2eaux-dashboard.preview.emergentagent.com/api';
+        
+        // ===== COEFFICIENTS DE CALCUL =====
+        const coefficientsG = {
+            'rt2012': { 'H1': 0.7, 'H2': 0.6, 'H3': 0.5 },
+            'bonne': { 'H1': 0.9, 'H2': 0.8, 'H3': 0.7 },
+            'moyenne': { 'H1': 1.1, 'H2': 1.0, 'H3': 0.9 },
+            'ancienne': { 'H1': 1.4, 'H2': 1.3, 'H3': 1.2 },
+            'faible': { 'H1': 1.8, 'H2': 1.7, 'H3': 1.6 }
+        };
+
+        const ratiosNorme = {
+            'plancher_chauffant': 1.0,
+            'radiateurs_bt': 1.1,
+            'radiateurs_ht': 1.2,
+            'ventilo_convecteurs': 1.05
+        };
+
+        // ===== GESTION DES ONGLETS =====
+        function switchTab(tabName) {
+            // Masquer tous les contenus
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Masquer tous les boutons actifs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Afficher le contenu sélectionné
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ===== GESTION DES TYPES PAC =====
+        function updatePACSpecific() {
+            const typePAC = document.getElementById('type_pac').value;
+            const airEauDiv = document.getElementById('airEauSpecific');
+            const airAirDiv = document.getElementById('airAirSpecific');
+            
+            if (typePAC === 'air_eau') {
+                airEauDiv.style.display = 'grid';
+                airAirDiv.style.display = 'none';
+            } else {
+                airEauDiv.style.display = 'none';
+                airAirDiv.style.display = 'grid';
+            }
+        }
+
+        function toggleECS() {
+            const productionECS = document.getElementById('production_ecs').value === 'true';
+            const volumeGroup = document.getElementById('volumeECSGroup');
+            volumeGroup.style.display = productionECS ? 'block' : 'none';
+        }
+
+        // ===== GESTION DES PIÈCES =====
+        function ajouterPiece() {
+            const pieceId = Date.now().toString();
+            const piece = {
+                id: pieceId,
+                nom: `Pièce ${pieces.length + 1}`,
+                longueur: '',
+                largeur: '',
+                hauteur: '2.5',
+                surface: '',
+                volume: '',
+                temperature_souhaitee: '20',
+                temperature_exterieure: '-7',
+                delta_t: '',
+                coefficient_g: '1.0',
+                ratio_norme_energetique: '1.0',
+                puissance_calculee: '',
+                type_unite_interieure: 'murale',
+                commentaires: ''
+            };
+            
+            pieces.push(piece);
+            renderPieces();
+        }
+
+        function supprimerPiece(pieceId) {
+            pieces = pieces.filter(p => p.id !== pieceId);
+            renderPieces();
+        }
+
+        function renderPieces() {
+            const container = document.getElementById('piecesContainer');
+            
+            if (pieces.length === 0) {
+                container.innerHTML = '<p>Aucune pièce ajoutée. Cliquez sur "Ajouter une pièce" pour commencer.</p>';
+                return;
+            }
+            
+            container.innerHTML = pieces.map(piece => createPieceHTML(piece)).join('');
+        }
+
+        function createPieceHTML(piece) {
+            const typePAC = document.getElementById('type_pac').value;
+            
+            return `
+                <div class="piece-item">
+                    <button class="btn-remove-piece" onclick="supprimerPiece('${piece.id}')">✕</button>
+                    
+                    <div class="piece-header">
+                        <input type="text" class="piece-title" value="${piece.nom}" 
+                               onchange="updatePieceField('${piece.id}', 'nom', this.value)" 
+                               placeholder="Nom de la pièce">
+                    </div>
+                    
+                    <div class="form-grid">
+                        <!-- Dimensions -->
+                        <div class="form-group">
+                            <label>Longueur (m)</label>
+                            <input type="number" step="0.1" value="${piece.longueur}" 
+                                   onchange="updatePieceField('${piece.id}', 'longueur', this.value); calculerPiece('${piece.id}')" 
+                                   placeholder="5.0">
+                        </div>
+                        <div class="form-group">
+                            <label>Largeur (m)</label>
+                            <input type="number" step="0.1" value="${piece.largeur}" 
+                                   onchange="updatePieceField('${piece.id}', 'largeur', this.value); calculerPiece('${piece.id}')" 
+                                   placeholder="4.0">
+                        </div>
+                        <div class="form-group">
+                            <label>Hauteur (m)</label>
+                            <input type="number" step="0.1" value="${piece.hauteur}" 
+                                   onchange="updatePieceField('${piece.id}', 'hauteur', this.value); calculerPiece('${piece.id}')" 
+                                   placeholder="2.5">
+                        </div>
+                        
+                        <!-- Calculs automatiques -->
+                        <div class="form-group">
+                            <label>Surface (m²)</label>
+                            <input type="text" class="auto-calc" value="${piece.surface}" readonly placeholder="Auto-calculée">
+                        </div>
+                        <div class="form-group">
+                            <label>Volume (m³)</label>
+                            <input type="text" class="auto-calc" value="${piece.volume}" readonly placeholder="Auto-calculé">
+                        </div>
+                        <div class="form-group">
+                            <label>Delta T (°C)</label>
+                            <input type="text" class="auto-calc" value="${piece.delta_t}" readonly placeholder="Auto-calculé">
+                        </div>
+                        
+                        <!-- Températures -->
+                        <div class="form-group">
+                            <label>Température souhaitée (°C)</label>
+                            <input type="number" step="0.1" value="${piece.temperature_souhaitee}" 
+                                   onchange="updatePieceField('${piece.id}', 'temperature_souhaitee', this.value); calculerPiece('${piece.id}')" 
+                                   placeholder="20">
+                        </div>
+                        
+                        <!-- Unité intérieure (Air/Air) -->
+                        ${typePAC === 'air_air' ? `
+                        <div class="form-group">
+                            <label>Unité intérieure</label>
+                            <select onchange="updatePieceField('${piece.id}', 'type_unite_interieure', this.value)">
+                                <option value="murale" ${piece.type_unite_interieure === 'murale' ? 'selected' : ''}>Murale</option>
+                                <option value="cassette" ${piece.type_unite_interieure === 'cassette' ? 'selected' : ''}>Cassette</option>
+                                <option value="gainable" ${piece.type_unite_interieure === 'gainable' ? 'selected' : ''}>Gainable</option>
+                                <option value="console" ${piece.type_unite_interieure === 'console' ? 'selected' : ''}>Console</option>
+                            </select>
+                        </div>
+                        ` : ''}
+                        
+                        <!-- Puissance calculée -->
+                        <div class="form-group">
+                            <label>Puissance calculée (kW)</label>
+                            <input type="text" class="auto-calc" value="${piece.puissance_calculee}" readonly placeholder="Auto-calculée">
+                        </div>
+                        
+                        <!-- Commentaires -->
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Commentaires</label>
+                            <textarea rows="2" value="${piece.commentaires}" 
+                                     onchange="updatePieceField('${piece.id}', 'commentaires', this.value)" 
+                                     placeholder="Commentaires spécifiques à cette pièce"></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updatePieceField(pieceId, field, value) {
+            const piece = pieces.find(p => p.id === pieceId);
+            if (piece) {
+                piece[field] = value;
+            }
+        }
+
+        // ===== CALCULS AUTOMATIQUES =====
+        function calculerPiece(pieceId) {
+            const piece = pieces.find(p => p.id === pieceId);
+            if (!piece) return;
+            
+            const longueur = parseFloat(piece.longueur) || 0;
+            const largeur = parseFloat(piece.largeur) || 0;
+            const hauteur = parseFloat(piece.hauteur) || 2.5;
+            
+            // Calculs automatiques
+            piece.surface = (longueur * largeur).toFixed(2);
+            piece.volume = (longueur * largeur * hauteur).toFixed(2);
+            
+            // Delta T
+            const tempInt = parseFloat(piece.temperature_souhaitee) || 20;
+            const tempExt = parseFloat(document.getElementById('temperature_exterieure_base').value) || -7;
+            piece.delta_t = (tempInt - tempExt).toFixed(1);
+            
+            // Coefficient G selon isolation et zone
+            const isolation = document.getElementById('isolation').value;
+            const zone = document.getElementById('zone_climatique').value;
+            piece.coefficient_g = coefficientsG[isolation]?.[zone] || 1.0;
+            
+            // Ratio selon émetteur (Air/Eau) ou base (Air/Air)
+            const typePAC = document.getElementById('type_pac').value;
+            if (typePAC === 'air_eau') {
+                const emetteur = document.getElementById('type_emetteur').value;
+                piece.ratio_norme_energetique = ratiosNorme[emetteur] || 1.0;
+            } else {
+                piece.ratio_norme_energetique = 1.0; // Base pour Air/Air
+            }
+            
+            // Calcul puissance : Surface × Coeff G × ΔT × Ratio / 1000
+            const surface = parseFloat(piece.surface) || 0;
+            const deltaT = parseFloat(piece.delta_t) || 0;
+            const coeffG = parseFloat(piece.coefficient_g) || 1.0;
+            const ratio = parseFloat(piece.ratio_norme_energetique) || 1.0;
+            
+            piece.puissance_calculee = ((surface * coeffG * deltaT * ratio) / 1000).toFixed(2);
+            
+            // Re-render pour afficher les nouvelles valeurs
+            renderPieces();
+        }
+
+        function calculerTout() {
+            // Calculer toutes les pièces
+            pieces.forEach(piece => calculerPiece(piece.id));
+            
+            // Calculer les totaux
+            const puissanceTotale = pieces.reduce((total, piece) => {
+                return total + (parseFloat(piece.puissance_calculee) || 0);
+            }, 0);
+            
+            // Calcul ECS si applicable
+            let puissanceECS = 0;
+            const productionECS = document.getElementById('production_ecs').value === 'true';
+            if (productionECS) {
+                const volumeBallon = parseFloat(document.getElementById('volume_ballon_ecs').value) || 200;
+                puissanceECS = volumeBallon * 0.01; // Formule simplifiée
+            }
+            
+            const puissanceFinale = puissanceTotale + puissanceECS;
+            
+            // COP estimé selon type
+            const typePAC = document.getElementById('type_pac').value;
+            let copEstime = 0;
+            if (typePAC === 'air_eau') {
+                copEstime = 3.5; // COP moyen Air/Eau
+            } else {
+                copEstime = parseFloat(document.getElementById('scop_estime').value) || 4.0;
+            }
+            
+            // Afficher les résultats
+            document.getElementById('puissanceTotale').textContent = puissanceTotale.toFixed(2) + ' kW';
+            document.getElementById('puissanceECS').textContent = puissanceECS.toFixed(2) + ' kW';
+            document.getElementById('puissanceFinale').textContent = puissanceFinale.toFixed(2) + ' kW';
+            document.getElementById('copEstime').textContent = copEstime.toFixed(1);
+            
+            document.getElementById('resultatsSection').style.display = 'block';
+            
+            // Détail par pièce
+            const detailsPieces = document.getElementById('detailsPieces');
+            detailsPieces.innerHTML = `
+                <h4>📋 Détail par pièce</h4>
+                <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    ${pieces.map(piece => `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>${piece.nom} (${piece.surface}m²)</span>
+                            <span><strong>${piece.puissance_calculee} kW</strong></span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            showMessage('✅ Calculs terminés avec succès !', 'success');
+        }
+
+        // ===== API ET SAUVEGARDE =====
+        async function sauvegarder() {
+            try {
+                const calculData = {
+                    nom: document.getElementById('nom').value,
+                    client_nom: document.getElementById('client_nom').value,
+                    adresse: document.getElementById('adresse').value,
+                    batiment: document.getElementById('batiment').value,
+                    type_pac: document.getElementById('type_pac').value,
+                    surface_totale: document.getElementById('surface_totale').value,
+                    altitude: document.getElementById('altitude').value,
+                    zone_climatique: document.getElementById('zone_climatique').value,
+                    isolation: document.getElementById('isolation').value,
+                    annee_construction: document.getElementById('annee_construction').value,
+                    dpe: document.getElementById('dpe').value,
+                    temperature_exterieure_base: document.getElementById('temperature_exterieure_base').value,
+                    temperature_interieure_souhaitee: document.getElementById('temperature_interieure_souhaitee').value,
+                    type_emetteur: document.getElementById('type_emetteur').value,
+                    production_ecs: document.getElementById('production_ecs').value === 'true',
+                    volume_ballon_ecs: document.getElementById('volume_ballon_ecs').value,
+                    type_installation: document.getElementById('type_installation').value,
+                    scop_estime: document.getElementById('scop_estime').value,
+                    seer_estime: document.getElementById('seer_estime').value,
+                    pieces: pieces,
+                    puissance_calculee: document.getElementById('puissanceTotale').textContent,
+                    puissance_totale_calculee: document.getElementById('puissanceFinale').textContent,
+                    cop_estime: document.getElementById('copEstime').textContent
+                };
+
+                const token = localStorage.getItem('h2eaux_token');
+                const response = await fetch(`${API_URL}/calculs-pac`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(calculData)
+                });
+
+                if (response.ok) {
+                    showMessage('✅ Calcul sauvegardé avec succès !', 'success');
+                } else {
+                    throw new Error('Erreur lors de la sauvegarde');
+                }
+                
+            } catch (error) {
+                console.error('Error saving:', error);
+                showMessage('❌ Erreur lors de la sauvegarde: ' + error.message, 'error');
+            }
+        }
+
+        function exporterPDF() {
+            showMessage('📄 Export PDF en cours de développement...', 'info');
+        }
+
+        // ===== UTILITAIRES =====
+        function showMessage(message, type) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${type}`;
+            messageDiv.textContent = message;
+            
+            messagesDiv.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // ===== INITIALISATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Valeurs par défaut
+            document.getElementById('temperature_exterieure_base').value = '-7';
+            document.getElementById('temperature_interieure_souhaitee').value = '20';
+            document.getElementById('surface_totale').value = '150';
+            document.getElementById('volume_ballon_ecs').value = '200';
+            document.getElementById('scop_estime').value = '4.0';
+            document.getElementById('seer_estime').value = '6.0';
+            
+            // Ajouter une pièce par défaut
+            ajouterPiece();
+            
+            console.log('🌡️ Module Calculs PAC Avancés initialisé');
+        });
+    </script>
+</body>
+</html>
