@@ -2763,6 +2763,143 @@
         </div>
     </div>
 
+    <!-- MODULE PARAMÈTRES (ADMIN ONLY) -->
+    <div id="parametresScreen" class="module-screen hidden">
+        <div class="module-header">
+            <button onclick="showDashboard()" class="back-button">← Retour Dashboard</button>
+            <h2>⚙️ Paramètres & Administration</h2>
+        </div>
+
+        <div class="admin-sections">
+            <!-- Section Gestion Utilisateurs -->
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3>👥 Gestion des Utilisateurs</h3>
+                    <button onclick="showAddUser()" class="add-button">+ Nouvel Utilisateur</button>
+                </div>
+                
+                <div class="search-bar">
+                    <input type="text" id="searchUsers" placeholder="Rechercher un utilisateur..." onkeyup="filterUsers()">
+                </div>
+
+                <div id="usersList" class="items-list">
+                    <!-- Les utilisateurs seront chargés ici -->
+                </div>
+            </div>
+
+            <!-- Section Permissions par Module -->
+            <div class="admin-section">
+                <h3>🔒 Configuration des Permissions</h3>
+                <div class="permissions-info">
+                    <div class="permission-module">
+                        <h4>👥 Clients</h4>
+                        <p>Accès à la gestion des clients MEG</p>
+                    </div>
+                    <div class="permission-module">
+                        <h4>🏗️ Chantiers</h4>
+                        <p>Gestion des chantiers et projets</p>
+                    </div>
+                    <div class="permission-module">
+                        <h4>📄 Documents</h4>
+                        <p>Accès aux documents PDF hors-ligne</p>
+                    </div>
+                    <div class="permission-module">
+                        <h4>📋 Fiches Chantier</h4>
+                        <p>Relevés et plans 2D</p>
+                    </div>
+                    <div class="permission-module">
+                        <h4>🌡️ Calculs PAC</h4>
+                        <p>Calculs PAC Air/Eau & Air/Air</p>
+                    </div>
+                    <div class="permission-module">
+                        <h4>🔄 MEG Integration</h4>
+                        <p>Synchronisation comptabilité</p>
+                    </div>
+                    <div class="permission-module">
+                        <h4>📅 Calendrier</h4>
+                        <p>Planning des chantiers</p>
+                    </div>
+                    <div class="permission-module">
+                        <h4>💬 Chat Équipe</h4>
+                        <p>Communication interne</p>
+                    </div>
+                    <div class="permission-module">
+                        <h4>⚙️ Paramètres</h4>
+                        <p>Administration complète (ADMIN SEULEMENT)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Ajout/Édition Utilisateur -->
+        <div id="userModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="userModalTitle">👤 Nouvel Utilisateur</h3>
+                    <button onclick="hideUserModal()" class="close-button">×</button>
+                </div>
+                <form id="userForm">
+                    <div class="form-group">
+                        <label>Nom d'utilisateur *</label>
+                        <input type="text" id="userName" required>
+                    </div>
+                    
+                    <div class="form-group" id="passwordGroup">
+                        <label>Mot de passe *</label>
+                        <input type="password" id="userPassword" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rôle *</label>
+                        <select id="userRole" onchange="updatePermissionsDisplay()">
+                            <option value="employee">Employé</option>
+                            <option value="admin">Administrateur</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Permissions d'accès</label>
+                        <div class="permissions-grid">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm_clients" checked>
+                                <label for="perm_clients">👥 Clients</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm_chantiers" checked>
+                                <label for="perm_chantiers">🏗️ Chantiers</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm_documents" checked>
+                                <label for="perm_documents">📄 Documents</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm_calculs_pac" checked>
+                                <label for="perm_calculs_pac">🌡️ Calculs PAC</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm_catalogues" checked>
+                                <label for="perm_catalogues">📦 Catalogues</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm_chat" checked>
+                                <label for="perm_chat">💬 Chat</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm_parametres">
+                                <label for="perm_parametres">⚙️ Paramètres (Admin seulement)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" onclick="hideUserModal()">Annuler</button>
+                        <button type="submit">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         const BACKEND_URL = 'https://h2eaux-dashboard.preview.emergentagent.com';
         
