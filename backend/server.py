@@ -1015,44 +1015,7 @@ async def delete_calcul_pac(calcul_id: str, current_user: User = Depends(get_cur
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Calcul PAC not found")
     return {"message": "Calcul PAC deleted successfully"}
 
-# Fiche Chantier routes - Version complète
-@api_router.get("/fiches-chantier", response_model=List[FicheChantier])
-async def get_fiches_chantier(current_user: User = Depends(get_current_user)):
-    fiches = await db.fiches_chantier.find().sort("created_at", -1).to_list(1000)
-    return [FicheChantier(**fiche) for fiche in fiches]
-
-@api_router.post("/fiches-chantier", response_model=FicheChantier)
-async def create_fiche_chantier(fiche_data: FicheChantierCreate, current_user: User = Depends(get_current_user)):
-    new_fiche = FicheChantier(**fiche_data.dict())
-    await db.fiches_chantier.insert_one(new_fiche.dict())
-    return new_fiche
-
-@api_router.get("/fiches-chantier/{fiche_id}", response_model=FicheChantier)
-async def get_fiche_chantier(fiche_id: str, current_user: User = Depends(get_current_user)):
-    fiche = await db.fiches_chantier.find_one({"id": fiche_id})
-    if not fiche:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fiche chantier not found")
-    return FicheChantier(**fiche)
-
-@api_router.put("/fiches-chantier/{fiche_id}", response_model=FicheChantier)
-async def update_fiche_chantier(fiche_id: str, fiche_data: FicheChantierUpdate, current_user: User = Depends(get_current_user)):
-    fiche = await db.fiches_chantier.find_one({"id": fiche_id})
-    if not fiche:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fiche chantier not found")
-    
-    update_data = {k: v for k, v in fiche_data.dict().items() if v is not None}
-    update_data["updated_at"] = datetime.utcnow()
-    
-    await db.fiches_chantier.update_one({"id": fiche_id}, {"$set": update_data})
-    updated_fiche = await db.fiches_chantier.find_one({"id": fiche_id})
-    return FicheChantier(**updated_fiche)
-
-@api_router.delete("/fiches-chantier/{fiche_id}")
-async def delete_fiche_chantier(fiche_id: str, current_user: User = Depends(get_current_user)):
-    result = await db.fiches_chantier.delete_one({"id": fiche_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fiche chantier not found")
-    return {"message": "Fiche chantier deleted successfully"}
+# Endpoints removed - using unified /fiches-sdb endpoints
 
 # Health check
 @api_router.get("/health")
