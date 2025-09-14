@@ -1792,6 +1792,423 @@
             }
         }
 
+        // PAC Calculations Functions
+        async function loadCalculsPac() {
+            try {
+                calculsPac = await apiCall('/calculs-pac') || [];
+                displayCalculsPac();
+            } catch (error) {
+                console.error('Error loading calculs PAC:', error);
+                showMessage('Erreur lors du chargement des calculs PAC: ' + error.message, 'error');
+                calculsPac = [];
+                displayCalculsPac();
+            }
+        }
+
+        function displayCalculsPac() {
+            const calculsList = document.getElementById('calculsList');
+            
+            if (calculsPac.length === 0) {
+                calculsList.innerHTML = `
+                    <div class="text-center" style="padding: 3rem; color: var(--text-secondary);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🌡️</div>
+                        <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">Aucun calcul PAC trouvé</div>
+                        <div>Cliquez sur un type de PAC ci-dessus pour commencer</div>
+                    </div>
+                `;
+                return;
+            }
+
+            calculsList.innerHTML = calculsPac.map(calcul => `
+                <div class="calcul-card">
+                    <div class="calcul-header">
+                        <div class="calcul-title">${calcul.nom}</div>
+                        <div class="calcul-type">${calcul.type_pac === 'air-eau' ? 'Air/Eau' : 'Air/Air'}</div>
+                    </div>
+                    <div class="calcul-info">
+                        ${calcul.client_nom ? `<div class="calcul-detail">👤 ${calcul.client_nom}</div>` : ''}
+                        ${calcul.zone_climatique ? `<div class="calcul-detail">🌍 Zone ${calcul.zone_climatique}</div>` : ''}
+                        ${calcul.puissance_calculee ? `<div class="calcul-detail">⚡ ${calcul.puissance_calculee} kW</div>` : ''}
+                        ${calcul.surface_totale ? `<div class="calcul-detail">📐 ${calcul.surface_totale} m²</div>` : ''}
+                    </div>
+                    <div class="client-actions">
+                        <button class="btn btn-small btn-edit" onclick="editCalculPac('${calcul.id}')">Modifier</button>
+                        <button class="btn btn-small btn-primary" onclick="exportCalculPdf('${calcul.id}')">Export PDF</button>
+                        <button class="btn btn-small btn-delete" onclick="deleteCalculPac('${calcul.id}', '${calcul.nom}')">Supprimer</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showPacType(type) {
+            const typeText = type === 'air-eau' ? 'Air/Eau' : 'Air/Air';
+            document.getElementById('calculPacModalTitle').textContent = `Nouveau Calcul PAC ${typeText}`;
+            document.getElementById('calculType').value = type;
+            updateCalculFields();
+            loadClientsForSelect('calculClient');
+            currentEditingCalcul = null;
+            document.getElementById('calculPacForm').reset();
+            document.getElementById('calculType').value = type;
+            document.getElementById('calculPacModal').classList.add('active');
+        }
+
+        function updateCalculFields() {
+            const type = document.getElementById('calculType').value;
+            const fieldsContainer = document.getElementById('calculFields');
+            
+            if (type === 'air-eau') {
+                fieldsContainer.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Surface totale (m²) *</label>
+                            <input type="number" id="calculSurface" class="form-input" required min="1" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Hauteur sous plafond (m)</label>
+                            <input type="number" id="calculHauteur" class="form-input" value="2.5" min="2" max="4" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Isolation</label>
+                            <select id="calculIsolation" class="form-input">
+                                <option value="rt2012">RT2012 (Neuf)</option>
+                                <option value="bonne">Bonne isolation</option>
+                                <option value="moyenne">Isolation moyenne</option>
+                                <option value="ancienne">Ancienne (avant 1980)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Delta T (°C)</label>
+                            <input type="number" id="calculDeltaT" class="form-input" value="20" min="15" max="30">
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'air-air') {
+                fieldsContainer.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label">Nombre de pièces *</label>
+                        <input type="number" id="calculNbPieces" class="form-input" required min="1" max="20" onchange="generatePiecesFields()">
+                    </div>
+                    <div id="piecesFields"></div>
+                `;
+            }
+        }
+
+        function generatePiecesFields() {
+            const nbPieces = parseInt(document.getElementById('calculNbPieces').value);
+            const container = document.getElementById('piecesFields');
+            
+            if (nbPieces > 0) {
+                let fieldsHtml = '<div class="pieces-title" style="margin: 1rem 0; font-weight: 600; color: var(--text);">Détail par pièce :</div>';
+                
+                for (let i = 1; i <= nbPieces; i++) {
+                    fieldsHtml += `
+                        <div class="piece-group" style="background: var(--background); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <h4 style="color: var(--primary); margin-bottom: 1rem;">Pièce ${i}</h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Nom de la pièce</label>
+                                    <input type="text" id="piece${i}Nom" class="form-input" placeholder="Ex: Salon, Chambre...">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Surface (m²) *</label>
+                                    <input type="number" id="piece${i}Surface" class="form-input" required min="1" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = fieldsHtml;
+            }
+        }
+
+        function hideCalculPacModal() {
+            document.getElementById('calculPacModal').classList.remove('active');
+            currentEditingCalcul = null;
+        }
+
+        async function handleCalculPacForm(event) {
+            event.preventDefault();
+            
+            const type = document.getElementById('calculType').value;
+            const formData = {
+                nom: document.getElementById('calculNom').value.trim(),
+                type_pac: type,
+                client_id: document.getElementById('calculClient').value || null,
+                zone_climatique: document.getElementById('calculZone').value
+            };
+
+            if (!formData.nom) {
+                showMessage('Le nom du calcul est obligatoire.', 'error');
+                return;
+            }
+
+            if (type === 'air-eau') {
+                const surface = parseFloat(document.getElementById('calculSurface').value);
+                const hauteur = parseFloat(document.getElementById('calculHauteur').value) || 2.5;
+                const isolation = document.getElementById('calculIsolation').value;
+                const deltaT = parseInt(document.getElementById('calculDeltaT').value) || 20;
+
+                // Calcul automatique de puissance
+                let coeffG = 1.2; // Coefficient par défaut
+                switch (isolation) {
+                    case 'rt2012': coeffG = 0.6; break;
+                    case 'bonne': coeffG = 0.8; break;
+                    case 'moyenne': coeffG = 1.2; break;
+                    case 'ancienne': coeffG = 1.8; break;
+                }
+
+                const puissance = Math.round((surface * hauteur * coeffG * deltaT / 1000) * 10) / 10;
+
+                Object.assign(formData, {
+                    surface_totale: surface,
+                    hauteur_plafond: hauteur,
+                    isolation: isolation,
+                    delta_t: deltaT,
+                    puissance_calculee: puissance
+                });
+            } else if (type === 'air-air') {
+                const nbPieces = parseInt(document.getElementById('calculNbPieces').value);
+                const pieces = [];
+                let surfaceTotal = 0;
+
+                for (let i = 1; i <= nbPieces; i++) {
+                    const nom = document.getElementById(`piece${i}Nom`).value.trim() || `Pièce ${i}`;
+                    const surface = parseFloat(document.getElementById(`piece${i}Surface`).value);
+                    
+                    if (surface > 0) {
+                        pieces.push({ nom, surface });
+                        surfaceTotal += surface;
+                    }
+                }
+
+                Object.assign(formData, {
+                    pieces: pieces,
+                    surface_totale: surfaceTotal,
+                    puissance_calculee: Math.round(surfaceTotal * 100) // 100W/m² approximation
+                });
+            }
+
+            try {
+                if (currentEditingCalcul) {
+                    await apiCall(`/calculs-pac/${currentEditingCalcul.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('Calcul PAC modifié avec succès !', 'success');
+                } else {
+                    await apiCall('/calculs-pac', {
+                        method: 'POST',
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('Calcul PAC créé avec succès !', 'success');
+                }
+
+                hideCalculPacModal();
+                loadCalculsPac();
+            } catch (error) {
+                console.error('Error saving calcul PAC:', error);
+                showMessage('Erreur lors de la sauvegarde: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteCalculPac(calculId, calculNom) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer le calcul "${calculNom}" ?\n\nCette action est irréversible.`)) {
+                return;
+            }
+
+            try {
+                await apiCall(`/calculs-pac/${calculId}`, {
+                    method: 'DELETE'
+                });
+                showMessage('Calcul PAC supprimé avec succès !', 'success');
+                loadCalculsPac();
+            } catch (error) {
+                console.error('Error deleting calcul PAC:', error);
+                showMessage('Erreur lors de la suppression: ' + error.message, 'error');
+            }
+        }
+
+        // Chantiers Functions
+        async function loadChantiers() {
+            try {
+                chantiers = await apiCall('/chantiers') || [];
+                displayChantiers();
+                updateChantiersStats();
+            } catch (error) {
+                console.error('Error loading chantiers:', error);
+                showMessage('Erreur lors du chargement des chantiers: ' + error.message, 'error');
+                chantiers = [];
+                displayChantiers();
+                updateChantiersStats();
+            }
+        }
+
+        function displayChantiers() {
+            const chantiersList = document.getElementById('chantiersList');
+            
+            if (chantiers.length === 0) {
+                chantiersList.innerHTML = `
+                    <div class="text-center" style="padding: 3rem; color: var(--text-secondary);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🏗️</div>
+                        <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">Aucun chantier trouvé</div>
+                        <div>Cliquez sur "Nouveau Chantier" pour commencer</div>
+                    </div>
+                `;
+                return;
+            }
+
+            chantiers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            chantiersList.innerHTML = chantiers.map(chantier => `
+                <div class="chantier-card">
+                    <div class="chantier-header">
+                        <div class="chantier-title">${chantier.nom}</div>
+                        <div class="chantier-status status-${chantier.statut}">
+                            ${getStatusLabel(chantier.statut)}
+                        </div>
+                    </div>
+                    <div class="chantier-info">
+                        ${chantier.client_nom ? `<div class="chantier-detail">👤 ${chantier.client_nom}</div>` : ''}
+                        ${chantier.adresse ? `<div class="chantier-detail">📍 ${chantier.adresse}</div>` : ''}
+                        ${chantier.date_debut ? `<div class="chantier-detail">📅 Début: ${formatDate(chantier.date_debut)}</div>` : ''}
+                        ${chantier.date_fin_prevue ? `<div class="chantier-detail">🏁 Fin: ${formatDate(chantier.date_fin_prevue)}</div>` : ''}
+                        ${chantier.budget_estime ? `<div class="chantier-budget">💰 ${formatCurrency(chantier.budget_estime)}</div>` : ''}
+                    </div>
+                    ${chantier.description ? `<div class="chantier-detail" style="margin-top: 0.5rem; font-style: italic;">${chantier.description}</div>` : ''}
+                    <div class="client-actions" style="margin-top: 1rem;">
+                        <button class="btn btn-small btn-edit" onclick="editChantier('${chantier.id}')">Modifier</button>
+                        <button class="btn btn-small btn-primary" onclick="viewChantierDetails('${chantier.id}')">Détails</button>
+                        <button class="btn btn-small btn-delete" onclick="deleteChantier('${chantier.id}', '${chantier.nom}')">Supprimer</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'en_attente': 'En attente',
+                'en_cours': 'En cours',
+                'termine': 'Terminé',
+                'facture': 'Facturé'
+            };
+            return labels[status] || status;
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'EUR'
+            }).format(amount);
+        }
+
+        function updateChantiersStats() {
+            const stats = {
+                enCours: chantiers.filter(c => c.statut === 'en_cours').length,
+                enAttente: chantiers.filter(c => c.statut === 'en_attente').length,
+                termines: chantiers.filter(c => c.statut === 'termine').length,
+                budgetTotal: chantiers.reduce((sum, c) => sum + (parseFloat(c.budget_estime) || 0), 0)
+            };
+
+            document.getElementById('chantiersEnCours').textContent = stats.enCours;
+            document.getElementById('chantiersEnAttente').textContent = stats.enAttente;
+            document.getElementById('chantiersTermines').textContent = stats.termines;
+            document.getElementById('chantiersBudgetTotal').textContent = formatCurrency(stats.budgetTotal);
+        }
+
+        function showAddChantierModal() {
+            currentEditingChantier = null;
+            document.getElementById('chantierModalTitle').textContent = 'Nouveau Chantier';
+            document.getElementById('chantierForm').reset();
+            loadClientsForSelect('chantierClient');
+            document.getElementById('chantierModal').classList.add('active');
+        }
+
+        function hideChantierModal() {
+            document.getElementById('chantierModal').classList.remove('active');
+            currentEditingChantier = null;
+        }
+
+        async function handleChantierForm(event) {
+            event.preventDefault();
+            
+            const formData = {
+                nom: document.getElementById('chantierNom').value.trim(),
+                client_id: document.getElementById('chantierClient').value || null,
+                description: document.getElementById('chantierDescription').value.trim(),
+                date_debut: document.getElementById('chantierDateDebut').value || null,
+                date_fin_prevue: document.getElementById('chantierDateFin').value || null,
+                budget_estime: parseFloat(document.getElementById('chantierBudget').value) || null,
+                statut: document.getElementById('chantierStatut').value,
+                adresse: document.getElementById('chantierAdresse').value.trim()
+            };
+
+            if (!formData.nom) {
+                showMessage('Le nom du chantier est obligatoire.', 'error');
+                return;
+            }
+
+            try {
+                if (currentEditingChantier) {
+                    await apiCall(`/chantiers/${currentEditingChantier.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('Chantier modifié avec succès !', 'success');
+                } else {
+                    await apiCall('/chantiers', {
+                        method: 'POST',
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('Chantier créé avec succès !', 'success');
+                }
+
+                hideChantierModal();
+                loadChantiers();
+            } catch (error) {
+                console.error('Error saving chantier:', error);
+                showMessage('Erreur lors de la sauvegarde: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteChantier(chantierId, chantierNom) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer le chantier "${chantierNom}" ?\n\nCette action is irréversible.`)) {
+                return;
+            }
+
+            try {
+                await apiCall(`/chantiers/${chantierId}`, {
+                    method: 'DELETE'
+                });
+                showMessage('Chantier supprimé avec succès !', 'success');
+                loadChantiers();
+            } catch (error) {
+                console.error('Error deleting chantier:', error);
+                showMessage('Erreur lors de la suppression: ' + error.message, 'error');
+            }
+        }
+
+        // Utility Functions
+        async function loadClientsForSelect(selectId) {
+            try {
+                if (clients.length === 0) {
+                    await loadClients();
+                }
+                
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Sélectionner un client</option>';
+                
+                clients.forEach(client => {
+                    const option = document.createElement('option');
+                    option.value = client.id;
+                    option.textContent = `${client.nom} ${client.prenom || ''}`.trim();
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading clients for select:', error);
+            }
+
         // Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Hide loading screen after delay
