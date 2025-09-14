@@ -129,6 +129,8 @@ export default function LoginScreen() {
               disabled={loading}
               testID="login-button"
               activeOpacity={0.8}
+              accessible={true}
+              accessibilityRole="button"
             >
               {loading ? (
                 <ActivityIndicator color="#fff" />
