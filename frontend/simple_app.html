@@ -546,6 +546,363 @@
             background-color: #FF9500 !important;
         }
 
+        /* CALENDRIER STYLES */
+        .calendar-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .calendar-nav {
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .view-controls {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .view-btn {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .view-btn.active {
+            background-color: #007AFF;
+        }
+
+        .calendar-grid {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background-color: #1a1a1a;
+        }
+
+        .day-header {
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            color: #007AFF;
+            border-right: 1px solid #444;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .calendar-day {
+            min-height: 100px;
+            border-right: 1px solid #444;
+            border-bottom: 1px solid #444;
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .calendar-day:hover {
+            background-color: #333;
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+
+        .calendar-day.today {
+            background-color: rgba(0, 122, 255, 0.1);
+            border: 2px solid #007AFF;
+        }
+
+        .calendar-day.has-events {
+            background-color: rgba(0, 212, 170, 0.1);
+        }
+
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .day-events {
+            font-size: 11px;
+        }
+
+        .day-event {
+            background-color: #007AFF;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+            margin-bottom: 2px;
+            font-size: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* DOCUMENTS AVANCÉS STYLES */
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .storage-info {
+            margin: 20px 0;
+        }
+
+        .storage-card {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .storage-bar {
+            background-color: #1a1a1a;
+            border-radius: 10px;
+            height: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .storage-used {
+            background-color: #00D4AA;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .search-and-filters {
+            display: flex;
+            gap: 16px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .document-card {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #444;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .document-card:hover {
+            transform: translateY(-2px);
+            border-color: #007AFF;
+        }
+
+        .document-icon {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .document-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #007AFF;
+        }
+
+        .document-size {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .document-status {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        .status-en-ligne { background-color: #00D4AA; color: white; }
+        .status-hors-ligne { background-color: #007AFF; color: white; }
+        .status-synchronisation { background-color: #FF9500; color: white; }
+
+        /* UPLOAD ZONE */
+        .upload-zone {
+            border: 2px dashed #007AFF;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .upload-zone:hover {
+            background-color: rgba(0, 122, 255, 0.05);
+        }
+
+        .upload-zone.dragover {
+            background-color: rgba(0, 122, 255, 0.1);
+            border-color: #00D4AA;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .upload-progress {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            background-color: #1a1a1a;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: #00D4AA;
+            height: 100%;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* MEG INTEGRATION STYLES */
+        .meg-status {
+            margin: 20px 0;
+        }
+
+        .status-card {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-icon {
+            font-size: 32px;
+        }
+
+        .meg-sections {
+            display: grid;
+            gap: 20px;
+        }
+
+        .meg-section {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .meg-section h3 {
+            margin: 0 0 16px 0;
+            color: #007AFF;
+        }
+
+        .meg-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .sync-btn {
+            background-color: #00D4AA;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .browse-btn {
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .sync-status {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .sync-status p {
+            margin: 4px 0;
+            font-size: 14px;
+        }
+
+        .meg-config .form-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .meg-config input {
+            flex: 1;
+        }
+
+        .meg-log {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .log-content {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin: 4px 0;
+            color: #ccc;
+        }
+
+        .log-entry.success {
+            color: #00D4AA;
+        }
+
+        .log-entry.error {
+            color: #E74C3C;
+        }
+
+        .log-entry.warning {
+            color: #FF9500;
+        }
+
         .calcul-summary {
             background-color: #1a1a1a;
             border-radius: 8px;
