@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 
 # Configuration
-BASE_URL = "http://localhost:8001/api"
+BASE_URL = "https://h2eaux-dashboard.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 # Test data
