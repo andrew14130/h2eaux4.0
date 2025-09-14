@@ -1698,8 +1698,8 @@
                     loadDocuments();
                     break;
                 case 'fiches-sdb':
-                    showMessage('Module Fiches SDB en développement', 'success');
-                    showDashboard();
+                    document.getElementById('fichesSdbScreen').classList.remove('hidden');
+                    loadFichesSdb();
                     break;
                 default:
                     showMessage('Module en développement', 'success');
