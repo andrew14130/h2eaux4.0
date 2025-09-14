@@ -1382,12 +1382,21 @@
         let clients = [];
         let chantiers = [];
         let calculsPac = [];
+        // Modules Configuration
+        const modules = [
             {
                 id: 'clients',
                 title: 'Clients',
                 icon: '👥',
                 description: 'Gestion complète des clients MEG avec synchronisation',
                 permission: 'clients'
+            },
+            {
+                id: 'calculs-pac',
+                title: 'Calculs PAC',
+                icon: '🌡️',
+                description: 'Calculs automatiques PAC Air/Eau & Air/Air',
+                permission: 'calculs_pac'
             },
             {
                 id: 'chantiers',
@@ -1409,13 +1418,6 @@
                 icon: '📋',
                 description: 'Relevés détaillés avec plans 2D éditables',
                 permission: 'catalogues'
-            },
-            {
-                id: 'calculs',
-                title: 'Calculs PAC',
-                icon: '🌡️',
-                description: 'Calculs automatiques PAC Air/Eau & Air/Air',
-                permission: 'calculs_pac'
             },
             {
                 id: 'meg',
