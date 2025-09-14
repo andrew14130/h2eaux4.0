@@ -1786,64 +1786,87 @@
             const pieceHtml = `
                 <div class="piece-card" id="pieceAirEau${piecesAirEauCounter}">
                     <div class="piece-header">
-                        <span class="piece-name">Pièce ${piecesAirEauCounter}</span>
+                        <span class="piece-name">🏠 Pièce ${piecesAirEauCounter}</span>
                         <button type="button" class="btn-delete" onclick="removePieceAirEau(${piecesAirEauCounter})">Supprimer</button>
                     </div>
+                    
+                    <!-- Informations pièce -->
                     <div class="form-row">
                         <div class="form-group">
                             <label>Nom de la pièce</label>
                             <input type="text" id="pieceAirEauNom${piecesAirEauCounter}" value="Pièce ${piecesAirEauCounter}">
                         </div>
                         <div class="form-group">
-                            <label>Type</label>
+                            <label>Type de pièce</label>
                             <select id="pieceAirEauType${piecesAirEauCounter}">
                                 <option value="salon">Salon</option>
                                 <option value="cuisine">Cuisine</option>
                                 <option value="chambre">Chambre</option>
                                 <option value="salle_de_bain">Salle de bain</option>
                                 <option value="bureau">Bureau</option>
+                                <option value="couloir">Couloir</option>
+                                <option value="garage">Garage</option>
                                 <option value="autre">Autre</option>
                             </select>
                         </div>
                     </div>
+                    
+                    <!-- Dimensions avec calculs automatiques -->
+                    <h5>📐 Dimensions (calculs automatiques)</h5>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Longueur (m)</label>
-                            <input type="number" id="pieceAirEauLongueur${piecesAirEauCounter}" step="0.1" onchange="calculateSurfacePieceAirEau(${piecesAirEauCounter})">
+                            <input type="number" id="pieceAirEauLongueur${piecesAirEauCounter}" step="0.1" onchange="calculateFullAirEau(${piecesAirEauCounter})" placeholder="0.0">
                         </div>
                         <div class="form-group">
                             <label>Largeur (m)</label>
-                            <input type="number" id="pieceAirEauLargeur${piecesAirEauCounter}" step="0.1" onchange="calculateSurfacePieceAirEau(${piecesAirEauCounter})">
+                            <input type="number" id="pieceAirEauLargeur${piecesAirEauCounter}" step="0.1" onchange="calculateFullAirEau(${piecesAirEauCounter})" placeholder="0.0">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Surface (m²)</label>
-                            <input type="number" id="pieceAirEauSurface${piecesAirEauCounter}" step="0.1" readonly style="background: #e8f5e8; color: #2d5a2d;">
+                            <label>Surface calculée (m²)</label>
+                            <input type="number" id="pieceAirEauSurface${piecesAirEauCounter}" step="0.1" readonly class="technical-calc">
                         </div>
                         <div class="form-group">
                             <label>Hauteur plafond (m)</label>
-                            <input type="number" id="pieceAirEauHauteur${piecesAirEauCounter}" value="2.5" step="0.1">
+                            <input type="number" id="pieceAirEauHauteur${piecesAirEauCounter}" value="2.5" step="0.1" onchange="calculateFullAirEau(${piecesAirEauCounter})">
+                        </div>
+                    </div>
+                    
+                    <!-- Calculs techniques automatiques -->
+                    <h5>⚙️ Calculs techniques automatiques</h5>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Coefficient G (selon isolation)</label>
+                            <input type="number" id="pieceAirEauCoeffG${piecesAirEauCounter}" step="0.1" readonly class="technical-calc">
+                        </div>
+                        <div class="form-group">
+                            <label>Delta T (°C)</label>
+                            <input type="number" id="pieceAirEauDeltaT${piecesAirEauCounter}" readonly class="technical-calc">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Isolation murs</label>
-                            <select id="pieceAirEauIsolation${piecesAirEauCounter}">
-                                <option value="faible">Faible</option>
-                                <option value="moyenne">Moyenne</option>
-                                <option value="bonne">Bonne</option>
-                                <option value="rt2012">RT 2012+</option>
-                            </select>
+                            <label>Ratio norme énergétique</label>
+                            <input type="number" id="pieceAirEauRatio${piecesAirEauCounter}" step="0.1" readonly class="technical-calc">
                         </div>
                         <div class="form-group">
-                            <label>Puissance nécessaire (W)</label>
-                            <input type="number" id="pieceAirEauPuissance${piecesAirEauCounter}" readonly style="background: #e8f5e8; color: #2d5a2d;">
+                            <label>Puissance calculée (W)</label>
+                            <input type="number" id="pieceAirEauPuissance${piecesAirEauCounter}" readonly class="technical-calc">
                         </div>
                     </div>
+                    
+                    <!-- Radiateurs existants -->
+                    <h5>🔥 Radiateurs existants</h5>
+                    <div id="radiateursAirEau${piecesAirEauCounter}Container">
+                        <button type="button" class="btn-add-piece" onclick="addRadiateurAirEau(${piecesAirEauCounter})">+ Ajouter radiateur</button>
+                    </div>
+                    
+                    <!-- Commentaires -->
                     <div class="form-group">
-                        <label>Commentaires</label>
-                        <textarea id="pieceAirEauCommentaires${piecesAirEauCounter}" rows="2"></textarea>
+                        <label>Commentaires techniques</label>
+                        <textarea id="pieceAirEauCommentaires${piecesAirEauCounter}" rows="2" placeholder="Observations, contraintes particulières..."></textarea>
                     </div>
                 </div>
             `;
