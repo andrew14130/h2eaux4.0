@@ -971,7 +971,7 @@ window.fiches = {
     async delete(id, nom) {
         if (confirm(`Supprimer la fiche "${nom}" ?\nCette action est irréversible.`)) {
             try {
-                await app.apiCall(`/fiches-sdb/${id}`, { method: 'DELETE' });
+                await app.apiCall(`/fiches-chantier/${id}`, { method: 'DELETE' });
                 app.showMessage('Fiche supprimée avec succès', 'success');
                 this.load();
             } catch (error) {
