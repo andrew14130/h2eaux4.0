@@ -5208,6 +5208,512 @@ Document généré par H2EAUX GESTION - ${date}
             return content;
         }
 
+        // CALENDRIER FUNCTIONS
+        let currentDate = new Date();
+        let currentView = 'month';
+        let rendezVous = [];
+        
+        async function loadCalendrier() {
+            await loadRendezVous();
+            generateCalendar();
+        }
+        
+        async function loadRendezVous() {
+            // Simulation de chargement des RDV depuis l'API
+            try {
+                // const response = await fetch(`${BACKEND_URL}/api/rendez-vous`);
+                // rendezVous = await response.json();
+                
+                // Données de démonstration
+                rendezVous = [
+                    {
+                        id: 1,
+                        titre: 'Visite technique Villa Martin',
+                        date: '2025-01-15',
+                        heureDebut: '09:00',
+                        duree: 120,
+                        type: 'visite_technique',
+                        client: 'M. Martin',
+                        adresse: '123 Rue des Roses',
+                        status: 'confirme'
+                    },
+                    {
+                        id: 2,
+                        titre: 'Installation PAC Dupont',
+                        date: '2025-01-20',
+                        heureDebut: '08:00',
+                        duree: 480,
+                        type: 'installation',
+                        client: 'Famille Dupont',
+                        status: 'planifie'
+                    }
+                ];
+                
+            } catch (error) {
+                console.error('Erreur chargement RDV:', error);
+            }
+        }
+        
+        function generateCalendar() {
+            const container = document.getElementById('calendarDays');
+            const monthYearElement = document.getElementById('currentMonthYear');
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // Mise à jour du titre
+            const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                              'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            monthYearElement.textContent = `${monthNames[month]} ${year}`;
+            
+            // Premier jour du mois et nombre de jours
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay() + 1); // Commencer lundi
+            
+            container.innerHTML = '';
+            
+            // Générer 42 jours (6 semaines)
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                if (date.getMonth() !== month) {
+                    dayElement.className += ' other-month';
+                }
+                
+                if (isToday(date)) {
+                    dayElement.className += ' today';
+                }
+                
+                const dayEvents = getEventsForDate(date);
+                if (dayEvents.length > 0) {
+                    dayElement.className += ' has-events';
+                }
+                
+                dayElement.innerHTML = `
+                    <div class="day-number">${date.getDate()}</div>
+                    <div class="day-events">
+                        ${dayEvents.slice(0, 2).map(event => 
+                            `<div class="day-event" title="${event.titre}">${event.heureDebut} ${event.titre}</div>`
+                        ).join('')}
+                        ${dayEvents.length > 2 ? `<div class="day-event">+${dayEvents.length - 2} autres</div>` : ''}
+                    </div>
+                `;
+                
+                dayElement.onclick = () => selectDate(date);
+                container.appendChild(dayElement);
+            }
+        }
+        
+        function isToday(date) {
+            const today = new Date();
+            return date.toDateString() === today.toDateString();
+        }
+        
+        function getEventsForDate(date) {
+            return rendezVous.filter(rdv => rdv.date === date.toISOString().split('T')[0]);
+        }
+        
+        function selectDate(date) {
+            console.log('Date sélectionnée:', date);
+            // Ouvrir vue jour ou modal selon le contexte
+        }
+        
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            generateCalendar();
+        }
+        
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            generateCalendar();
+        }
+        
+        function setCalendarView(view) {
+            currentView = view;
+            
+            // Mise à jour des boutons
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`view${view.charAt(0).toUpperCase() + view.slice(1)}`).classList.add('active');
+            
+            // Affichage des vues
+            document.getElementById('monthView').classList.toggle('hidden', view !== 'month');
+            document.getElementById('weekView').classList.toggle('hidden', view !== 'week');
+            document.getElementById('dayView').classList.toggle('hidden', view !== 'day');
+            
+            if (view === 'week') generateWeekView();
+            if (view === 'day') generateDayView();
+        }
+        
+        function generateWeekView() {
+            // Implémentation vue semaine
+            showMessage('Vue semaine en cours de développement', 'success');
+        }
+        
+        function generateDayView() {
+            // Implémentation vue jour
+            showMessage('Vue jour en cours de développement', 'success');
+        }
+        
+        function showAddRendezVous() {
+            document.getElementById('rendezVousModalTitle').textContent = '📅 Nouveau Rendez-vous';
+            document.getElementById('rendezVousForm').reset();
+            document.getElementById('rendezVousModal').classList.remove('hidden');
+        }
+        
+        function hideRendezVousModal() {
+            document.getElementById('rendezVousModal').classList.add('hidden');
+        }
+        
+        // DOCUMENTS AVANCÉS FUNCTIONS
+        let documentsAvances = [];
+        let storageUsed = 0;
+        let storageTotal = 1000; // 1GB en MB
+        
+        async function loadDocumentsAvances() {
+            // Simulation données documents avec stockage hors ligne
+            documentsAvances = [
+                {
+                    id: 1,
+                    nom: 'Catalogue_Daikin_2025.pdf',
+                    type: 'catalogue',
+                    taille: 85000, // 85MB
+                    statut: 'hors_ligne',
+                    dateAjout: '2025-01-10',
+                    client: null,
+                    url: '/docs/catalogue_daikin.pdf'
+                },
+                {
+                    id: 2,
+                    nom: 'Devis_Villa_Martin.pdf',
+                    type: 'devis',
+                    taille: 2500, // 2.5MB
+                    statut: 'en_ligne',
+                    dateAjout: '2025-01-12',
+                    client: 'M. Martin'
+                }
+            ];
+            
+            updateStorageInfo();
+            displayDocumentsAvances();
+        }
+        
+        function updateStorageInfo() {
+            storageUsed = documentsAvances
+                .filter(doc => doc.statut === 'hors_ligne')
+                .reduce((total, doc) => total + doc.taille, 0) / 1000; // En MB
+            
+            const percentUsed = (storageUsed / storageTotal) * 100;
+            
+            document.getElementById('storageUsed').style.width = `${percentUsed}%`;
+            document.getElementById('storageUsedText').textContent = `${Math.round(storageUsed)} MB`;
+            document.getElementById('storageTotalText').textContent = `${storageTotal} MB`;
+        }
+        
+        function displayDocumentsAvances() {
+            const container = document.getElementById('documentsAvancesList');
+            
+            container.innerHTML = documentsAvances.map(doc => `
+                <div class="document-card" onclick="openDocument('${doc.id}')">
+                    <div class="document-icon">${getDocumentTypeIcon(doc.type)}</div>
+                    <div class="document-name">${doc.nom}</div>
+                    <div class="document-size">${formatFileSize(doc.taille * 1000)}</div>
+                    <div class="document-status status-${doc.statut.replace('_', '-')}">${getStatutText(doc.statut)}</div>
+                    ${doc.client ? `<div class="document-client">Client: ${doc.client}</div>` : ''}
+                    <div class="document-actions">
+                        <button onclick="event.stopPropagation(); downloadDocument('${doc.id}')" class="btn-download">📥</button>
+                        ${doc.statut === 'en_ligne' ? 
+                            `<button onclick="event.stopPropagation(); makeOffline('${doc.id}')" class="btn-offline">💾</button>` :
+                            `<button onclick="event.stopPropagation(); removeOffline('${doc.id}')" class="btn-online">🌐</button>`
+                        }
+                        <button onclick="event.stopPropagation(); deleteDocument('${doc.id}')" class="btn-delete">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getDocumentTypeIcon(type) {
+            const icons = {
+                'devis': '💰',
+                'facture': '🧾', 
+                'catalogue': '📚',
+                'fiche_technique': '🔧',
+                'plan': '📐',
+                'photo': '📷',
+                'autre': '📄'
+            };
+            return icons[type] || '📄';
+        }
+        
+        function getStatutText(statut) {
+            const statuts = {
+                'en_ligne': 'En ligne',
+                'hors_ligne': 'Hors ligne',
+                'synchronisation': 'Sync...'
+            };
+            return statuts[statut] || statut;
+        }
+        
+        function showUploadDocument() {
+            document.getElementById('uploadModal').classList.remove('hidden');
+            setupFileUpload();
+        }
+        
+        function hideUploadModal() {
+            document.getElementById('uploadModal').classList.add('hidden');
+        }
+        
+        function setupFileUpload() {
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+            
+            uploadZone.onclick = () => fileInput.click();
+            
+            fileInput.onchange = (e) => handleFileUpload(e.target.files);
+            
+            // Drag & drop
+            uploadZone.ondragover = (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            };
+            
+            uploadZone.ondragleave = () => {
+                uploadZone.classList.remove('dragover');
+            };
+            
+            uploadZone.ondrop = (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                handleFileUpload(e.dataTransfer.files);
+            };
+        }
+        
+        function handleFileUpload(files) {
+            for (let file of files) {
+                if (file.size > 100 * 1024 * 1024) { // 100MB
+                    showMessage(`Fichier ${file.name} trop volumineux (max 100MB)`, 'error');
+                    continue;
+                }
+                
+                simulateFileUpload(file);
+            }
+        }
+        
+        function simulateFileUpload(file) {
+            const progressBar = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            progressBar.classList.remove('hidden');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `${Math.round(progress)}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progressBar.classList.add('hidden');
+                        addUploadedFile(file);
+                        hideUploadModal();
+                        showMessage(`Fichier ${file.name} uploadé avec succès`, 'success');
+                    }, 500);
+                }
+            }, 200);
+        }
+        
+        function addUploadedFile(file) {
+            const newDoc = {
+                id: Date.now(),
+                nom: file.name,
+                type: detectFileType(file.name),
+                taille: Math.round(file.size / 1000), // En KB
+                statut: 'hors_ligne',
+                dateAjout: new Date().toISOString().split('T')[0]
+            };
+            
+            documentsAvances.unshift(newDoc);
+            updateStorageInfo();
+            displayDocumentsAvances();
+        }
+        
+        function detectFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (ext === 'pdf' && filename.toLowerCase().includes('devis')) return 'devis';
+            if (ext === 'pdf' && filename.toLowerCase().includes('facture')) return 'facture';
+            if (ext === 'pdf' && filename.toLowerCase().includes('catalogue')) return 'catalogue';
+            if (['jpg', 'jpeg', 'png'].includes(ext)) return 'photo';
+            return 'autre';
+        }
+        
+        // MEG INTEGRATION FUNCTIONS
+        let megStatus = 'disconnected';
+        let clientsMeg = [];
+        
+        async function loadMegIntegration() {
+            document.getElementById('megStatus').textContent = 'Prêt pour import';
+            updateMegCounters();
+        }
+        
+        function updateMegCounters() {
+            document.getElementById('countClientsH2eaux').textContent = clients.length;
+            document.getElementById('countClientsMeg').textContent = clientsMeg.length;
+            document.getElementById('countDevisAttente').textContent = '0';
+            document.getElementById('countFacturesNonSync').textContent = '0';
+        }
+        
+        function showImportMeg() {
+            showMessage('Sélectionnez le fichier d\'export MEG (.csv)', 'success');
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv,.xml,.txt';
+            input.onchange = (e) => handleMegImport(e.target.files[0]);
+            input.click();
+        }
+        
+        function handleMegImport(file) {
+            if (!file) return;
+            
+            addMegLog(`Import fichier MEG: ${file.name}`, 'success');
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const content = e.target.result;
+                    parseMegFile(content);
+                } catch (error) {
+                    addMegLog(`Erreur lecture fichier: ${error.message}`, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function parseMegFile(content) {
+            // Simulation parsing CSV MEG
+            const lines = content.split('\n');
+            addMegLog(`Analyse de ${lines.length} lignes`, 'success');
+            
+            // Simuler extraction clients
+            clientsMeg = [
+                { nom: 'Martin', prenom: 'Jean', telephone: '0123456789', email: 'j.martin@email.com' },
+                { nom: 'Dupont', prenom: 'Marie', telephone: '0987654321', email: 'm.dupont@email.com' }
+            ];
+            
+            addMegLog(`${clientsMeg.length} clients MEG détectés`, 'success');
+            updateMegCounters();
+        }
+        
+        function importClientsMeg() {
+            if (clientsMeg.length === 0) {
+                showMessage('Aucun client MEG à importer', 'error');
+                return;
+            }
+            
+            addMegLog(`Import de ${clientsMeg.length} clients MEG vers H2EAUX`, 'success');
+            
+            // Simuler import
+            clientsMeg.forEach(clientMeg => {
+                const existingClient = clients.find(c => 
+                    c.nom.toLowerCase() === clientMeg.nom.toLowerCase() && 
+                    c.prenom.toLowerCase() === clientMeg.prenom.toLowerCase()
+                );
+                
+                if (!existingClient) {
+                    const newClient = {
+                        id: Date.now() + Math.random(),
+                        nom: clientMeg.nom,
+                        prenom: clientMeg.prenom,
+                        telephone: clientMeg.telephone,
+                        email: clientMeg.email,
+                        source: 'MEG_IMPORT',
+                        created_at: new Date().toISOString()
+                    };
+                    clients.push(newClient);
+                    addMegLog(`Client ajouté: ${newClient.nom} ${newClient.prenom}`, 'success');
+                } else {
+                    addMegLog(`Client existant ignoré: ${clientMeg.nom} ${clientMeg.prenom}`, 'warning');
+                }
+            });
+            
+            updateMegCounters();
+            showMessage(`Import terminé: ${clientsMeg.length} clients traités`, 'success');
+        }
+        
+        function createDevisMeg() {
+            addMegLog('Création devis MEG - Fonctionnalité en développement', 'warning');
+            showMessage('Export devis vers MEG en cours de développement', 'success');
+        }
+        
+        function selectMegFolder() {
+            // Simulation sélection dossier
+            document.getElementById('megDossier').value = 'C:\\MEG\\Dossiers\\H2EAUX_Export';
+            addMegLog('Dossier MEG configuré', 'success');
+        }
+        
+        function addMegLog(message, type = 'info') {
+            const logContent = document.getElementById('megLogContent');
+            const timestamp = new Date().toLocaleTimeString('fr-FR');
+            const logEntry = document.createElement('p');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            
+            logContent.appendChild(logEntry);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+        
+        // Mise à jour de la fonction showModule pour les nouveaux modules
+        function showModule(moduleName) {
+            document.getElementById('dashboardScreen').classList.add('hidden');
+            
+            const screens = ['clientsScreen', 'calculsPacScreen', 'chantiersScreen', 'documentsScreen', 'fichesChantierScreen', 'calendrierScreen', 'documentsAvancesScreen', 'megIntegrationScreen'];
+            screens.forEach(screen => {
+                document.getElementById(screen)?.classList.add('hidden');
+            });
+            
+            switch(moduleName) {
+                case 'clients':
+                    document.getElementById('clientsScreen').classList.remove('hidden');
+                    loadClients();
+                    break;
+                case 'calculs-pac':
+                    document.getElementById('calculsPacScreen').classList.remove('hidden');
+                    loadCalculsPac();
+                    break;
+                case 'chantiers':
+                    document.getElementById('chantiersScreen').classList.remove('hidden');
+                    loadChantiers();
+                    break;
+                case 'documents':
+                    document.getElementById('documentsAvancesScreen').classList.remove('hidden');
+                    loadDocumentsAvances();
+                    break;
+                case 'fiches-chantier':
+                    document.getElementById('fichesChantierScreen').classList.remove('hidden');
+                    loadFichesChantier();
+                    break;
+                case 'calendrier':
+                    document.getElementById('calendrierScreen').classList.remove('hidden');
+                    loadCalendrier();
+                    break;
+                case 'meg-integration':
+                    document.getElementById('megIntegrationScreen').classList.remove('hidden');
+                    loadMegIntegration();
+                    break;
+                default:
+                    showMessage('Module en développement', 'success');
+                    showDashboard();
+            }
+        }
+
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 H2EAUX GESTION initialisée');
