@@ -47,7 +47,7 @@ export default function LoginScreen() {
     
     try {
       console.log('🔄 Tentative de connexion avec:', username);
-      console.log('🌐 Backend URL:', process.env.EXPO_PUBLIC_BACKEND_URL);
+      console.log('🌐 Backend URL:', 'https://h2eaux-gestion-1.preview.emergentagent.com');
       
       await login(username, password);
       
