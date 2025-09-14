@@ -2477,6 +2477,237 @@
             }
         });
 
+        // CHANTIERS FUNCTIONS
+        let chantiers = [];
+        let currentEditingChantier = null;
+        
+        async function loadChantiers() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`${BACKEND_URL}/api/chantiers`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    chantiers = await response.json();
+                    displayChantiers();
+                } else {
+                    showMessage('Erreur lors du chargement des chantiers');
+                }
+            } catch (error) {
+                console.error('Erreur chantiers:', error);
+                showMessage('Erreur de connexion');
+            }
+        }
+        
+        function displayChantiers() {
+            const container = document.getElementById('chantiersList');
+            if (chantiers.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucun chantier trouvé. Créez votre premier chantier!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = chantiers.map(chantier => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <h3 class="item-title">🏗️ ${chantier.nom}</h3>
+                        <div class="item-actions">
+                            <button class="btn-edit" onclick="editChantier('${chantier.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteChantierConfirm('${chantier.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <p><strong>Client:</strong> ${chantier.client_nom} ${chantier.client_telephone ? '(' + chantier.client_telephone + ')' : ''}</p>
+                        <p><strong>Type:</strong> ${chantier.type_travaux ? chantier.type_travaux.replace('_', ' ') : 'Non défini'}</p>
+                        <p><strong>Localisation:</strong> ${chantier.adresse}${chantier.ville ? ', ' + chantier.ville : ''}</p>
+                        ${chantier.date_debut ? `<p><strong>Début:</strong> ${new Date(chantier.date_debut).toLocaleDateString('fr-FR')}</p>` : ''}
+                        ${chantier.date_fin_prevue ? `<p><strong>Fin prévue:</strong> ${new Date(chantier.date_fin_prevue).toLocaleDateString('fr-FR')}</p>` : ''}
+                        ${chantier.budget_estime ? `<p><strong>Budget:</strong> ${chantier.budget_estime} €</p>` : ''}
+                        ${chantier.description ? `<p><strong>Description:</strong> ${chantier.description}</p>` : ''}
+                        <p><strong>Statut:</strong> <span class="status-badge status-${chantier.statut}">${getStatutText(chantier.statut)}</span></p>
+                    </div>
+                    <div class="item-meta">
+                        <span>Créé le ${new Date(chantier.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getStatutText(statut) {
+            const statuts = {
+                'en_attente': 'En attente',
+                'en_cours': 'En cours',
+                'termine': 'Terminé',
+                'annule': 'Annulé'
+            };
+            return statuts[statut] || statut;
+        }
+        
+        function filterChantiers() {
+            const search = document.getElementById('searchChantiers').value.toLowerCase();
+            const statutFilter = document.getElementById('filterStatutChantiers').value;
+            const typeFilter = document.getElementById('filterTypeChantiers').value;
+            
+            const filtered = chantiers.filter(chantier => {
+                const matchSearch = chantier.nom.toLowerCase().includes(search) ||
+                                  chantier.client_nom.toLowerCase().includes(search) ||
+                                  chantier.ville.toLowerCase().includes(search) ||
+                                  chantier.type_travaux.toLowerCase().includes(search);
+                
+                const matchStatut = !statutFilter || chantier.statut === statutFilter;
+                const matchType = !typeFilter || chantier.type_travaux === typeFilter;
+                
+                return matchSearch && matchStatut && matchType;
+            });
+            
+            const container = document.getElementById('chantiersList');
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucun chantier trouvé pour ces critères.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = filtered.map(chantier => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <h3 class="item-title">🏗️ ${chantier.nom}</h3>
+                        <div class="item-actions">
+                            <button class="btn-edit" onclick="editChantier('${chantier.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteChantierConfirm('${chantier.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <p><strong>Client:</strong> ${chantier.client_nom} ${chantier.client_telephone ? '(' + chantier.client_telephone + ')' : ''}</p>
+                        <p><strong>Type:</strong> ${chantier.type_travaux ? chantier.type_travaux.replace('_', ' ') : 'Non défini'}</p>
+                        <p><strong>Localisation:</strong> ${chantier.adresse}${chantier.ville ? ', ' + chantier.ville : ''}</p>
+                        ${chantier.date_debut ? `<p><strong>Début:</strong> ${new Date(chantier.date_debut).toLocaleDateString('fr-FR')}</p>` : ''}
+                        ${chantier.date_fin_prevue ? `<p><strong>Fin prévue:</strong> ${new Date(chantier.date_fin_prevue).toLocaleDateString('fr-FR')}</p>` : ''}
+                        ${chantier.budget_estime ? `<p><strong>Budget:</strong> ${chantier.budget_estime} €</p>` : ''}
+                        <p><strong>Statut:</strong> <span class="status-badge status-${chantier.statut}">${getStatutText(chantier.statut)}</span></p>
+                    </div>
+                    <div class="item-meta">
+                        <span>Créé le ${new Date(chantier.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showAddChantier() {
+            currentEditingChantier = null;
+            document.getElementById('chantierModalTitle').textContent = '🏗️ Nouveau Chantier';
+            document.getElementById('chantierForm').reset();
+            document.getElementById('chantierModal').classList.remove('hidden');
+        }
+        
+        function editChantier(chantierId) {
+            const chantier = chantiers.find(c => c.id === chantierId);
+            if (!chantier) return;
+            
+            currentEditingChantier = chantier;
+            document.getElementById('chantierModalTitle').textContent = '🏗️ Modifier Chantier';
+            
+            document.getElementById('chantierNom').value = chantier.nom;
+            document.getElementById('chantierTypeTravaux').value = chantier.type_travaux;
+            document.getElementById('chantierClientNom').value = chantier.client_nom;
+            document.getElementById('chantierClientTelephone').value = chantier.client_telephone;
+            document.getElementById('chantierAdresse').value = chantier.adresse;
+            document.getElementById('chantierVille').value = chantier.ville;
+            document.getElementById('chantierCodePostal').value = chantier.code_postal;
+            document.getElementById('chantierDateDebut').value = chantier.date_debut;
+            document.getElementById('chantierDateFinPrevue').value = chantier.date_fin_prevue;
+            document.getElementById('chantierStatut').value = chantier.statut;
+            document.getElementById('chantierDateFinReelle').value = chantier.date_fin_reelle;
+            document.getElementById('chantierBudgetEstime').value = chantier.budget_estime;
+            document.getElementById('chantierBudgetFinal').value = chantier.budget_final;
+            document.getElementById('chantierDescription').value = chantier.description;
+            document.getElementById('chantierNotes').value = chantier.notes;
+            
+            document.getElementById('chantierModal').classList.remove('hidden');
+        }
+        
+        function hideChantierModal() {
+            document.getElementById('chantierModal').classList.add('hidden');
+            currentEditingChantier = null;
+        }
+        
+        async function deleteChantierConfirm(chantierId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce chantier ?')) return;
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`${BACKEND_URL}/api/chantiers/${chantierId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showMessage('Chantier supprimé avec succès', 'success');
+                    loadChantiers();
+                } else {
+                    showMessage('Erreur lors de la suppression');
+                }
+            } catch (error) {
+                console.error('Erreur suppression chantier:', error);
+                showMessage('Erreur de connexion');
+            }
+        }
+        
+        // Chantier form submission
+        document.getElementById('chantierForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const chantierData = {
+                nom: document.getElementById('chantierNom').value,
+                type_travaux: document.getElementById('chantierTypeTravaux').value,
+                client_nom: document.getElementById('chantierClientNom').value,
+                client_telephone: document.getElementById('chantierClientTelephone').value,
+                adresse: document.getElementById('chantierAdresse').value,
+                ville: document.getElementById('chantierVille').value,
+                code_postal: document.getElementById('chantierCodePostal').value,
+                date_debut: document.getElementById('chantierDateDebut').value,
+                date_fin_prevue: document.getElementById('chantierDateFinPrevue').value,
+                statut: document.getElementById('chantierStatut').value,
+                date_fin_reelle: document.getElementById('chantierDateFinReelle').value,
+                budget_estime: document.getElementById('chantierBudgetEstime').value,
+                budget_final: document.getElementById('chantierBudgetFinal').value,
+                description: document.getElementById('chantierDescription').value,
+                notes: document.getElementById('chantierNotes').value
+            };
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const url = currentEditingChantier 
+                    ? `${BACKEND_URL}/api/chantiers/${currentEditingChantier.id}`
+                    : `${BACKEND_URL}/api/chantiers`;
+                const method = currentEditingChantier ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(chantierData)
+                });
+                
+                if (response.ok) {
+                    const message = currentEditingChantier ? 'Chantier modifié avec succès' : 'Chantier créé avec succès';
+                    showMessage(message, 'success');
+                    hideChantierModal();
+                    loadChantiers();
+                } else {
+                    showMessage('Erreur lors de l\'enregistrement');
+                }
+            } catch (error) {
+                console.error('Erreur sauvegarde chantier:', error);
+                showMessage('Erreur de connexion');
+            }
+        });
+
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 H2EAUX GESTION initialisée');
