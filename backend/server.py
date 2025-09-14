@@ -922,37 +922,37 @@ class CalculPACUpdate(BaseModel):
     pieces: Optional[List[Piece]] = None
     notes: Optional[str] = None
 
-# Fiche SDB routes - Updated to use FicheChantier model for 8-tab support
-@api_router.get("/fiches-sdb", response_model=List[FicheChantier])
+# Fiche SDB routes - Updated for 8-tab Fiches Chantier support
+@api_router.get("/fiches-sdb", response_model=List[FicheSDB])
 async def get_fiches_sdb(current_user: User = Depends(get_current_user)):
-    fiches = await db.fiches_chantier.find().sort("created_at", -1).to_list(1000)
-    return [FicheChantier(**fiche) for fiche in fiches]
+    fiches = await db.fiches_sdb.find().sort("created_at", -1).to_list(1000)
+    return [FicheSDB(**fiche) for fiche in fiches]
 
-@api_router.post("/fiches-sdb", response_model=FicheChantier)
+@api_router.post("/fiches-sdb", response_model=FicheSDB)
 async def create_fiche_sdb(fiche_data: FicheSDBCreate, current_user: User = Depends(get_current_user)):
-    new_fiche = FicheChantier(**fiche_data.dict())
-    await db.fiches_chantier.insert_one(new_fiche.dict())
+    new_fiche = FicheSDB(**fiche_data.dict())
+    await db.fiches_sdb.insert_one(new_fiche.dict())
     return new_fiche
 
-@api_router.get("/fiches-sdb/{fiche_id}", response_model=FicheChantier)
+@api_router.get("/fiches-sdb/{fiche_id}", response_model=FicheSDB)
 async def get_fiche_sdb(fiche_id: str, current_user: User = Depends(get_current_user)):
-    fiche = await db.fiches_chantier.find_one({"id": fiche_id})
+    fiche = await db.fiches_sdb.find_one({"id": fiche_id})
     if not fiche:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fiche chantier not found")
-    return FicheChantier(**fiche)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fiche not found")
+    return FicheSDB(**fiche)
 
-@api_router.put("/fiches-sdb/{fiche_id}", response_model=FicheChantier)
+@api_router.put("/fiches-sdb/{fiche_id}", response_model=FicheSDB)
 async def update_fiche_sdb(fiche_id: str, fiche_data: FicheSDBUpdate, current_user: User = Depends(get_current_user)):
-    fiche = await db.fiches_chantier.find_one({"id": fiche_id})
+    fiche = await db.fiches_sdb.find_one({"id": fiche_id})
     if not fiche:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fiche chantier not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fiche not found")
     
     update_data = {k: v for k, v in fiche_data.dict().items() if v is not None}
     update_data["updated_at"] = datetime.utcnow()
     
-    await db.fiches_chantier.update_one({"id": fiche_id}, {"$set": update_data})
-    updated_fiche = await db.fiches_chantier.find_one({"id": fiche_id})
-    return FicheChantier(**updated_fiche)
+    await db.fiches_sdb.update_one({"id": fiche_id}, {"$set": update_data})
+    updated_fiche = await db.fiches_sdb.find_one({"id": fiche_id})
+    return FicheSDB(**updated_fiche)
 
 @api_router.delete("/fiches-sdb/{fiche_id}")
 async def delete_fiche_sdb(fiche_id: str, current_user: User = Depends(get_current_user)):
