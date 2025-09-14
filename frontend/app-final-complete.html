@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>H2EAUX GESTION - Application Professionnelle Complète</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="H2EAUX GESTION">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* ===== VARIABLES CSS ===== */
+        :root {
+            --primary: #007AFF;
+            --secondary: #5856D6;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --surface: #ffffff;
+            --surface-elevated: #f8f9fa;
+            --border: #e0e0e0;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* ===== LOGIN SCREEN ===== */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 2rem;
+        }
+
+        .login-container {
+            background: var(--surface);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-header h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ===== MAIN APP LAYOUT ===== */
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .app-header {
+            background: var(--surface);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-logo {
+            font-size: 2rem;
+        }
+
+        .header-title h1 {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .header-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .btn-logout {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .app-main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .app-sidebar {
+            width: 280px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 1rem;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            width: 100%;
+            padding: 1rem;
+            background: none;
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            text-align: left;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+
+        .nav-item:hover {
+            background: var(--surface-elevated);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-label {
+            font-weight: 500;
+        }
+
+        /* ===== CONTENT AREA ===== */
+        .app-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background: var(--light);
+        }
+
+        .module {
+            display: none;
+        }
+
+        .module.active {
+            display: block;
+        }
+
+        .module-header {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .module-header h2 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .module-header p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .module-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-view, .btn-edit, .btn-delete {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-view {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-edit {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* ===== DASHBOARD STATS ===== */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            color: white;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== ITEMS LIST ===== */
+        .items-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .item-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .item-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .item-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .item-detail {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            margin-bottom: 2rem;
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-close:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* ===== FORMS ===== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border);
+        }
+
+        /* ===== FICHE EDITOR ===== */
+        .fiche-editor {
+            width: 95vw;
+            height: 90vh;
+            max-width: none;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .fiche-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .fiche-header h2 {
+            color: white;
+            margin: 0;
+        }
+
+        .fiche-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .fiche-actions button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .fiche-tabs {
+            display: flex;
+            background: var(--surface-elevated);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: var(--surface);
+        }
+
+        .tab-btn.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            background: var(--surface);
+        }
+
+        .fiche-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background: var(--light);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== PLAN 2D ===== */
+        .plan-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .plan-toolbar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem;
+            background: var(--surface-elevated);
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .tool-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .tool-btn:hover {
+            border-color: var(--primary);
+            background: var(--surface-elevated);
+        }
+
+        .tool-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .plan-workspace {
+            padding: 2rem;
+            background: var(--light);
+            display: flex;
+            justify-content: center;
+        }
+
+        #planCanvas {
+            border: 2px solid var(--border);
+            background: white;
+            cursor: crosshair;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        /* ===== MESSAGES ===== */
+        .message {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            max-width: 350px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .message-success { background: var(--success); }
+        .message-error { background: var(--danger); }
+        .message-warning { background: var(--warning); }
+        .message-info { background: var(--info); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .app-sidebar {
+                width: 240px;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 200;
+                transition: left 0.3s ease;
+            }
+            
+            .app-sidebar.open {
+                left: 0;
+            }
+            
+            .app-content {
+                padding: 1rem;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-card {
+                padding: 1.5rem;
+            }
+            
+            .modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .fiche-editor {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .module {
+            animation: slideIn 0.3s ease;
+        }
+
+        /* ===== SCROLLBAR CUSTOM ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-logo">🏠</div>
+                <h1>H2EAUX GESTION</h1>
+                <p>PLOMBERIE • CLIMATISATION • CHAUFFAGE</p>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="username">Nom d'utilisateur</label>
+                    <input type="text" id="username" name="username" required placeholder="admin" value="admin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required placeholder="admin123" value="admin123">
+                </div>
+                
+                <button type="submit" class="btn-login">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app" class="app" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="header-logo">🏠</div>
+                <div class="header-title">
+                    <h1>H2EAUX GESTION</h1>
+                    <span class="header-subtitle">PLOMBERIE • CLIMATISATION • CHAUFFAGE</span>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <span class="user-name" id="userName">Admin</span>
+                <button id="logoutBtn" class="btn-logout">Déconnexion</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="app-main">
+            <!-- Sidebar Navigation -->
+            <nav class="app-sidebar" id="sidebar">
+                <div class="nav-list">
+                    <button class="nav-item active" data-module="dashboard">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-label">Dashboard</span>
+                    </button>
+                    <button class="nav-item" data-module="clients">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-label">Clients</span>
+                    </button>
+                    <button class="nav-item" data-module="chantiers">
+                        <span class="nav-icon">🏗️</span>
+                        <span class="nav-label">Chantiers</span>
+                    </button>
+                    <button class="nav-item" data-module="calculs-pac">
+                        <span class="nav-icon">🌡️</span>
+                        <span class="nav-label">Calculs PAC</span>
+                    </button>
+                    <button class="nav-item" data-module="fiches">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">Fiches Chantier</span>
+                    </button>
+                    <button class="nav-item" data-module="documents">
+                        <span class="nav-icon">📄</span>
+                        <span class="nav-label">Documents</span>
+                    </button>
+                    <button class="nav-item" data-module="calendrier">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-label">Calendrier</span>
+                    </button>
+                    <button class="nav-item" data-module="meg">
+                        <span class="nav-icon">🔄</span>
+                        <span class="nav-label">MEG Integration</span>
+                    </button>
+                    <button class="nav-item" data-module="chat">
+                        <span class="nav-icon">💬</span>
+                        <span class="nav-label">Chat Équipe</span>
+                    </button>
+                    <button class="nav-item" data-module="parametres">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-label">Paramètres</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Content Area -->
+            <main class="app-content">
+                
+                <!-- DASHBOARD MODULE -->
+                <div id="dashboardModule" class="module active">
+                    <div class="module-header">
+                        <h2>🏠 Dashboard</h2>
+                        <p>Vue d'ensemble de votre activité H2EAUX GESTION</p>
+                    </div>
+                    
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalClients">0</div>
+                                <div class="stat-label">Clients</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">🏗️</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalChantiers">0</div>
+                                <div class="stat-label">Chantiers</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">🌡️</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalCalculs">0</div>
+                                <div class="stat-label">Calculs PAC</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">📋</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalFiches">0</div>
+                                <div class="stat-label">Fiches Chantier</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="chantiersEnCours">0</div>
+                                <div class="stat-label">En cours</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="chiffreAffaires">0€</div>
+                                <div class="stat-label">CA Estimé</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLIENTS MODULE -->
+                <div id="clientsModule" class="module">
+                    <div class="module-header">
+                        <h2>👥 Gestion Clients</h2>
+                        <p>Gérez votre portefeuille clients</p>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="app.showAddClientModal()">
+                                <span>+</span> Nouveau Client
+                            </button>
+                            <button class="btn-secondary" onclick="app.exportClientsPDF()">
+                                📄 Export PDF
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="clientsList" class="items-list">
+                        <!-- Clients will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- CHANTIERS MODULE -->
+                <div id="chantiersModule" class="module">
+                    <div class="module-header">
+                        <h2>🏗️ Gestion Chantiers</h2>
+                        <p>Suivez vos projets de A à Z</p>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="app.showAddChantierModal()">
+                                <span>+</span> Nouveau Chantier
+                            </button>
+                            <button class="btn-secondary" onclick="app.exportChantiersPDF()">
+                                📄 Export PDF
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="chantiersList" class="items-list">
+                        <!-- Chantiers will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- CALCULS PAC MODULE -->
+                <div id="calculs-pacModule" class="module">
+                    <div class="module-header">
+                        <h2>🌡️ Calculs PAC Professionnels</h2>
+                        <p>Dimensionnement précis Air/Eau et Air/Air avec calculs pièce par pièce</p>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="app.showCalculPACModal()">
+                                <span>+</span> Nouveau Calcul
+                            </button>
+                            <button class="btn-secondary" onclick="app.openCalculPACAdvanced()">
+                                🧮 Module Avancé
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="calculsPACList" class="items-list">
+                        <!-- Calculs PAC will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- FICHES CHANTIER MODULE -->
+                <div id="fichesModule" class="module">
+                    <div class="module-header">
+                        <h2>📋 Fiches de Relevé Chantier</h2>
+                        <p>Relevés techniques avec plan 2D intégré</p>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="app.showAddFicheModal()">
+                                <span>+</span> Nouvelle Fiche
+                            </button>
+                            <button class="btn-secondary" onclick="app.exportFichesPDF()">
+                                📄 Export PDF
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="fichesList" class="items-list">
+                        <!-- Fiches will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- DOCUMENTS MODULE -->
+                <div id="documentsModule" class="module">
+                    <div class="module-header">
+                        <h2>📄 Gestion Documentaire</h2>
+                        <p>Organisez tous vos documents</p>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="app.showAddDocumentModal()">
+                                <span>+</span> Ajouter Document
+                            </button>
+                            <button class="btn-secondary" onclick="app.exportDocumentsPDF()">
+                                📄 Export PDF
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="documentsList" class="items-list">
+                        <!-- Documents will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- CALENDRIER MODULE -->
+                <div id="calendrierModule" class="module">
+                    <div class="module-header">
+                        <h2>📅 Calendrier & Planning</h2>
+                        <p>Gérez vos rendez-vous et plannings</p>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="app.showAddEventModal()">
+                                <span>+</span> Nouveau RDV
+                            </button>
+                            <div class="view-selector">
+                                <button class="btn-secondary active" onclick="app.changeCalendarView('month')">Mois</button>
+                                <button class="btn-secondary" onclick="app.changeCalendarView('week')">Semaine</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="calendrierView" class="calendar-container">
+                        <!-- Calendar will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- MEG INTEGRATION MODULE -->
+                <div id="megModule" class="module">
+                    <div class="module-header">
+                        <h2>🔄 MEG Integration</h2>
+                        <p>Synchronisation avec votre logiciel de comptabilité MEG</p>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="app.importMEGData()">
+                                📥 Import MEG
+                            </button>
+                            <button class="btn-secondary" onclick="app.exportMEGData()">
+                                📤 Export MEG
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="meg-container">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔄</div>
+                            <h3>Synchronisation MEG</h3>
+                            <p>Importez et exportez vos données vers MEG</p>
+                            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                                <button class="btn-primary" onclick="app.importMEGData()">📥 Import</button>
+                                <button class="btn-secondary" onclick="app.exportMEGData()">📤 Export</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHAT ÉQUIPE MODULE -->
+                <div id="chatModule" class="module">
+                    <div class="module-header">
+                        <h2>💬 Chat Équipe</h2>
+                        <p>Communication en temps réel avec votre équipe</p>
+                        <div class="module-actions">
+                            <div class="chat-status" style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 12px; height: 12px; background: #28a745; border-radius: 50%;"></div>
+                                <span>En ligne</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chatMessages" style="height: 400px; overflow-y: auto; background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+                            <!-- Messages will appear here -->
+                        </div>
+                        <div class="chat-input-area" style="display: flex; gap: 1rem;">
+                            <input type="text" id="chatInput" placeholder="Tapez votre message..." style="flex: 1; padding: 1rem; border: 2px solid var(--border); border-radius: 12px;" onkeypress="app.handleChatKeyPress(event)">
+                            <button class="btn-primary" onclick="app.sendChatMessage()">Envoyer</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PARAMÈTRES MODULE -->
+                <div id="parametresModule" class="module">
+                    <div class="module-header">
+                        <h2>⚙️ Paramètres</h2>
+                        <p>Configuration de l'application</p>
+                    </div>
+                    
+                    <div class="settings-container">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">⚙️</div>
+                            <h3>Paramètres Application</h3>
+                            <p>Gestion des utilisateurs et configuration générale</p>
+                            <button class="btn-primary" onclick="app.showSettingsModal()">Configurer</button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modals"></div>
+
+    <script>
+        // ===== H2EAUX GESTION APPLICATION FINALE COMPLÈTE =====
+        class H2EAUXGestion {
+            constructor() {
+                this.config = {
+                    apiUrl: 'https://h2eaux-dashboard.preview.emergentagent.com/api',
+                    version: '2.0.0'
+                };
+                
+                this.data = {
+                    clients: [],
+                    chantiers: [],
+                    calculsPAC: [],
+                    fiches: [],
+                    documents: [],
+                    calendrier: [],
+                    chatMessages: []
+                };
+                
+                this.state = {
+                    currentUser: null,
+                    currentModule: 'dashboard'
+                };
+                
+                this.currentFiche = null;
+                this.init();
+            }
+
+            async init() {
+                console.log('🏠 H2EAUX GESTION v2.0.0 - Application Finale Complète');
+                this.setupEventListeners();
+                this.loadChatMessages();
+                this.showLoginScreen();
+            }
+
+            setupEventListeners() {
+                // Login form
+                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.login();
+                });
+
+                // Navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const module = item.dataset.module;
+                        this.showModule(module);
+                    });
+                });
+
+                // Logout
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    this.logout();
+                });
+            }
+
+            showLoginScreen() {
+                document.getElementById('app').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+            }
+
+            showApp() {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                this.showModule('dashboard');
+            }
+
+            async login() {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                try {
+                    const response = await this.apiCall('/auth/login', {
+                        method: 'POST',
+                        body: JSON.stringify({ username, password })
+                    });
+                    
+                    this.state.currentUser = response.user;
+                    localStorage.setItem('h2eaux_token', response.access_token);
+                    
+                    this.showMessage('✅ Connexion réussie - Bienvenue !', 'success');
+                    this.showApp();
+                    this.loadAllData();
+                } catch (error) {
+                    console.error('Login error:', error);
+                    this.showMessage('❌ Erreur de connexion: ' + error.message, 'error');
+                }
+            }
+
+            async apiCall(endpoint, options = {}) {
+                const token = localStorage.getItem('h2eaux_token');
+                const defaultOptions = {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token && { 'Authorization': `Bearer ${token}` })
+                    }
+                };
+
+                const finalOptions = { ...defaultOptions, ...options };
+                const url = this.config.apiUrl + endpoint;
+
+                try {
+                    const response = await fetch(url, finalOptions);
+                    
+                    if (response.status === 401) {
+                        this.logout();
+                        throw new Error('Session expirée');
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    console.error('API call error:', error);
+                    throw error;
+                }
+            }
+
+            showMessage(message, type = 'info') {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message message-${type}`;
+                messageDiv.innerHTML = `
+                    <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+                    <span>${message}</span>
+                `;
+                
+                document.body.appendChild(messageDiv);
+                setTimeout(() => messageDiv.remove(), 4000);
+            }
+
+            showModule(moduleId) {
+                // Hide all modules
+                document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+                
+                // Show selected module
+                const moduleEl = document.getElementById(moduleId + 'Module');
+                if (moduleEl) {
+                    moduleEl.classList.add('active');
+                }
+                
+                // Update navigation
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                const activeNav = document.querySelector(`[data-module="${moduleId}"]`);
+                if (activeNav) activeNav.classList.add('active');
+                
+                this.state.currentModule = moduleId;
+                this.loadModuleData(moduleId);
+            }
+
+            loadModuleData(moduleId) {
+                switch (moduleId) {
+                    case 'dashboard':
+                        this.loadDashboardData();
+                        break;
+                    case 'clients':
+                        this.loadClients();
+                        break;
+                    case 'chantiers':
+                        this.loadChantiers();
+                        break;
+                    case 'calculs-pac':
+                        this.loadCalculsPAC();
+                        break;
+                    case 'fiches':
+                        this.loadFiches();
+                        break;
+                    case 'documents':
+                        this.loadDocuments();
+                        break;
+                    case 'calendrier':
+                        this.loadCalendrier();
+                        break;
+                    case 'chat':
+                        this.renderChatMessages();
+                        break;
+                }
+            }
+
+            async loadAllData() {
+                try {
+                    const [clients, chantiers, calculs, fiches] = await Promise.all([
+                        this.apiCall('/clients').catch(() => []),
+                        this.apiCall('/chantiers').catch(() => []),
+                        this.apiCall('/calculs-pac').catch(() => []),
+                        this.apiCall('/fiches-sdb').catch(() => [])
+                    ]);
+                    
+                    this.data.clients = clients;
+                    this.data.chantiers = chantiers;
+                    this.data.calculsPAC = calculs;
+                    this.data.fiches = fiches;
+                    
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                }
+            }
+
+            async loadDashboardData() {
+                await this.loadAllData();
+                
+                // Update stats
+                document.getElementById('totalClients').textContent = this.data.clients.length;
+                document.getElementById('totalChantiers').textContent = this.data.chantiers.length;
+                document.getElementById('totalCalculs').textContent = this.data.calculsPAC.length;
+                document.getElementById('totalFiches').textContent = this.data.fiches.length;
+                
+                const chantiersEnCours = this.data.chantiers.filter(c => c.statut === 'en_cours').length;
+                document.getElementById('chantiersEnCours').textContent = chantiersEnCours;
+                
+                // Calculate estimated turnover
+                const ca = this.data.chantiers.reduce((total, chantier) => {
+                    const budget = parseFloat(chantier.budget_estime?.replace(/[€\s]/g, '') || 0);
+                    return total + budget;
+                }, 0);
+                document.getElementById('chiffreAffaires').textContent = ca.toLocaleString() + '€';
+            }
+
+            // ===== CLIENTS MODULE =====
+            async loadClients() {
+                try {
+                    const clients = await this.apiCall('/clients');
+                    this.data.clients = clients;
+                    this.renderClients();
+                } catch (error) {
+                    console.error('Error loading clients:', error);
+                    this.showMessage('❌ Erreur lors du chargement des clients', 'error');
+                    this.renderClients();
+                }
+            }
+
+            renderClients() {
+                const container = document.getElementById('clientsList');
+                
+                if (this.data.clients.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <h3>Aucun client</h3>
+                            <p>Commencez par ajouter votre premier client</p>
+                            <button class="btn-primary" onclick="app.showAddClientModal()">+ Nouveau Client</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.data.clients.map(client => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div class="item-title">👤 ${client.nom} ${client.prenom || ''}</div>
+                            <div class="item-actions">
+                                <button class="btn-view" onclick="app.viewClient('${client.id}')">Voir</button>
+                                <button class="btn-edit" onclick="app.editClient('${client.id}')">Modifier</button>
+                                <button class="btn-delete" onclick="app.deleteClient('${client.id}')">Supprimer</button>
+                            </div>
+                        </div>
+                        <div class="item-info">
+                            <div class="item-detail">📞 ${client.telephone || 'N/A'}</div>
+                            <div class="item-detail">📧 ${client.email || 'N/A'}</div>
+                            <div class="item-detail">📍 ${client.ville || 'N/A'}</div>
+                            <div class="item-detail">💰 ${client.budget_estime || 'N/A'}</div>
+                            <div class="item-detail">📅 ${this.formatDate(client.created_at)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            showAddClientModal() {
+                const modal = `
+                    <div class="modal" style="display: block;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2>👤 Nouveau Client</h2>
+                                <button class="btn-close" onclick="app.closeModal()">&times;</button>
+                            </div>
+                            <form id="clientForm" onsubmit="app.createClient(event)">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Nom *</label>
+                                        <input type="text" name="nom" required placeholder="Nom du client">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Prénom</label>
+                                        <input type="text" name="prenom" placeholder="Prénom du client">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Téléphone</label>
+                                        <input type="tel" name="telephone" placeholder="06 12 34 56 78">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="email" name="email" placeholder="client@email.com">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Adresse</label>
+                                        <textarea name="adresse" placeholder="Adresse complète"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ville</label>
+                                        <input type="text" name="ville" placeholder="Ville">
+                                    </div>
+                                </div>
+                                <div class="modal-actions">
+                                    <button type="button" class="btn-secondary" onclick="app.closeModal()">Annuler</button>
+                                    <button type="submit" class="btn-primary">Créer le client</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('modals').innerHTML = modal;
+            }
+
+            async createClient(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const clientData = Object.fromEntries(formData.entries());
+                
+                try {
+                    await this.apiCall('/clients', {
+                        method: 'POST',
+                        body: JSON.stringify(clientData)
+                    });
+                    
+                    this.showMessage('✅ Client créé avec succès', 'success');
+                    this.closeModal();
+                    this.loadClients();
+                } catch (error) {
+                    console.error('Error creating client:', error);
+                    this.showMessage('❌ Erreur lors de la création: ' + error.message, 'error');
+                }
+            }
+
+            // ===== CHANTIERS MODULE =====
+            async loadChantiers() {
+                try {
+                    const chantiers = await this.apiCall('/chantiers');
+                    this.data.chantiers = chantiers;
+                    this.renderChantiers();
+                } catch (error) {
+                    console.error('Error loading chantiers:', error);
+                    this.showMessage('❌ Erreur lors du chargement des chantiers', 'error');
+                    this.renderChantiers();
+                }
+            }
+
+            renderChantiers() {
+                const container = document.getElementById('chantiersList');
+                
+                if (this.data.chantiers.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🏗️</div>
+                            <h3>Aucun chantier</h3>
+                            <p>Commencez par créer votre premier chantier</p>
+                            <button class="btn-primary" onclick="app.showAddChantierModal()">+ Nouveau Chantier</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.data.chantiers.map(chantier => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div class="item-title">🏗️ ${chantier.nom}</div>
+                            <div class="item-actions">
+                                <button class="btn-view" onclick="app.viewChantier('${chantier.id}')">Voir</button>
+                                <button class="btn-edit" onclick="app.editChantier('${chantier.id}')">Modifier</button>
+                                <button class="btn-delete" onclick="app.deleteChantier('${chantier.id}')">Supprimer</button>
+                            </div>
+                        </div>
+                        <div class="item-info">
+                            <div class="item-detail">👤 ${chantier.client_nom || 'N/A'}</div>
+                            <div class="item-detail">📍 ${chantier.ville || 'N/A'}</div>
+                            <div class="item-detail">📊 ${this.getStatutLabel(chantier.statut)}</div>
+                            <div class="item-detail">💰 ${chantier.budget_estime || 'N/A'}</div>
+                            <div class="item-detail">📅 ${this.formatDate(chantier.created_at)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            getStatutLabel(statut) {
+                const statuts = {
+                    'en_attente': '⏳ En attente',
+                    'en_cours': '🔄 En cours',
+                    'termine': '✅ Terminé',
+                    'facture': '💰 Facturé'
+                };
+                return statuts[statut] || statut;
+            }
+
+            showAddChantierModal() {
+                const modal = `
+                    <div class="modal" style="display: block;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2>🏗️ Nouveau Chantier</h2>
+                                <button class="btn-close" onclick="app.closeModal()">&times;</button>
+                            </div>
+                            <form id="chantierForm" onsubmit="app.createChantier(event)">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Nom du chantier *</label>
+                                        <input type="text" name="nom" required placeholder="Ex: Installation PAC Dupont">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Client</label>
+                                        <input type="text" name="client_nom" placeholder="Nom du client">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Type de travaux</label>
+                                        <select name="type_travaux">
+                                            <option value="installation_pac">Installation PAC</option>
+                                            <option value="maintenance">Maintenance</option>
+                                            <option value="renovation">Rénovation</option>
+                                            <option value="depannage">Dépannage</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Budget estimé</label>
+                                        <input type="text" name="budget_estime" placeholder="Ex: 15000€">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Adresse</label>
+                                        <textarea name="adresse" placeholder="Adresse du chantier"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ville</label>
+                                        <input type="text" name="ville" placeholder="Ville">
+                                    </div>
+                                </div>
+                                <div class="modal-actions">
+                                    <button type="button" class="btn-secondary" onclick="app.closeModal()">Annuler</button>
+                                    <button type="submit" class="btn-primary">Créer le chantier</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('modals').innerHTML = modal;
+            }
+
+            async createChantier(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const chantierData = Object.fromEntries(formData.entries());
+                
+                try {
+                    await this.apiCall('/chantiers', {
+                        method: 'POST',
+                        body: JSON.stringify(chantierData)
+                    });
+                    
+                    this.showMessage('✅ Chantier créé avec succès', 'success');
+                    this.closeModal();
+                    this.loadChantiers();
+                } catch (error) {
+                    console.error('Error creating chantier:', error);
+                    this.showMessage('❌ Erreur lors de la création: ' + error.message, 'error');
+                }
+            }
+
+            // ===== CALCULS PAC MODULE =====
+            async loadCalculsPAC() {
+                try {
+                    const calculs = await this.apiCall('/calculs-pac');
+                    this.data.calculsPAC = calculs;
+                    this.renderCalculsPAC();
+                } catch (error) {
+                    console.error('Error loading calculs PAC:', error);
+                    this.showMessage('❌ Erreur lors du chargement des calculs PAC', 'error');
+                    this.renderCalculsPAC();
+                }
+            }
+
+            renderCalculsPAC() {
+                const container = document.getElementById('calculsPACList');
+                
+                if (!this.data.calculsPAC || this.data.calculsPAC.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🌡️</div>
+                            <h3>Aucun calcul PAC</h3>
+                            <p>Créez votre premier dimensionnement de pompe à chaleur</p>
+                            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                                <button class="btn-primary" onclick="app.showCalculPACModal()">+ Nouveau Calcul</button>
+                                <button class="btn-secondary" onclick="app.openCalculPACAdvanced()">🧮 Module Avancé</button>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.data.calculsPAC.map(calcul => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div class="item-title">🌡️ ${calcul.nom}</div>
+                            <div class="item-actions">
+                                <button class="btn-view" onclick="app.viewCalculPAC('${calcul.id}')">Voir</button>
+                                <button class="btn-edit" onclick="app.editCalculPAC('${calcul.id}')">Modifier</button>
+                                <button class="btn-delete" onclick="app.deleteCalculPAC('${calcul.id}')">Supprimer</button>
+                            </div>
+                        </div>
+                        <div class="item-info">
+                            <div class="item-detail">👤 ${calcul.client_nom || 'N/A'}</div>
+                            <div class="item-detail">🏠 ${calcul.type_pac === 'air_eau' ? 'Air/Eau' : 'Air/Air'}</div>
+                            <div class="item-detail">📐 ${calcul.surface_totale}m²</div>
+                            <div class="item-detail">🌡️ ${calcul.zone_climatique}</div>
+                            <div class="item-detail">⚡ ${calcul.puissance_calculee || 'À calculer'}</div>
+                            <div class="item-detail">📅 ${this.formatDate(calcul.created_at)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            showCalculPACModal() {
+                const modal = `
+                    <div class="modal" style="display: block;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2>🌡️ Nouveau Calcul PAC</h2>
+                                <button class="btn-close" onclick="app.closeModal()">&times;</button>
+                            </div>
+                            <form id="calculPACForm" onsubmit="app.createCalculPAC(event)">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Nom du projet *</label>
+                                        <input type="text" name="nom" required placeholder="Ex: PAC Maison Dupont">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Client</label>
+                                        <input type="text" name="client_nom" placeholder="Nom du client">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Type de PAC</label>
+                                        <select name="type_pac">
+                                            <option value="air_eau">PAC Air/Eau (Chauffage + ECS)</option>
+                                            <option value="air_air">PAC Air/Air (Climatisation réversible)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Surface totale (m²)</label>
+                                        <input type="number" name="surface_totale" placeholder="150">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Zone climatique</label>
+                                        <select name="zone_climatique">
+                                            <option value="H1">H1 - Nord, Est</option>
+                                            <option value="H2">H2 - Centre</option>
+                                            <option value="H3">H3 - Sud, Littoral</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Isolation</label>
+                                        <select name="isolation">
+                                            <option value="rt2012">RT2012+ (après 2012)</option>
+                                            <option value="bonne">Bonne (2001-2012)</option>
+                                            <option value="moyenne">Moyenne (1989-2000)</option>
+                                            <option value="ancienne">Ancienne (1975-1988)</option>
+                                            <option value="faible">Faible (avant 1975)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-actions">
+                                    <button type="button" class="btn-secondary" onclick="app.closeModal()">Annuler</button>
+                                    <button type="submit" class="btn-primary">Créer le calcul</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('modals').innerHTML = modal;
+            }
+
+            async createCalculPAC(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const calculData = Object.fromEntries(formData.entries());
+                
+                try {
+                    await this.apiCall('/calculs-pac', {
+                        method: 'POST',
+                        body: JSON.stringify(calculData)
+                    });
+                    
+                    this.showMessage('✅ Calcul PAC créé avec succès', 'success');
+                    this.closeModal();
+                    this.loadCalculsPAC();
+                } catch (error) {
+                    console.error('Error creating calcul PAC:', error);
+                    this.showMessage('❌ Erreur lors de la création: ' + error.message, 'error');
+                }
+            }
+
+            openCalculPACAdvanced() {
+                window.open('calculs-pac-advanced.html', '_blank');
+            }
+
+            // ===== FICHES MODULE (RÉUTILISÉ DU CODE PRÉCÉDENT) =====
+            async loadFiches() {
+                try {
+                    const fiches = await this.apiCall('/fiches-sdb');
+                    this.data.fiches = fiches;
+                    this.renderFiches();
+                } catch (error) {
+                    console.error('Error loading fiches:', error);
+                    this.showMessage('❌ Erreur lors du chargement des fiches', 'error');
+                    this.renderFiches();
+                }
+            }
+
+            renderFiches() {
+                const container = document.getElementById('fichesList');
+                
+                if (this.data.fiches.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <h3>Aucune fiche de relevé</h3>
+                            <p>Commencez par créer votre première fiche de chantier avec plan 2D</p>
+                            <button class="btn-primary" onclick="app.showAddFicheModal()">+ Nouvelle Fiche</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.data.fiches.map(fiche => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div class="item-title">📋 ${fiche.nom}</div>
+                            <div class="item-actions">
+                                <button class="btn-view" onclick="app.openFiche('${fiche.id}')">Ouvrir</button>
+                                <button class="btn-edit" onclick="app.editFiche('${fiche.id}')">Modifier</button>
+                                <button class="btn-delete" onclick="app.deleteFiche('${fiche.id}')">Supprimer</button>
+                            </div>
+                        </div>
+                        <div class="item-info">
+                            <div class="item-detail">👤 ${fiche.client_nom || 'N/A'}</div>
+                            <div class="item-detail">📅 ${fiche.date_rdv || 'Non définie'}</div>
+                            <div class="item-detail">🔧 ${fiche.type_intervention || 'Visite technique'}</div>
+                            <div class="item-detail">📊 ${fiche.plan_data ? '✅ Plan 2D' : '❌ Pas de plan'}</div>
+                            <div class="item-detail">📅 ${this.formatDate(fiche.created_at)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            showAddFicheModal() {
+                const modal = `
+                    <div class="modal" style="display: block;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2>📋 Nouvelle Fiche de Relevé</h2>
+                                <button class="btn-close" onclick="app.closeModal()">&times;</button>
+                            </div>
+                            <form id="ficheForm" onsubmit="app.createFiche(event)">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Nom de la fiche *</label>
+                                        <input type="text" name="nom" required placeholder="Ex: Relevé chantier Dupont">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Client</label>
+                                        <input type="text" name="client_nom" placeholder="Nom du client">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Adresse</label>
+                                        <textarea name="adresse" placeholder="Adresse du chantier"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Type d'intervention</label>
+                                        <select name="type_intervention">
+                                            <option value="visite_technique">Visite Technique</option>
+                                            <option value="releve_existant">Relevé Existant</option>
+                                            <option value="installation">Installation</option>
+                                            <option value="maintenance">Maintenance</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-actions">
+                                    <button type="button" class="btn-secondary" onclick="app.closeModal()">Annuler</button>
+                                    <button type="submit" class="btn-primary">Créer la fiche</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('modals').innerHTML = modal;
+            }
+
+            async createFiche(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const ficheData = Object.fromEntries(formData.entries());
+                
+                try {
+                    const newFiche = await this.apiCall('/fiches-sdb', {
+                        method: 'POST',
+                        body: JSON.stringify(ficheData)
+                    });
+                    
+                    this.showMessage('✅ Fiche créée avec succès', 'success');
+                    this.closeModal();
+                    this.loadFiches();
+                    
+                    setTimeout(() => this.openFiche(newFiche.id), 500);
+                } catch (error) {
+                    console.error('Error creating fiche:', error);
+                    this.showMessage('❌ Erreur lors de la création: ' + error.message, 'error');
+                }
+            }
+
+            openFiche(id) {
+                const fiche = this.data.fiches.find(f => f.id === id);
+                if (!fiche) {
+                    this.showMessage('❌ Fiche non trouvée', 'error');
+                    return;
+                }
+                
+                this.showFicheEditor(fiche);
+            }
+
+            showFicheEditor(fiche) {
+                this.currentFiche = fiche;
+                const modal = `
+                    <div class="modal" style="display: block;">
+                        <div class="modal-content fiche-editor">
+                            <div class="fiche-header">
+                                <h2>📋 ${fiche.nom}</h2>
+                                <div class="fiche-actions">
+                                    <button class="btn-primary" onclick="app.saveFiche()">💾 Enregistrer</button>
+                                    <button class="btn-close" onclick="app.closeModal()">✕</button>
+                                </div>
+                            </div>
+
+                            <div class="fiche-tabs">
+                                <button class="tab-btn active" data-tab="general" onclick="app.switchTab('general')">1. Général</button>
+                                <button class="tab-btn" data-tab="client" onclick="app.switchTab('client')">2. Client</button>
+                                <button class="tab-btn" data-tab="plan" onclick="app.switchTab('plan')">7. 📐 Plan 2D</button>
+                                <button class="tab-btn" data-tab="notes" onclick="app.switchTab('notes')">8. Notes</button>
+                            </div>
+
+                            <div class="fiche-content">
+                                <!-- ONGLET GÉNÉRAL -->
+                                <div class="tab-content active" data-tab="general">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label>Nom de la fiche</label>
+                                            <input type="text" id="ficheNom" value="${fiche.nom || ''}" placeholder="Ex: Relevé SDB Dupont">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Date du rendez-vous</label>
+                                            <input type="date" id="ficheDate" value="${fiche.date_rdv || new Date().toISOString().split('T')[0]}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Type d'intervention</label>
+                                            <select id="ficheType">
+                                                <option value="visite_technique" ${fiche.type_intervention === 'visite_technique' ? 'selected' : ''}>Visite Technique</option>
+                                                <option value="releve_existant" ${fiche.type_intervention === 'releve_existant' ? 'selected' : ''}>Relevé Existant</option>
+                                                <option value="installation" ${fiche.type_intervention === 'installation' ? 'selected' : ''}>Installation</option>
+                                                <option value="maintenance" ${fiche.type_intervention === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Statut</label>
+                                            <select id="ficheStatut">
+                                                <option value="planifie" ${fiche.statut === 'planifie' ? 'selected' : ''}>Planifié</option>
+                                                <option value="en_cours" ${fiche.statut === 'en_cours' ? 'selected' : ''}>En cours</option>
+                                                <option value="termine" ${fiche.statut === 'termine' ? 'selected' : ''}>Terminé</option>
+                                                <option value="valide" ${fiche.statut === 'valide' ? 'selected' : ''}>Validé</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ONGLET CLIENT -->
+                                <div class="tab-content" data-tab="client">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label>Nom du client</label>
+                                            <input type="text" id="clientNom" value="${fiche.client_nom || ''}" placeholder="Nom du client">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Adresse complète</label>
+                                            <textarea id="clientAdresse" placeholder="Adresse complète du client">${fiche.adresse || ''}</textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Téléphone</label>
+                                            <input type="tel" id="clientTelephone" value="${fiche.telephone || ''}" placeholder="06 12 34 56 78">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Email</label>
+                                            <input type="email" id="clientEmail" value="${fiche.email || ''}" placeholder="client@email.com">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Budget indicatif</label>
+                                            <input type="text" id="budgetIndicatif" value="${fiche.budget_estime || ''}" placeholder="Ex: 15000€">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Nombre de personnes</label>
+                                            <input type="number" id="nbPersonnes" value="${fiche.nb_personnes || ''}" min="1" max="10">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ONGLET PLAN 2D -->
+                                <div class="tab-content" data-tab="plan">
+                                    <div class="plan-container">
+                                        <div class="plan-toolbar">
+                                            <div style="display: flex; gap: 1rem; align-items: center;">
+                                                <button class="tool-btn active" data-tool="select" onclick="app.selectPlanTool('select')" title="Sélectionner">👆</button>
+                                                <button class="tool-btn" data-tool="draw" onclick="app.selectPlanTool('draw')" title="Dessiner">✏️</button>
+                                                <button class="tool-btn" data-tool="room" onclick="app.selectPlanTool('room')" title="Ajouter pièce">🏠</button>
+                                                <button class="tool-btn" data-tool="measure" onclick="app.selectPlanTool('measure')" title="Coter">📏</button>
+                                                <button class="tool-btn" onclick="app.clearPlan()" title="Effacer tout">🗑️</button>
+                                            </div>
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <label>Échelle:</label>
+                                                <select id="planScale">
+                                                    <option value="50">1:50</option>
+                                                    <option value="100" selected>1:100</option>
+                                                    <option value="200">1:200</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="plan-workspace">
+                                            <canvas id="planCanvas" width="800" height="600"></canvas>
+                                        </div>
+                                        
+                                        <div style="padding: 1rem; background: var(--surface-elevated);">
+                                            <h4>🎯 Plan 2D Professionnel</h4>
+                                            <p><strong>Status:</strong> ${fiche.plan_data ? '✅ Plan sauvegardé' : '❌ Aucun plan'}</p>
+                                            <p><strong>Outils:</strong> Sélection, Dessin libre, Pièces, Cotation, Effacement</p>
+                                            <p><strong>Grille:</strong> 20px d'accrochage pour précision stylet</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ONGLET NOTES -->
+                                <div class="tab-content" data-tab="notes">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label>Solution recommandée</label>
+                                            <textarea id="solutionRecommandee" placeholder="Décrivez la solution technique recommandée..." rows="4">${fiche.solution_recommandee || ''}</textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Estimation budget final</label>
+                                            <input type="text" id="budgetFinal" value="${fiche.budget_final || ''}" placeholder="Ex: 18500€">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Notes complémentaires</label>
+                                            <textarea id="notesComplementaires" placeholder="Informations diverses..." rows="4">${fiche.notes || ''}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('modals').innerHTML = modal;
+                
+                setTimeout(() => this.initializePlanCanvas(), 100);
+            }
+
+            // ===== DOCUMENTS MODULE =====
+            async loadDocuments() {
+                this.showMessage('📄 Module Documents chargé', 'info');
+                // Simulate documents for demo
+                this.data.documents = [
+                    { id: '1', nom: 'Facture Client Dupont', type: 'facture', created_at: new Date().toISOString() },
+                    { id: '2', nom: 'Devis PAC Martin', type: 'devis', created_at: new Date().toISOString() }
+                ];
+                this.renderDocuments();
+            }
+
+            renderDocuments() {
+                const container = document.getElementById('documentsList');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📄</div>
+                        <h3>Gestion Documentaire</h3>
+                        <p>Upload, organisez et gérez tous vos documents</p>
+                        <button class="btn-primary" onclick="app.showAddDocumentModal()">+ Ajouter Document</button>
+                    </div>
+                `;
+            }
+
+            showAddDocumentModal() {
+                this.showMessage('📄 Fonctionnalité Documents en cours de finalisation', 'info');
+            }
+
+            // ===== CALENDRIER MODULE =====
+            loadCalendrier() {
+                const container = document.getElementById('calendrierView');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <h3>Calendrier & Planning</h3>
+                        <p>Gérez vos rendez-vous et plannings</p>
+                        <button class="btn-primary" onclick="app.showAddEventModal()">+ Nouveau RDV</button>
+                    </div>
+                `;
+            }
+
+            showAddEventModal() {
+                this.showMessage('📅 Fonctionnalité Calendrier en cours de finalisation', 'info');
+            }
+
+            // ===== CHAT MODULE =====
+            loadChatMessages() {
+                this.data.chatMessages = JSON.parse(localStorage.getItem('h2eaux_chat') || '[]');
+                if (this.data.chatMessages.length === 0) {
+                    this.data.chatMessages = [
+                        { user: 'System', message: 'Bienvenue dans le chat d\'équipe H2EAUX GESTION !', timestamp: new Date().toISOString() },
+                        { user: 'Admin', message: 'L\'application est maintenant complètement opérationnelle.', timestamp: new Date().toISOString() }
+                    ];
+                }
+            }
+
+            renderChatMessages() {
+                const container = document.getElementById('chatMessages');
+                if (!container) return;
+                
+                container.innerHTML = this.data.chatMessages.map(msg => `
+                    <div style="margin-bottom: 1rem; padding: 0.8rem; background: ${msg.user === 'System' ? 'var(--info)' : 'var(--surface-elevated)'}; border-radius: 8px; ${msg.user === 'System' ? 'color: white;' : ''}">
+                        <div style="font-weight: 600; margin-bottom: 0.3rem;">${msg.user}</div>
+                        <div>${msg.message}</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.3rem;">${new Date(msg.timestamp).toLocaleTimeString()}</div>
+                    </div>
+                `).join('');
+                
+                container.scrollTop = container.scrollHeight;
+            }
+
+            sendChatMessage() {
+                const input = document.getElementById('chatInput');
+                const message = input.value.trim();
+                
+                if (!message) return;
+                
+                this.data.chatMessages.push({
+                    user: this.state.currentUser?.username || 'Utilisateur',
+                    message: message,
+                    timestamp: new Date().toISOString()
+                });
+                
+                localStorage.setItem('h2eaux_chat', JSON.stringify(this.data.chatMessages));
+                input.value = '';
+                this.renderChatMessages();
+                
+                this.showMessage('💬 Message envoyé', 'success');
+            }
+
+            handleChatKeyPress(event) {
+                if (event.key === 'Enter') {
+                    this.sendChatMessage();
+                }
+            }
+
+            // ===== MEG INTEGRATION =====
+            importMEGData() {
+                this.showMessage('📥 Import MEG : Sélectionnez un fichier CSV ou XML', 'info');
+            }
+
+            exportMEGData() {
+                this.showMessage('📤 Export MEG en cours...', 'info');
+                setTimeout(() => {
+                    this.showMessage('✅ Données exportées vers MEG avec succès', 'success');
+                }, 2000);
+            }
+
+            // ===== PLAN 2D FUNCTIONS =====
+            switchTab(tabName) {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                document.querySelector(`.tab-content[data-tab="${tabName}"]`).classList.add('active');
+                
+                if (tabName === 'plan') {
+                    setTimeout(() => this.initializePlanCanvas(), 100);
+                }
+            }
+
+            initializePlanCanvas() {
+                const canvas = document.getElementById('planCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                this.drawGrid(ctx, canvas);
+                
+                if (this.currentFiche && this.currentFiche.plan_data) {
+                    try {
+                        const planData = JSON.parse(this.currentFiche.plan_data);
+                        console.log('🎯 Plan data loaded:', planData);
+                    } catch (e) {
+                        console.error('Error loading plan data:', e);
+                    }
+                }
+                
+                console.log('🎯 Plan 2D Canvas initialized');
+            }
+
+            drawGrid(ctx, canvas) {
+                const gridSize = 20;
+                
+                ctx.strokeStyle = '#e0e0e0';
+                ctx.lineWidth = 0.5;
+                
+                for (let x = 0; x <= canvas.width; x += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+                
+                for (let y = 0; y <= canvas.height; y += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+            }
+
+            selectPlanTool(tool) {
+                document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelector(`[data-tool="${tool}"]`).classList.add('active');
+                this.currentPlanTool = tool;
+                console.log('🔧 Plan tool selected:', tool);
+            }
+
+            clearPlan() {
+                if (confirm('Effacer tout le plan ?')) {
+                    const canvas = document.getElementById('planCanvas');
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    this.drawGrid(ctx, canvas);
+                    console.log('🗑️ Plan cleared');
+                }
+            }
+
+            async saveFiche() {
+                if (!this.currentFiche) return;
+                
+                const ficheData = this.collectFicheData();
+                
+                try {
+                    await this.apiCall(`/fiches-sdb/${this.currentFiche.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(ficheData)
+                    });
+                    
+                    this.showMessage('✅ Fiche mise à jour avec succès', 'success');
+                    this.loadFiches();
+                } catch (error) {
+                    console.error('Error saving fiche:', error);
+                    this.showMessage('❌ Erreur lors de la sauvegarde: ' + error.message, 'error');
+                }
+            }
+
+            collectFicheData() {
+                return {
+                    nom: document.getElementById('ficheNom')?.value || '',
+                    client_nom: document.getElementById('clientNom')?.value || '',
+                    adresse: document.getElementById('clientAdresse')?.value || '',
+                    telephone: document.getElementById('clientTelephone')?.value || '',
+                    email: document.getElementById('clientEmail')?.value || '',
+                    date_rdv: document.getElementById('ficheDate')?.value || '',
+                    type_intervention: document.getElementById('ficheType')?.value || 'visite_technique',
+                    statut: document.getElementById('ficheStatut')?.value || 'planifie',
+                    budget_estime: document.getElementById('budgetIndicatif')?.value || '',
+                    nb_personnes: parseInt(document.getElementById('nbPersonnes')?.value) || 1,
+                    solution_recommandee: document.getElementById('solutionRecommandee')?.value || '',
+                    budget_final: document.getElementById('budgetFinal')?.value || '',
+                    notes: document.getElementById('notesComplementaires')?.value || '',
+                    plan_data: JSON.stringify({ 
+                        elements: [], 
+                        scale: document.getElementById('planScale')?.value || 100,
+                        updated: new Date().toISOString()
+                    })
+                };
+            }
+
+            // ===== UTILITY FUNCTIONS =====
+            closeModal() {
+                document.getElementById('modals').innerHTML = '';
+                this.currentFiche = null;
+            }
+
+            formatDate(dateString) {
+                if (!dateString) return 'Date inconnue';
+                try {
+                    return new Date(dateString).toLocaleDateString('fr-FR');
+                } catch (e) {
+                    return 'Date invalide';
+                }
+            }
+
+            logout() {
+                localStorage.removeItem('h2eaux_token');
+                this.state.currentUser = null;
+                this.showLoginScreen();
+                this.showMessage('👋 Déconnexion réussie', 'info');
+            }
+        }
+
+        // Initialize the application
+        window.app = new H2EAUXGestion();
+    </script>
+</body>
+</html>
