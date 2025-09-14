@@ -282,6 +282,21 @@ class H2EAUXGestion {
             case 'calculs-pac':
                 if (window.calculsPac) calculsPac.load();
                 break;
+            case 'fiches':
+                if (window.fiches) fiches.load();
+                break;
+            case 'documents':
+                if (window.documents) documents.load();
+                break;
+            case 'calendrier':
+                if (window.calendrier) calendrier.load();
+                break;
+            case 'meg':
+                if (window.meg) meg.load();
+                break;
+            case 'chat':
+                if (window.chat) chat.load();
+                break;
             case 'parametres':
                 if (window.settings) settings.load();
                 break;
