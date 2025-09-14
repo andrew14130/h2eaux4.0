@@ -2263,6 +2263,12 @@
             // Client form
             document.getElementById('clientForm').addEventListener('submit', handleClientForm);
 
+            // PAC Calculation form
+            document.getElementById('calculPacForm').addEventListener('submit', handleCalculPacForm);
+
+            // Chantier form
+            document.getElementById('chantierForm').addEventListener('submit', handleChantierForm);
+
             // Close modal on outside click
             document.getElementById('clientModal').addEventListener('click', function(e) {
                 if (e.target === this) {
