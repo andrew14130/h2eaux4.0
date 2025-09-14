@@ -888,37 +888,56 @@ class Piece(BaseModel):
 class CalculPACExtended(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     nom: str
+    
+    # Informations générales
     client_nom: str
     adresse: str = ""
+    batiment: str = ""  # Nom/type du bâtiment
+    
+    # Type PAC
     type_pac: str = "air_eau"  # air_eau, air_air, geothermie
     
-    # Commun
+    # Caractéristiques bâtiment
     surface_totale: str = ""
-    isolation: str = "moyenne"
-    zone_climatique: str = "H2"
-    budget_estime: str = ""
-    pieces: List[Piece] = Field(default_factory=list)
-    notes: str = ""
+    altitude: str = "0"  # Altitude en mètres
+    zone_climatique: str = "H2"  # H1, H2, H3
+    isolation: str = "moyenne"  # rt2012, bonne, moyenne, ancienne, faible
+    annee_construction: str = "2000"
+    dpe: str = "D"  # A, B, C, D, E, F, G
+    document_joint: str = ""  # Chemin vers le document joint
     
-    # Spécifique Air/Eau
-    temperature_exterieure_base: str = ""
-    temperature_interieure_souhaitee: str = ""
-    altitude: str = ""
-    type_emetteur: str = ""
+    # Températures de base
+    temperature_exterieure_base: str = "-7"
+    temperature_interieure_souhaitee: str = "20"
+    
+    # Émetteurs (Air/Eau)
+    type_emetteur: str = "radiateurs_bt"  # plancher_chauffant, radiateurs_bt, radiateurs_ht, ventilo_convecteurs
+    
+    # ECS (Eau Chaude Sanitaire)
     production_ecs: bool = False
-    volume_ballon_ecs: str = ""
-    puissance_calculee: str = ""
-    cop_estime: str = ""
+    volume_ballon_ecs: str = "200"  # Volume en litres configurable
+    puissance_ecs: str = ""  # Puissance calculée pour ECS
     
-    # Spécifique Air/Air
-    type_installation: str = ""
-    puissance_totale_calculee: str = ""
-    scop_estime: str = ""
-    seer_estime: str = ""
+    # Air/Air spécifique
+    type_installation: str = "multi_split"  # mono_split, multi_split, gainable
+    scop_estime: str = "4.0"  # Coefficient de performance chauffage
+    seer_estime: str = "6.0"  # Coefficient de performance climatisation
+    
+    # Calculs et résultats
+    puissance_calculee: str = ""  # Puissance chauffage calculée
+    puissance_totale_calculee: str = ""  # Puissance totale avec ECS
+    cop_estime: str = ""  # COP Air/Eau
+    consommation_estimee: str = ""
+    
+    # Gestion pièce par pièce
+    pieces: List[Piece] = Field(default_factory=list)
+    
+    # Informations commerciales
+    budget_estime: str = ""
+    notes: str = ""
     
     # Legacy fields
     surface_a_chauffer: str = ""
-    consommation_estimee: str = ""
     
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
