@@ -900,7 +900,7 @@ window.fiches = {
         const ficheData = Object.fromEntries(formData.entries());
         
         try {
-            const newFiche = await app.apiCall('/fiches-sdb', {
+            const newFiche = await app.apiCall('/fiches-chantier', {
                 method: 'POST',
                 body: JSON.stringify(ficheData)
             });
