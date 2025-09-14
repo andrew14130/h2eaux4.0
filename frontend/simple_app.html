@@ -818,15 +818,16 @@
             </div>
         </div>
 
-        <!-- Modal Calcul Air/Eau -->
+        <!-- Modal Calcul Air/Eau - VERSION DÉFINITIVE -->
         <div id="calculAirEauModal" class="modal hidden">
-            <div class="modal-content">
+            <div class="modal-content large-modal">
                 <div class="modal-header">
-                    <h3 id="calculAirEauModalTitle">Nouveau Calcul PAC Air/Eau</h3>
+                    <h3 id="calculAirEauModalTitle">🌡️ Nouveau Calcul PAC Air/Eau (Chauffage + ECS)</h3>
                     <button onclick="hideCalculAirEauModal()" class="close-button">×</button>
                 </div>
                 <form id="calculAirEauForm">
                     <!-- Informations générales -->
+                    <h4>📋 Informations générales</h4>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Nom du projet *</label>
@@ -839,8 +840,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Adresse du projet</label>
-                        <textarea id="airEauAdresse" rows="2"></textarea>
+                        <label>Adresse complète du bâtiment</label>
+                        <textarea id="airEauAdresse" rows="2" placeholder="Adresse, ville, code postal"></textarea>
                     </div>
                     
                     <!-- Caractéristiques bâtiment -->
@@ -858,20 +859,40 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Zone climatique</label>
+                            <label>Zone climatique *</label>
                             <select id="airEauZoneClimatique">
-                                <option value="H1">H1 (Nord/Est - froid)</option>
-                                <option value="H2">H2 (Centre - tempéré)</option>
-                                <option value="H3">H3 (Sud - chaud)</option>
+                                <option value="H1">H1 (Nord/Est - froid) -7°C</option>
+                                <option value="H2">H2 (Centre - tempéré) -5°C</option>
+                                <option value="H3">H3 (Sud - chaud) -3°C</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Isolation</label>
+                            <label>Isolation *</label>
                             <select id="airEauIsolation">
-                                <option value="faible">Faible (avant 1975)</option>
-                                <option value="moyenne">Moyenne (1975-2000)</option>
-                                <option value="bonne">Bonne (après 2000)</option>
-                                <option value="rt2012">RT 2012+</option>
+                                <option value="faible">Faible (avant 1975) - G=2.5</option>
+                                <option value="moyenne">Moyenne (1975-2000) - G=1.8</option>
+                                <option value="bonne">Bonne (après 2000) - G=1.2</option>
+                                <option value="rt2012">RT 2012+ - G=0.8</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Année de construction</label>
+                            <input type="number" id="airEauAnneeConstruction" min="1900" max="2025">
+                        </div>
+                        <div class="form-group">
+                            <label>DPE (Diagnostic Performance Énergétique)</label>
+                            <select id="airEauDpe">
+                                <option value="">-- Sélectionner --</option>
+                                <option value="A">A (< 51 kWh/m²/an)</option>
+                                <option value="B">B (51-90 kWh/m²/an)</option>
+                                <option value="C">C (91-150 kWh/m²/an)</option>
+                                <option value="D">D (151-230 kWh/m²/an)</option>
+                                <option value="E">E (231-330 kWh/m²/an)</option>
+                                <option value="F">F (331-450 kWh/m²/an)</option>
+                                <option value="G">G (> 450 kWh/m²/an)</option>
                             </select>
                         </div>
                     </div>
@@ -880,21 +901,22 @@
                     <h4>🌡️ Émetteurs de chaleur</h4>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Type émetteur principal</label>
+                            <label>Type émetteur principal *</label>
                             <select id="airEauTypeEmetteur">
                                 <option value="plancher_chauffant">Plancher chauffant (35°C)</option>
                                 <option value="radiateurs_bt">Radiateurs BT (45°C)</option>
                                 <option value="radiateurs_ht">Radiateurs HT (65°C)</option>
-                                <option value="ventilo_convecteurs">Ventilo-convecteurs</option>
+                                <option value="ventilo_convecteurs">Ventilo-convecteurs (40°C)</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Température de départ (°C)</label>
-                            <input type="number" id="airEauTempDepart" value="35">
+                            <input type="number" id="airEauTempDepart" value="35" readonly style="background: #e8f5e8; color: #2d5a2d;">
                         </div>
                     </div>
 
                     <!-- ECS -->
+                    <h4>🚿 Production ECS (Eau Chaude Sanitaire)</h4>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Production ECS</label>
@@ -905,44 +927,57 @@
                         </div>
                         <div class="form-group" id="ecsVolumeGroup">
                             <label>Volume ballon ECS (L)</label>
-                            <input type="number" id="airEauVolumeBallonEcs" value="200">
+                            <select id="airEauVolumeBallonEcs">
+                                <option value="150">150L (1-2 personnes)</option>
+                                <option value="200">200L (3-4 personnes)</option>
+                                <option value="300">300L (5-6 personnes)</option>
+                                <option value="500">500L (+ de 6 personnes)</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Gestion des pièces -->
+                    <!-- Gestion des pièces avec calculs automatiques complets -->
                     <div class="pieces-section">
                         <div class="pieces-header">
-                            <h4>🏠 Gestion par pièces</h4>
+                            <h4>🏠 Gestion pièce par pièce avec calculs automatiques</h4>
                             <button type="button" class="btn-add-piece" onclick="addPieceAirEau()">+ Ajouter pièce</button>
                         </div>
                         <div id="piecesAirEauContainer">
                             <!-- Les pièces seront ajoutées ici -->
                         </div>
-                        <div class="form-group">
-                            <label>Puissance totale calculée (kW)</label>
-                            <input type="number" id="airEauPuissanceTotale" readonly style="background: #e8f5e8; color: #2d5a2d;">
+                        <div class="calcul-summary">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Puissance totale calculée (kW)</label>
+                                    <input type="number" id="airEauPuissanceTotale" readonly style="background: #e8f5e8; color: #2d5a2d;">
+                                </div>
+                                <div class="form-group">
+                                    <label>COP estimé</label>
+                                    <input type="number" id="airEauCopEstime" step="0.1" value="3.5">
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Budget estimé (€)</label>
-                            <input type="number" id="airEauBudgetEstime" step="100">
+                            <label>Budget estimé installation (€)</label>
+                            <input type="number" id="airEauBudgetEstime" step="500">
                         </div>
                         <div class="form-group">
-                            <label>COP estimé</label>
-                            <input type="number" id="airEauCopEstime" step="0.1" value="3.5">
+                            <label>Document joint (référence)</label>
+                            <input type="text" id="airEauDocumentJoint" placeholder="Ex: Plan maison, étude thermique...">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label>Notes</label>
-                        <textarea id="airEauNotes" rows="3"></textarea>
+                        <label>Notes et observations</label>
+                        <textarea id="airEauNotes" rows="3" placeholder="Notes techniques, contraintes particulières..."></textarea>
                     </div>
 
                     <div class="modal-actions">
                         <button type="button" onclick="hideCalculAirEauModal()">Annuler</button>
-                        <button type="submit">Enregistrer</button>
+                        <button type="submit">Enregistrer le calcul</button>
                     </div>
                 </form>
             </div>
