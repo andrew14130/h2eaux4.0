@@ -1570,6 +1570,14 @@
                     showScreen('clients');
                     loadClients();
                     break;
+                case 'calculs-pac':
+                    showScreen('calculsPac');
+                    loadCalculsPac();
+                    break;
+                case 'chantiers':
+                    showScreen('chantiers');
+                    loadChantiers();
+                    break;
                 default:
                     showMessage(`Module ${module.title} - Interface en développement.\n\nCe module sera bientôt disponible avec toutes les fonctionnalités métier.`);
             }
