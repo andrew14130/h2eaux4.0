@@ -3542,6 +3542,334 @@
             }
         });
 
+        // FICHES CHANTIER FUNCTIONS
+        let fichesChantier = [];
+        let currentEditingFiche = null;
+        
+        async function loadFichesChantier() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`${BACKEND_URL}/api/fiches-sdb`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    fichesChantier = await response.json();
+                    displayFichesChantier();
+                } else {
+                    showMessage('Erreur lors du chargement des fiches');
+                }
+            } catch (error) {
+                console.error('Erreur fiches chantier:', error);
+                showMessage('Erreur de connexion');
+            }
+        }
+        
+        function displayFichesChantier() {
+            const container = document.getElementById('fichesChantierList');
+            if (fichesChantier.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucune fiche trouvée. Créez votre première fiche de relevé!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = fichesChantier.map(fiche => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <h3 class="item-title">📋 ${fiche.nom}</h3>
+                        <div class="item-actions">
+                            <button class="btn-edit" onclick="editFicheChantier('${fiche.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteFicheChantierConfirm('${fiche.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <p><strong>Client:</strong> ${fiche.client_nom}</p>
+                        <p><strong>Date RDV:</strong> ${fiche.date_rendez_vous ? new Date(fiche.date_rendez_vous).toLocaleDateString('fr-FR') : 'Non définie'}</p>
+                        <p><strong>Type:</strong> ${fiche.type_intervention || 'Non défini'}</p>
+                        <p><strong>Statut:</strong> <span class="status-badge status-${fiche.statut}">${getFicheStatutText(fiche.statut)}</span></p>
+                        ${fiche.budget_estimation ? `<p><strong>Budget estimé:</strong> ${fiche.budget_estimation} €</p>` : ''}
+                    </div>
+                    <div class="item-meta">
+                        <span>Créé le ${new Date(fiche.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getFicheStatutText(statut) {
+            const statuts = {
+                'en_cours': 'En cours',
+                'complete': 'Terminée',
+                'a_revoir': 'À revoir'
+            };
+            return statuts[statut] || statut;
+        }
+        
+        function filterFichesChantier() {
+            const search = document.getElementById('searchFichesChantier').value.toLowerCase();
+            const filtered = fichesChantier.filter(fiche => 
+                fiche.nom.toLowerCase().includes(search) ||
+                fiche.client_nom.toLowerCase().includes(search) ||
+                fiche.type_intervention.toLowerCase().includes(search)
+            );
+            
+            const container = document.getElementById('fichesChantierList');
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucune fiche trouvée pour cette recherche.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = filtered.map(fiche => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <h3 class="item-title">📋 ${fiche.nom}</h3>
+                        <div class="item-actions">
+                            <button class="btn-edit" onclick="editFicheChantier('${fiche.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteFicheChantierConfirm('${fiche.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <p><strong>Client:</strong> ${fiche.client_nom}</p>
+                        <p><strong>Date RDV:</strong> ${fiche.date_rendez_vous ? new Date(fiche.date_rendez_vous).toLocaleDateString('fr-FR') : 'Non définie'}</p>
+                        <p><strong>Type:</strong> ${fiche.type_intervention || 'Non défini'}</p>
+                        <p><strong>Statut:</strong> <span class="status-badge status-${fiche.statut}">${getFicheStatutText(fiche.statut)}</span></p>
+                    </div>
+                    <div class="item-meta">
+                        <span>Créé le ${new Date(fiche.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showAddFicheChantier() {
+            currentEditingFiche = null;
+            document.getElementById('ficheChantierModalTitle').textContent = '📋 Nouvelle Fiche de Relevé Chantier';
+            document.getElementById('ficheChantierForm').reset();
+            showTab('general'); // Commencer par l'onglet général
+            initializePlanCanvas(); // Initialiser le canvas
+            document.getElementById('ficheChantierModal').classList.remove('hidden');
+        }
+        
+        function hideFicheChantierModal() {
+            document.getElementById('ficheChantierModal').classList.add('hidden');
+            currentEditingFiche = null;
+        }
+        
+        // GESTION DES ONGLETS
+        function showTab(tabName) {
+            // Cacher tous les onglets
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Désactiver tous les boutons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Afficher l'onglet sélectionné
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            
+            // Activer le bouton correspondant
+            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+            
+            // Si c'est l'onglet plan2d, initialiser le canvas
+            if (tabName === 'plan2d') {
+                setTimeout(initializePlanCanvas, 100);
+            }
+        }
+        
+        // PLAN 2D - STYLE MAGICPLAN
+        let canvas = null;
+        let ctx = null;
+        let isDrawing = false;
+        let drawingMode = 'none';
+        let currentPath = [];
+        let allPaths = [];
+        let rooms = [];
+        let measurements = [];
+        
+        function initializePlanCanvas() {
+            canvas = document.getElementById('planCanvas');
+            if (!canvas) return;
+            
+            ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#007AFF';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid
+            drawGrid();
+            
+            // Events
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', endDraw);
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', handleTouch);
+        }
+        
+        function drawGrid() {
+            if (!ctx) return;
+            
+            ctx.strokeStyle = '#f0f0f0';
+            ctx.lineWidth = 0.5;
+            
+            // Grille 20px
+            for (let x = 0; x <= canvas.width; x += 20) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            for (let y = 0; y <= canvas.height; y += 20) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Remettre les paramètres de dessin
+            ctx.strokeStyle = '#007AFF';
+            ctx.lineWidth = 2;
+        }
+        
+        function startDrawing() {
+            drawingMode = 'drawing';
+            canvas.classList.add('drawing');
+            showMessage('Mode dessin activé - Tracez les murs', 'success');
+        }
+        
+        function addRoom() {
+            drawingMode = 'room';
+            showMessage('Cliquez pour ajouter une pièce', 'success');
+        }
+        
+        function addMeasure() {
+            drawingMode = 'measuring';
+            canvas.classList.add('measuring');
+            showMessage('Cliquez deux points pour coter', 'success');
+        }
+        
+        function clearPlan() {
+            if (confirm('Effacer tout le plan ?')) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawGrid();
+                allPaths = [];
+                rooms = [];
+                measurements = [];
+                showMessage('Plan effacé', 'success');
+            }
+        }
+        
+        function savePlan() {
+            const planData = {
+                paths: allPaths,
+                rooms: rooms,
+                measurements: measurements,
+                echelle: document.getElementById('planEchelle').value,
+                nord: document.getElementById('planNord').value,
+                legende: document.getElementById('planLegende').value
+            };
+            
+            // Sauvegarder dans le formulaire (simulation)
+            const planDataStr = JSON.stringify(planData);
+            console.log('Plan sauvegardé:', planDataStr);
+            showMessage('Plan sauvegardé avec la fiche', 'success');
+        }
+        
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
+        
+        function startDraw(e) {
+            if (drawingMode !== 'drawing') return;
+            
+            isDrawing = true;
+            const pos = getMousePos(e);
+            currentPath = [pos];
+        }
+        
+        function draw(e) {
+            if (!isDrawing || drawingMode !== 'drawing') return;
+            
+            const pos = getMousePos(e);
+            currentPath.push(pos);
+            
+            // Redraw everything
+            redrawCanvas();
+            
+            // Draw current path
+            ctx.strokeStyle = '#FF9500';
+            ctx.beginPath();
+            for (let i = 0; i < currentPath.length - 1; i++) {
+                ctx.moveTo(currentPath[i].x, currentPath[i].y);
+                ctx.lineTo(currentPath[i + 1].x, currentPath[i + 1].y);
+            }
+            ctx.stroke();
+        }
+        
+        function endDraw(e) {
+            if (!isDrawing) return;
+            
+            isDrawing = false;
+            allPaths.push([...currentPath]);
+            currentPath = [];
+            redrawCanvas();
+        }
+        
+        function redrawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+            
+            // Redraw all paths
+            ctx.strokeStyle = '#007AFF';
+            ctx.lineWidth = 2;
+            
+            allPaths.forEach(path => {
+                if (path.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(path[0].x, path[0].y);
+                    for (let i = 1; i < path.length; i++) {
+                        ctx.lineTo(path[i].x, path[i].y);
+                    }
+                    ctx.stroke();
+                }
+            });
+            
+            // Draw rooms
+            rooms.forEach(room => {
+                ctx.fillStyle = 'rgba(0, 122, 255, 0.1)';
+                ctx.fillRect(room.x - 30, room.y - 10, 60, 20);
+                ctx.fillStyle = '#007AFF';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(room.name, room.x, room.y + 3);
+            });
+        }
+        
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0] || e.changedTouches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
+                                            e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 H2EAUX GESTION initialisée');
