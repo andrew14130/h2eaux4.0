@@ -787,6 +787,8 @@ class FicheSDBUpdate(BaseModel):
     nom: Optional[str] = None
     client_nom: Optional[str] = None
     adresse: Optional[str] = None
+    telephone: Optional[str] = None
+    email: Optional[str] = None
     type_sdb: Optional[str] = None
     surface: Optional[str] = None
     carrelage_mur: Optional[str] = None
@@ -798,6 +800,34 @@ class FicheSDBUpdate(BaseModel):
     eclairage: Optional[str] = None
     budget_estime: Optional[str] = None
     notes: Optional[str] = None
+    
+    # Extended fields for chantier support
+    date_rdv: Optional[str] = None
+    type_intervention: Optional[str] = None
+    statut: Optional[str] = None
+    nb_personnes: Optional[int] = None
+    type_logement: Optional[str] = None
+    annee_construction: Optional[int] = None
+    isolation: Optional[str] = None
+    menuiseries: Optional[str] = None
+    chauffage_actuel: Optional[str] = None
+    etat_general: Optional[str] = None
+    production_ecs: Optional[str] = None
+    observations_existant: Optional[str] = None
+    besoins: Optional[str] = None
+    priorite: Optional[str] = None
+    delai_souhaite: Optional[str] = None
+    contraintes: Optional[str] = None
+    compteur_electrique: Optional[str] = None
+    arrivee_gaz: Optional[str] = None
+    evacuation_eaux: Optional[str] = None
+    acces_materiel: Optional[str] = None
+    contraintes_techniques: Optional[str] = None
+    plan_data: Optional[str] = None
+    solution_recommandee: Optional[str] = None
+    points_attention: Optional[str] = None
+    budget_final: Optional[str] = None
+    delai_realisation: Optional[str] = None
 
 # Fiche Chantier Models - Version complète 8 onglets
 class FicheChantier(BaseModel):
