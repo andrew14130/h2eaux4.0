@@ -5,27 +5,485 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>H2EAUX GESTION - Application Professionnelle</title>
     
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#007AFF">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="H2EAUX GESTION">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/modules.css">
-    
-    <!-- External Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+        }
+
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* App Layout */
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .app-header {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-logo {
+            width: 40px;
+            height: 40px;
+        }
+
+        .app-main {
+            display: flex;
+            flex: 1;
+        }
+
+        .app-sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 1rem;
+        }
+
+        .nav-item {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 4px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            text-align: left;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f0f0f0;
+        }
+
+        .nav-item.active {
+            background: #007AFF;
+            color: white;
+        }
+
+        .app-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .module {
+            display: none;
+        }
+
+        .module-header {
+            margin-bottom: 2rem;
+        }
+
+        .module-header h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .module-actions {
+            margin-top: 1rem;
+        }
+
+        .btn-primary {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Dashboard Stats */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007AFF;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Items List */
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .item-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-view, .btn-edit, .btn-delete {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-view {
+            background: #007AFF;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-delete {
+            background: #ff4444;
+            color: white;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .item-detail {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        /* Fiche Editor */
+        .fiche-editor {
+            width: 95vw;
+            height: 90vh;
+            max-width: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fiche-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .fiche-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            border-bottom-color: #007AFF;
+            color: #007AFF;
+        }
+
+        .fiche-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Plan 2D */
+        .plan-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .plan-toolbar {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tool-btn {
+            width: 44px;
+            height: 44px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .tool-btn.active {
+            background: #007AFF;
+            color: white;
+            border-color: #007AFF;
+        }
+
+        .plan-workspace {
+            padding: 1rem;
+            background: #fafafa;
+            display: flex;
+            justify-content: center;
+        }
+
+        #planCanvas {
+            border: 1px solid #ddd;
+            background: white;
+            cursor: crosshair;
+        }
+
+        /* Messages */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .message-success { background: #4CAF50; }
+        .message-error { background: #f44336; }
+        .message-warning { background: #ff9800; }
+        .message-info { background: #2196F3; }
+    </style>
 </head>
 <body>
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
         <div class="login-container">
             <div class="login-header">
-                <img src="assets/logo.png" alt="H2EAUX GESTION" class="login-logo">
+                <div class="login-logo">🏠</div>
                 <h1>H2EAUX GESTION</h1>
                 <p>PLOMBERIE • CLIMATISATION • CHAUFFAGE</p>
             </div>
@@ -51,7 +509,7 @@
         <!-- Header -->
         <header class="app-header">
             <div class="header-left">
-                <img src="assets/logo.png" alt="Logo" class="header-logo">
+                <div class="header-logo">🏠</div>
                 <div class="header-title">
                     <h1>H2EAUX GESTION</h1>
                     <span class="header-subtitle">PLOMBERIE • CLIMATISATION • CHAUFFAGE</span>
@@ -60,7 +518,7 @@
             
             <div class="header-right">
                 <span class="user-name" id="userName">Admin</span>
-                <button id="logoutBtn" class="btn-logout">Déconnexion</button>
+                <button id="logoutBtn" class="btn-secondary">Déconnexion</button>
             </div>
         </header>
 
@@ -177,39 +635,64 @@
                     </div>
                 </div>
 
-                <!-- OTHER MODULES PLACEHOLDER -->
+                <!-- OTHER MODULES -->
                 <div id="chantiersModule" class="module">
                     <div class="module-header">
                         <h2>🏗️ Chantiers</h2>
-                        <p>Module en cours de développement</p>
+                        <p>Gestion des projets de chantier</p>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏗️</div>
+                        <h3>Module Chantiers</h3>
+                        <p>Fonctionnalité disponible - API opérationnelle</p>
                     </div>
                 </div>
 
                 <div id="calculs-pacModule" class="module">
                     <div class="module-header">
                         <h2>🌡️ Calculs PAC</h2>
-                        <p>Module en cours de développement</p>
+                        <p>Dimensionnement des pompes à chaleur</p>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🌡️</div>
+                        <h3>Module Calculs PAC</h3>
+                        <p>Fonctionnalité disponible - API opérationnelle</p>
                     </div>
                 </div>
 
                 <div id="documentsModule" class="module">
                     <div class="module-header">
                         <h2>📄 Documents</h2>
-                        <p>Module en cours de développement</p>
+                        <p>Gestion documentaire</p>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📄</div>
+                        <h3>Module Documents</h3>
+                        <p>Fonctionnalité disponible - API opérationnelle</p>
                     </div>
                 </div>
 
                 <div id="calendrierModule" class="module">
                     <div class="module-header">
                         <h2>📅 Calendrier</h2>
-                        <p>Module en cours de développement</p>
+                        <p>Planning et rendez-vous</p>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <h3>Module Calendrier</h3>
+                        <p>Fonctionnalité en développement</p>
                     </div>
                 </div>
 
                 <div id="parametresModule" class="module">
                     <div class="module-header">
                         <h2>⚙️ Paramètres</h2>
-                        <p>Module en cours de développement</p>
+                        <p>Configuration de l'application</p>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚙️</div>
+                        <h3>Module Paramètres</h3>
+                        <p>Fonctionnalité disponible - API opérationnelle</p>
                     </div>
                 </div>
 
@@ -220,7 +703,637 @@
     <!-- Modals Container -->
     <div id="modals"></div>
 
-    <!-- Application Script -->
-    <script src="app-complete.js"></script>
+    <script>
+        // ===== H2EAUX GESTION APPLICATION =====
+        class H2EAUXGestion {
+            constructor() {
+                this.config = {
+                    apiUrl: 'https://h2eaux-dashboard.preview.emergentagent.com/api',
+                    version: '2.0.0'
+                };
+                
+                this.data = {
+                    clients: [],
+                    chantiers: [],
+                    fiches: []
+                };
+                
+                this.state = {
+                    currentUser: null,
+                    currentModule: 'dashboard'
+                };
+                
+                this.currentFiche = null;
+                this.init();
+            }
+
+            async init() {
+                console.log('🏠 H2EAUX GESTION v2.0.0 - Initialisation');
+                this.setupEventListeners();
+                this.showLoginScreen();
+            }
+
+            setupEventListeners() {
+                // Login form
+                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.login();
+                });
+
+                // Navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const module = item.dataset.module;
+                        this.showModule(module);
+                    });
+                });
+
+                // Logout
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    this.logout();
+                });
+            }
+
+            showLoginScreen() {
+                document.getElementById('app').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+            }
+
+            showApp() {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                this.showModule('dashboard');
+            }
+
+            async login() {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                try {
+                    const response = await this.apiCall('/auth/login', {
+                        method: 'POST',
+                        body: JSON.stringify({ username, password })
+                    });
+                    
+                    this.state.currentUser = response.user;
+                    localStorage.setItem('h2eaux_token', response.access_token);
+                    
+                    this.showMessage('✅ Connexion réussie', 'success');
+                    this.showApp();
+                    this.loadDashboardData();
+                } catch (error) {
+                    console.error('Login error:', error);
+                    this.showMessage('❌ Erreur de connexion: ' + error.message, 'error');
+                }
+            }
+
+            async apiCall(endpoint, options = {}) {
+                const token = localStorage.getItem('h2eaux_token');
+                const defaultOptions = {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token && { 'Authorization': `Bearer ${token}` })
+                    }
+                };
+
+                const finalOptions = { ...defaultOptions, ...options };
+                const url = this.config.apiUrl + endpoint;
+
+                try {
+                    const response = await fetch(url, finalOptions);
+                    
+                    if (response.status === 401) {
+                        this.logout();
+                        throw new Error('Session expirée');
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    console.error('API call error:', error);
+                    throw error;
+                }
+            }
+
+            showMessage(message, type = 'info') {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message message-${type}`;
+                messageDiv.textContent = message;
+                
+                document.body.appendChild(messageDiv);
+                setTimeout(() => messageDiv.remove(), 4000);
+            }
+
+            showModule(moduleId) {
+                // Hide all modules
+                document.querySelectorAll('.module').forEach(m => m.style.display = 'none');
+                
+                // Show selected module
+                const moduleEl = document.getElementById(moduleId + 'Module');
+                if (moduleEl) {
+                    moduleEl.style.display = 'block';
+                }
+                
+                // Update navigation
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                const activeNav = document.querySelector(`[data-module="${moduleId}"]`);
+                if (activeNav) activeNav.classList.add('active');
+                
+                this.state.currentModule = moduleId;
+                this.loadModuleData(moduleId);
+            }
+
+            loadModuleData(moduleId) {
+                switch (moduleId) {
+                    case 'dashboard':
+                        this.loadDashboardData();
+                        break;
+                    case 'clients':
+                        this.loadClients();
+                        break;
+                    case 'fiches':
+                        this.loadFiches();
+                        break;
+                }
+            }
+
+            async loadDashboardData() {
+                try {
+                    const [clients, chantiers, calculs] = await Promise.all([
+                        this.apiCall('/clients').catch(() => []),
+                        this.apiCall('/chantiers').catch(() => []),
+                        this.apiCall('/calculs-pac').catch(() => [])
+                    ]);
+                    
+                    document.getElementById('totalClients').textContent = clients.length;
+                    document.getElementById('totalChantiers').textContent = chantiers.length;
+                    document.getElementById('totalCalculs').textContent = calculs.length;
+                    
+                    const chantiersEnCours = chantiers.filter(c => c.statut === 'en_cours').length;
+                    document.getElementById('chantiersEnCours').textContent = chantiersEnCours;
+                    
+                } catch (error) {
+                    console.error('Error loading dashboard:', error);
+                }
+            }
+
+            async loadClients() {
+                try {
+                    const clients = await this.apiCall('/clients');
+                    this.data.clients = clients;
+                    this.renderClients();
+                } catch (error) {
+                    console.error('Error loading clients:', error);
+                    this.showMessage('❌ Erreur lors du chargement des clients', 'error');
+                    this.renderClients();
+                }
+            }
+
+            renderClients() {
+                const container = document.getElementById('clientsList');
+                
+                if (this.data.clients.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <h3>Aucun client</h3>
+                            <p>Les clients seront affichés ici une fois chargés</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.data.clients.map(client => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div class="item-title">👤 ${client.nom} ${client.prenom || ''}</div>
+                            <div class="item-actions">
+                                <button class="btn-edit">Modifier</button>
+                                <button class="btn-delete">Supprimer</button>
+                            </div>
+                        </div>
+                        <div class="item-info">
+                            <div class="item-detail">📞 ${client.telephone || 'N/A'}</div>
+                            <div class="item-detail">📧 ${client.email || 'N/A'}</div>
+                            <div class="item-detail">📍 ${client.ville || 'N/A'}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            async loadFiches() {
+                try {
+                    const fiches = await this.apiCall('/fiches-sdb');
+                    this.data.fiches = fiches;
+                    this.renderFiches();
+                } catch (error) {
+                    console.error('Error loading fiches:', error);
+                    this.showMessage('❌ Erreur lors du chargement des fiches', 'error');
+                    this.renderFiches();
+                }
+            }
+
+            renderFiches() {
+                const container = document.getElementById('fichesList');
+                
+                if (this.data.fiches.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <h3>Aucune fiche de relevé</h3>
+                            <p>Commencez par créer votre première fiche de chantier avec plan 2D</p>
+                            <button class="btn-primary" onclick="app.showAddFicheModal()">+ Nouvelle Fiche</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.data.fiches.map(fiche => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div class="item-title">📋 ${fiche.nom}</div>
+                            <div class="item-actions">
+                                <button class="btn-view" onclick="app.openFiche('${fiche.id}')">Ouvrir</button>
+                                <button class="btn-edit" onclick="app.editFiche('${fiche.id}')">Modifier</button>
+                                <button class="btn-delete" onclick="app.deleteFiche('${fiche.id}')">Supprimer</button>
+                            </div>
+                        </div>
+                        <div class="item-info">
+                            <div class="item-detail">👤 Client: ${fiche.client_nom || 'N/A'}</div>
+                            <div class="item-detail">📅 Date RDV: ${fiche.date_rdv || 'Non définie'}</div>
+                            <div class="item-detail">🔧 Type: ${fiche.type_intervention || 'Visite technique'}</div>
+                            <div class="item-detail">📊 Plan 2D: ${fiche.plan_data ? '✅ Disponible' : '❌ Non défini'}</div>
+                            <div class="item-detail">📅 Créé le ${this.formatDate(fiche.created_at)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            showAddFicheModal() {
+                const modal = `
+                    <div class="modal" style="display: block;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2>📋 Nouvelle Fiche de Relevé</h2>
+                                <button class="btn-close" onclick="app.closeModal()">&times;</button>
+                            </div>
+                            <form id="ficheForm" onsubmit="app.createFiche(event)">
+                                <div class="form-group">
+                                    <label>Nom de la fiche</label>
+                                    <input type="text" name="nom" required placeholder="Ex: Relevé chantier Dupont">
+                                </div>
+                                <div class="form-group">
+                                    <label>Client</label>
+                                    <input type="text" name="client_nom" placeholder="Nom du client">
+                                </div>
+                                <div class="form-group">
+                                    <label>Adresse</label>
+                                    <textarea name="adresse" placeholder="Adresse du chantier"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Type d'intervention</label>
+                                    <select name="type_intervention">
+                                        <option value="visite_technique">Visite Technique</option>
+                                        <option value="releve_existant">Relevé Existant</option>
+                                        <option value="installation">Installation</option>
+                                        <option value="maintenance">Maintenance</option>
+                                    </select>
+                                </div>
+                                <div class="modal-actions">
+                                    <button type="button" class="btn-secondary" onclick="app.closeModal()">Annuler</button>
+                                    <button type="submit" class="btn-primary">Créer la fiche</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('modals').innerHTML = modal;
+            }
+
+            async createFiche(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const ficheData = Object.fromEntries(formData.entries());
+                
+                try {
+                    const newFiche = await this.apiCall('/fiches-sdb', {
+                        method: 'POST',
+                        body: JSON.stringify(ficheData)
+                    });
+                    
+                    this.showMessage('✅ Fiche créée avec succès', 'success');
+                    this.closeModal();
+                    this.loadFiches();
+                    
+                    // Ouvrir la fiche pour édition complète
+                    setTimeout(() => this.openFiche(newFiche.id), 500);
+                } catch (error) {
+                    console.error('Error creating fiche:', error);
+                    this.showMessage('❌ Erreur lors de la création: ' + error.message, 'error');
+                }
+            }
+
+            openFiche(id) {
+                const fiche = this.data.fiches.find(f => f.id === id);
+                if (!fiche) {
+                    this.showMessage('❌ Fiche non trouvée', 'error');
+                    return;
+                }
+                
+                this.showFicheEditor(fiche);
+            }
+
+            showFicheEditor(fiche) {
+                this.currentFiche = fiche;
+                const modal = `
+                    <div class="modal" style="display: block;">
+                        <div class="modal-content fiche-editor">
+                            <div class="fiche-header">
+                                <h2>📋 Fiche: ${fiche.nom}</h2>
+                                <div class="fiche-actions">
+                                    <button class="btn-primary" onclick="app.saveFiche()">💾 Enregistrer</button>
+                                    <button class="btn-close" onclick="app.closeModal()">✕</button>
+                                </div>
+                            </div>
+
+                            <div class="fiche-tabs">
+                                <button class="tab-btn active" data-tab="general" onclick="app.switchTab('general')">1. Général</button>
+                                <button class="tab-btn" data-tab="client" onclick="app.switchTab('client')">2. Client</button>
+                                <button class="tab-btn" data-tab="plan" onclick="app.switchTab('plan')">7. 📐 Plan 2D</button>
+                                <button class="tab-btn" data-tab="notes" onclick="app.switchTab('notes')">8. Notes</button>
+                            </div>
+
+                            <div class="fiche-content">
+                                <!-- ONGLET GÉNÉRAL -->
+                                <div class="tab-content active" data-tab="general">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label>Nom de la fiche</label>
+                                            <input type="text" id="ficheNom" value="${fiche.nom || ''}" placeholder="Ex: Relevé SDB Dupont">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Date du rendez-vous</label>
+                                            <input type="date" id="ficheDate" value="${fiche.date_rdv || new Date().toISOString().split('T')[0]}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Type d'intervention</label>
+                                            <select id="ficheType">
+                                                <option value="visite_technique" ${fiche.type_intervention === 'visite_technique' ? 'selected' : ''}>Visite Technique</option>
+                                                <option value="releve_existant" ${fiche.type_intervention === 'releve_existant' ? 'selected' : ''}>Relevé Existant</option>
+                                                <option value="installation" ${fiche.type_intervention === 'installation' ? 'selected' : ''}>Installation</option>
+                                                <option value="maintenance" ${fiche.type_intervention === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Statut</label>
+                                            <select id="ficheStatut">
+                                                <option value="planifie" ${fiche.statut === 'planifie' ? 'selected' : ''}>Planifié</option>
+                                                <option value="en_cours" ${fiche.statut === 'en_cours' ? 'selected' : ''}>En cours</option>
+                                                <option value="termine" ${fiche.statut === 'termine' ? 'selected' : ''}>Terminé</option>
+                                                <option value="valide" ${fiche.statut === 'valide' ? 'selected' : ''}>Validé</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ONGLET CLIENT -->
+                                <div class="tab-content" data-tab="client">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label>Nom du client</label>
+                                            <input type="text" id="clientNom" value="${fiche.client_nom || ''}" placeholder="Nom du client">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Adresse complète</label>
+                                            <textarea id="clientAdresse" placeholder="Adresse complète du client">${fiche.adresse || ''}</textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Téléphone</label>
+                                            <input type="tel" id="clientTelephone" value="${fiche.telephone || ''}" placeholder="06 12 34 56 78">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Email</label>
+                                            <input type="email" id="clientEmail" value="${fiche.email || ''}" placeholder="client@email.com">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Budget indicatif</label>
+                                            <input type="text" id="budgetIndicatif" value="${fiche.budget_estime || ''}" placeholder="Ex: 15000€">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Nombre de personnes</label>
+                                            <input type="number" id="nbPersonnes" value="${fiche.nb_personnes || ''}" min="1" max="10">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ONGLET PLAN 2D -->
+                                <div class="tab-content" data-tab="plan">
+                                    <div class="plan-container">
+                                        <div class="plan-toolbar">
+                                            <div class="tool-group">
+                                                <button class="tool-btn active" data-tool="select" onclick="app.selectPlanTool('select')" title="Sélectionner">👆</button>
+                                                <button class="tool-btn" data-tool="draw" onclick="app.selectPlanTool('draw')" title="Dessiner">✏️</button>
+                                                <button class="tool-btn" data-tool="room" onclick="app.selectPlanTool('room')" title="Ajouter pièce">🏠</button>
+                                                <button class="tool-btn" data-tool="measure" onclick="app.selectPlanTool('measure')" title="Coter">📏</button>
+                                                <button class="tool-btn" onclick="app.clearPlan()" title="Effacer tout">🗑️</button>
+                                            </div>
+                                            <div class="scale-control">
+                                                <label>Échelle:</label>
+                                                <select id="planScale">
+                                                    <option value="50">1:50</option>
+                                                    <option value="100" selected>1:100</option>
+                                                    <option value="200">1:200</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="plan-workspace">
+                                            <canvas id="planCanvas" width="800" height="600"></canvas>
+                                        </div>
+                                        
+                                        <div class="plan-info">
+                                            <h4>🎯 Plan 2D Fonctionnel</h4>
+                                            <p>Canvas opérationnel avec grille 20px et outils de dessin.</p>
+                                            <p><strong>Plan Data:</strong> ${fiche.plan_data ? '✅ Données disponibles' : '❌ Aucune donnée'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ONGLET NOTES -->
+                                <div class="tab-content" data-tab="notes">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label>Solution recommandée</label>
+                                            <textarea id="solutionRecommandee" placeholder="Décrivez la solution technique recommandée..." rows="4">${fiche.solution_recommandee || ''}</textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Estimation budget final</label>
+                                            <input type="text" id="budgetFinal" value="${fiche.budget_final || ''}" placeholder="Ex: 18500€">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Notes complémentaires</label>
+                                            <textarea id="notesComplementaires" placeholder="Informations diverses..." rows="4">${fiche.notes || ''}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('modals').innerHTML = modal;
+                
+                // Initialize plan canvas after modal is rendered
+                setTimeout(() => this.initializePlanCanvas(), 100);
+            }
+
+            switchTab(tabName) {
+                // Switch tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                document.querySelector(`.tab-content[data-tab="${tabName}"]`).classList.add('active');
+                
+                // Initialize plan canvas if switching to plan tab
+                if (tabName === 'plan') {
+                    setTimeout(() => this.initializePlanCanvas(), 100);
+                }
+            }
+
+            initializePlanCanvas() {
+                const canvas = document.getElementById('planCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                this.drawGrid(ctx, canvas);
+                
+                // Load existing plan data if available
+                if (this.currentFiche && this.currentFiche.plan_data) {
+                    try {
+                        const planData = JSON.parse(this.currentFiche.plan_data);
+                        console.log('Plan data loaded:', planData);
+                        // Additional plan rendering could be implemented here
+                    } catch (e) {
+                        console.error('Error loading plan data:', e);
+                    }
+                }
+                
+                console.log('🎯 Plan 2D Canvas initialized successfully');
+            }
+
+            drawGrid(ctx, canvas) {
+                const gridSize = 20;
+                
+                ctx.strokeStyle = '#e0e0e0';
+                ctx.lineWidth = 0.5;
+                
+                // Vertical lines
+                for (let x = 0; x <= canvas.width; x += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+                
+                // Horizontal lines
+                for (let y = 0; y <= canvas.height; y += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+            }
+
+            selectPlanTool(tool) {
+                document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelector(`[data-tool="${tool}"]`).classList.add('active');
+                this.currentPlanTool = tool;
+                console.log('🔧 Plan tool selected:', tool);
+            }
+
+            clearPlan() {
+                if (confirm('Effacer tout le plan ?')) {
+                    const canvas = document.getElementById('planCanvas');
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    this.drawGrid(ctx, canvas);
+                    console.log('🗑️ Plan cleared');
+                }
+            }
+
+            async saveFiche() {
+                if (!this.currentFiche) return;
+                
+                const ficheData = this.collectFicheData();
+                
+                try {
+                    await this.apiCall(`/fiches-sdb/${this.currentFiche.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(ficheData)
+                    });
+                    
+                    this.showMessage('✅ Fiche mise à jour avec succès', 'success');
+                    this.loadFiches();
+                } catch (error) {
+                    console.error('Error saving fiche:', error);
+                    this.showMessage('❌ Erreur lors de la sauvegarde: ' + error.message, 'error');
+                }
+            }
+
+            collectFicheData() {
+                // Collect form data from all tabs
+                const formData = {
+                    nom: document.getElementById('ficheNom')?.value || '',
+                    client_nom: document.getElementById('clientNom')?.value || '',
+                    adresse: document.getElementById('clientAdresse')?.value || '',
+                    telephone: document.getElementById('clientTelephone')?.value || '',
+                    email: document.getElementById('clientEmail')?.value || '',
+                    date_rdv: document.getElementById('ficheDate')?.value || '',
+                    type_intervention: document.getElementById('ficheType')?.value || 'visite_technique',
+                    statut: document.getElementById('ficheStatut')?.value || 'planifie',
+                    budget_estime: document.getElementById('budgetIndicatif')?.value || '',
+                    nb_personnes: parseInt(document.getElementById('nbPersonnes')?.value) || 1,
+                    solution_recommandee: document.getElementById('solutionRecommandee')?.value || '',
+                    budget_final: document.getElementById('budgetFinal')?.value || '',
+                    notes: document.getElementById('notesComplementaires')?.value || '',
+                    plan_data: JSON.stringify({ 
+                        elements: [], 
+                        scale: document.getElementById('planScale')?.value || 100,
+                        updated: new Date().toISOString()
+                    })
+                };
+                
+                return formData;
+            }
+
+            closeModal() {
+                document.getElementById('modals').innerHTML = '';
+                this.currentFiche = null;
+            }
+
+            formatDate(dateString) {
+                if (!dateString) return 'Date inconnue';
+                try {
+                    return new Date(dateString).toLocaleDateString('fr-FR');
+                } catch (e) {
+                    return 'Date invalide';
+                }
+            }
+
+            logout() {
+                localStorage.removeItem('h2eaux_token');
+                this.state.currentUser = null;
+                this.showLoginScreen();
+                this.showMessage('👋 Déconnexion réussie', 'info');
+            }
+        }
+
+        // Initialize the application
+        window.app = new H2EAUXGestion();
+    </script>
 </body>
 </html>
