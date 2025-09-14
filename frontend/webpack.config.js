@@ -3,12 +3,19 @@ const createExpoWebpackConfigAsync = require('@expo/webpack-config');
 module.exports = async function (env, argv) {
   const config = await createExpoWebpackConfigAsync(env, argv);
   
-  // Ajouter une configuration pour supporter les modules React Native dans le web
+  // Configuration pour éviter l'erreur import.meta
   config.resolve.alias = {
     ...config.resolve.alias,
     'react-native$': 'react-native-web',
-    '@react-native-async-storage/async-storage': '@react-native-async-storage/async-storage/lib/commonjs/index.web.js'
   };
+
+  // Résoudre le problème import.meta
+  config.module.rules.push({
+    test: /\.m?js$/,
+    resolve: {
+      fullySpecified: false,
+    },
+  });
 
   return config;
 };
