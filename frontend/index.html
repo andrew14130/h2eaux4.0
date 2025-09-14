@@ -1375,8 +1375,13 @@
             currentScreen: 'login'
         };
 
-        // Modules Configuration
-        const modules = [
+        // Data arrays
+        let currentEditingClient = null;
+        let currentEditingChantier = null;
+        let currentEditingCalcul = null;
+        let clients = [];
+        let chantiers = [];
+        let calculsPac = [];
             {
                 id: 'clients',
                 title: 'Clients',
