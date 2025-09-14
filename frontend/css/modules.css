@@ -379,6 +379,401 @@
     }
 }
 
+/* ===== CALENDRIER MODULE ===== */
+.calendar-container {
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: var(--surface-elevated);
+    border-bottom: 1px solid var(--border);
+}
+
+.calendar-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.nav-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.view-selector {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.view-btn {
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.view-btn:hover {
+    background: var(--surface-hover);
+}
+
+.view-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.calendar-grid {
+    padding: 1rem;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    margin-bottom: 1px;
+}
+
+.weekday {
+    padding: 0.8rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--surface-elevated);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--border);
+}
+
+.calendar-day {
+    min-height: 100px;
+    padding: 0.5rem;
+    background: var(--surface);
+    cursor: pointer;
+    transition: background 0.3s ease;
+    position: relative;
+}
+
+.calendar-day:hover {
+    background: var(--surface-hover);
+}
+
+.calendar-day.today {
+    background: rgba(0, 122, 255, 0.1);
+    border: 2px solid var(--primary);
+}
+
+.calendar-day.other-month {
+    color: var(--text-disabled);
+    background: var(--surface-disabled);
+}
+
+.calendar-day.has-events {
+    background: rgba(46, 204, 113, 0.1);
+}
+
+.day-number {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+}
+
+.day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.event-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
+.event-dot.visite_technique {
+    background: #3498db;
+}
+
+.event-dot.installation {
+    background: #e74c3c;
+}
+
+.event-dot.maintenance {
+    background: #f39c12;
+}
+
+.more-events {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 0.2rem;
+}
+
+/* ===== CHAT MODULE ===== */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 60vh;
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.chat-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--danger);
+}
+
+.status-indicator.online {
+    background: var(--success);
+}
+
+.status-indicator.offline {
+    background: var(--danger);
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: var(--background);
+}
+
+.chat-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.chat-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.message-item {
+    margin-bottom: 1rem;
+    max-width: 70%;
+}
+
+.message-sent {
+    margin-left: auto;
+    text-align: right;
+}
+
+.message-received {
+    margin-right: auto;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.3rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.message-sent .message-header {
+    flex-direction: row-reverse;
+    gap: 0.5rem;
+}
+
+.message-content {
+    padding: 0.8rem 1rem;
+    border-radius: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    line-height: 1.4;
+}
+
+.message-sent .message-content {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.message-system {
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.message-system .message-content {
+    background: var(--surface-elevated);
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    display: inline-block;
+}
+
+.chat-input-area {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--surface-elevated);
+    border-top: 1px solid var(--border);
+}
+
+.chat-input-area input {
+    flex: 1;
+    padding: 0.8rem;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 1rem;
+}
+
+.chat-input-area input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.chat-input-area button {
+    padding: 0.8rem 1.5rem;
+    border-radius: 20px;
+}
+
+/* ===== MEG INTEGRATION STYLES ===== */
+.meg-sections {
+    display: grid;
+    gap: 2rem;
+    max-width: 800px;
+}
+
+.meg-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.meg-section h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+}
+
+.import-area {
+    text-align: center;
+    padding: 2rem;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    background: var(--surface-elevated);
+}
+
+.import-area p {
+    margin-top: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.export-options {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.export-options button {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* ===== EMPTY STATES ===== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+}
+
+.empty-state h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+}
+
+.empty-state p {
+    margin: 0 0 2rem 0;
+}
+
+/* ===== RESPONSIVE TABLET OPTIMIZATIONS ===== */
+@media (max-width: 1024px) {
+    .calendar-day {
+        min-height: 80px;
+        padding: 0.3rem;
+    }
+    
+    .day-number {
+        font-size: 0.9rem;
+    }
+    
+    .chat-container {
+        height: 50vh;
+    }
+    
+    .message-item {
+        max-width: 85%;
+    }
+    
+    .meg-sections {
+        gap: 1.5rem;
+    }
+    
+    .export-options {
+        flex-direction: column;
+    }
+}
+
 @media (max-width: 768px) {
     .fiche-editor {
         width: 100vw;
@@ -415,6 +810,50 @@
     #planCanvas {
         max-width: 100%;
         height: auto;
+    }
+    
+    .calendar-header {
+        padding: 1rem;
+    }
+    
+    .calendar-day {
+        min-height: 60px;
+        font-size: 0.8rem;
+    }
+    
+    .weekday {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .view-selector {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+    
+    .view-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    
+    .chat-container {
+        height: 70vh;
+    }
+    
+    .message-item {
+        max-width: 90%;
+    }
+    
+    .chat-input-area {
+        padding: 0.8rem;
+    }
+    
+    .meg-section {
+        padding: 1rem;
+    }
+    
+    .import-area {
+        padding: 1.5rem;
     }
 }
 
