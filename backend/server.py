@@ -1055,7 +1055,7 @@ async def get_fiches_sdb(current_user: User = Depends(get_current_user)):
     return [FicheChantier(**fiche) for fiche in fiches]
 
 @api_router.post("/fiches-sdb", response_model=FicheChantier)
-async def create_fiche_sdb(fiche_data: FicheChantierCreate, current_user: User = Depends(get_current_user)):
+async def create_fiche_sdb(fiche_data: FicheSDBCreate, current_user: User = Depends(get_current_user)):
     new_fiche = FicheChantier(**fiche_data.dict())
     await db.fiches_chantier.insert_one(new_fiche.dict())
     return new_fiche
