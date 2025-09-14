@@ -5966,43 +5966,42 @@ Document généré par H2EAUX GESTION - ${date}
         function showModule(moduleName) {
             document.getElementById('dashboardScreen').classList.add('hidden');
             
-            const screens = ['clientsScreen', 'calculsPacScreen', 'chantiersScreen', 'documentsScreen', 'fichesChantierScreen', 'calendrierScreen', 'documentsAvancesScreen', 'megIntegrationScreen'];
+            const screens = ['clientsScreen', 'calculsPacScreen', 'chantiersScreen', 'documentsScreen', 'fichesChantierScreen', 'calendrierScreen', 'documentsAvancesScreen', 'megIntegrationScreen', 'parametresScreen'];
             screens.forEach(screen => {
                 document.getElementById(screen)?.classList.add('hidden');
             });
             
-            switch(moduleName) {
-                case 'clients':
-                    document.getElementById('clientsScreen').classList.remove('hidden');
-                    loadClients();
-                    break;
-                case 'calculs-pac':
-                    document.getElementById('calculsPacScreen').classList.remove('hidden');
-                    loadCalculsPac();
-                    break;
-                case 'chantiers':
-                    document.getElementById('chantiersScreen').classList.remove('hidden');
-                    loadChantiers();
-                    break;
-                case 'documents':
-                    document.getElementById('documentsAvancesScreen').classList.remove('hidden');
-                    loadDocumentsAvances();
-                    break;
-                case 'fiches-chantier':
-                    document.getElementById('fichesChantierScreen').classList.remove('hidden');
-                    loadFichesChantier();
-                    break;
-                case 'calendrier':
-                    document.getElementById('calendrierScreen').classList.remove('hidden');
-                    loadCalendrier();
-                    break;
-                case 'meg-integration':
-                    document.getElementById('megIntegrationScreen').classList.remove('hidden');
-                    loadMegIntegration();
-                    break;
-                default:
-                    showMessage('Module en développement', 'success');
-                    showDashboard();
+            // Afficher l'écran demandé
+            if (moduleName === 'clients') {
+                document.getElementById('clientsScreen').classList.remove('hidden');
+                loadClients();
+            } else if (moduleName === 'calculs-pac') {
+                document.getElementById('calculsPacScreen').classList.remove('hidden');
+                loadCalculsPac();
+            } else if (moduleName === 'chantiers') {
+                document.getElementById('chantiersScreen').classList.remove('hidden');
+                loadChantiers();
+            } else if (moduleName === 'documents') {
+                document.getElementById('documentsScreen').classList.remove('hidden');
+                loadDocuments();
+            } else if (moduleName === 'fiches-chantier') {
+                document.getElementById('fichesChantierScreen').classList.remove('hidden');
+                loadFichesChantier();
+            } else if (moduleName === 'calendrier') {
+                document.getElementById('calendrierScreen').classList.remove('hidden');
+                loadCalendrier();
+            } else if (moduleName === 'meg-integration') {
+                document.getElementById('megIntegrationScreen').classList.remove('hidden');
+                loadMegIntegration();
+            } else if (moduleName === 'parametres') {
+                if (currentUser && currentUser.permissions.parametres) {
+                    document.getElementById('parametresScreen').classList.remove('hidden');
+                    loadUsersManagement();
+                } else {
+                    showMessage('Accès non autorisé aux paramètres');
+                }
+            } else if (moduleName === 'chat') {
+                showMessage('Module Chat Équipe - En développement');
             }
         }
 
