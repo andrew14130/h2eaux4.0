@@ -1,0 +1,35 @@
+{
+  "name": "H2EAUX GESTION - Application Professionnelle",
+  "short_name": "H2EAUX GESTION",
+  "description": "Application professionnelle complète pour plomberie, climatisation et chauffage - Optimisée tablette",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F1419",
+  "theme_color": "#007AFF",
+  "orientation": "landscape-primary",
+  "categories": ["business", "productivity"],
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshot-wide.png",
+      "sizes": "1024x768",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Interface principale H2EAUX GESTION"
+    }
+  ]
+}
