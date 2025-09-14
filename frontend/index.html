@@ -1582,9 +1582,45 @@
                     showScreen('chantiers');
                     loadChantiers();
                     break;
+                case 'documents':
+                    showDocumentsModule();
+                    break;
+                case 'fiches':
+                    showFichesModule();
+                    break;
+                case 'meg':
+                    showMegModule();
+                    break;
+                case 'calendrier':
+                    showCalendrierModule();
+                    break;
+                case 'chat':
+                    showChatModule();
+                    break;
                 default:
                     showMessage(`Module ${module.title} - Interface en développement.\n\nCe module sera bientôt disponible avec toutes les fonctionnalités métier.`);
             }
+        }
+
+        // Temporary functions for modules under development
+        function showDocumentsModule() {
+            showMessage('📄 Module Documents\n\nFonctionnalités à venir :\n• Bibliothèque PDF\n• Stockage hors-ligne\n• Synchronisation cloud\n• Recherche avancée');
+        }
+
+        function showFichesModule() {
+            showMessage('📋 Module Fiches Chantier\n\nFonctionnalités à venir :\n• Relevés détaillés\n• Plans 2D éditables\n• Support stylet\n• Export PDF');
+        }
+
+        function showMegModule() {
+            showMessage('🔄 Module MEG Integration\n\nFonctionnalités à venir :\n• Import/Export comptable\n• Synchronisation automatique\n• Rapports financiers\n• Interface MEG');
+        }
+
+        function showCalendrierModule() {
+            showMessage('📅 Module Calendrier\n\nFonctionnalités à venir :\n• Planning RDV\n• Gestion interventions\n• Vue mois/semaine/jour\n• Notifications');
+        }
+
+        function showChatModule() {
+            showMessage('💬 Module Chat Équipe\n\nFonctionnalités à venir :\n• Messages temps réel\n• Groupes équipe\n• Partage fichiers\n• Notifications push');
         }
 
         // Dashboard Functions
