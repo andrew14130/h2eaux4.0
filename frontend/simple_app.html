@@ -1032,6 +1032,430 @@
         loginForm.addEventListener('submit', handleLogin);
         logoutButton.addEventListener('click', handleLogout);
         
+        // Module navigation
+        function showModule(moduleName) {
+            document.getElementById('dashboardScreen').classList.add('hidden');
+            
+            const screens = ['clientsScreen', 'calculsPacScreen', 'chantiersScreen', 'documentsScreen', 'fichesSdbScreen'];
+            screens.forEach(screen => {
+                document.getElementById(screen)?.classList.add('hidden');
+            });
+            
+            switch(moduleName) {
+                case 'clients':
+                    document.getElementById('clientsScreen').classList.remove('hidden');
+                    loadClients();
+                    break;
+                case 'calculs-pac':
+                    document.getElementById('calculsPacScreen').classList.remove('hidden');
+                    loadCalculsPac();
+                    break;
+                case 'chantiers':
+                    showMessage('Module Chantiers en développement', 'success');
+                    showDashboard();
+                    break;
+                case 'documents':
+                    showMessage('Module Documents en développement', 'success');
+                    showDashboard();
+                    break;
+                case 'fiches-sdb':
+                    showMessage('Module Fiches SDB en développement', 'success');
+                    showDashboard();
+                    break;
+                default:
+                    showMessage('Module en développement', 'success');
+                    showDashboard();
+            }
+        }
+        
+        // CLIENTS FUNCTIONS
+        let clients = [];
+        let currentEditingClient = null;
+        
+        async function loadClients() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`${BACKEND_URL}/api/clients`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    clients = await response.json();
+                    displayClients();
+                } else {
+                    showMessage('Erreur lors du chargement des clients');
+                }
+            } catch (error) {
+                console.error('Erreur clients:', error);
+                showMessage('Erreur de connexion');
+            }
+        }
+        
+        function displayClients() {
+            const container = document.getElementById('clientsList');
+            if (clients.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucun client trouvé. Ajoutez votre premier client!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = clients.map(client => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <h3 class="item-title">${client.nom} ${client.prenom}</h3>
+                        <div class="item-actions">
+                            <button class="btn-edit" onclick="editClient('${client.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteClientConfirm('${client.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        ${client.telephone ? `<p>📞 ${client.telephone}</p>` : ''}
+                        ${client.email ? `<p>✉️ ${client.email}</p>` : ''}
+                        ${client.adresse ? `<p>📍 ${client.adresse}${client.ville ? ', ' + client.ville : ''}${client.code_postal ? ' ' + client.code_postal : ''}</p>` : ''}
+                        ${client.type_chauffage ? `<p>🔥 ${client.type_chauffage}</p>` : ''}
+                        ${client.notes ? `<p>📝 ${client.notes}</p>` : ''}
+                    </div>
+                    <div class="item-meta">
+                        <span>Créé le ${new Date(client.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function filterClients() {
+            const search = document.getElementById('searchClients').value.toLowerCase();
+            const filtered = clients.filter(client => 
+                client.nom.toLowerCase().includes(search) ||
+                client.prenom.toLowerCase().includes(search) ||
+                client.telephone.includes(search) ||
+                client.email.toLowerCase().includes(search)
+            );
+            
+            const container = document.getElementById('clientsList');
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucun client trouvé pour cette recherche.</p></div>';
+                return;
+            }
+            
+            // Même logique d'affichage que displayClients mais avec filtered
+            container.innerHTML = filtered.map(client => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <h3 class="item-title">${client.nom} ${client.prenom}</h3>
+                        <div class="item-actions">
+                            <button class="btn-edit" onclick="editClient('${client.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteClientConfirm('${client.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        ${client.telephone ? `<p>📞 ${client.telephone}</p>` : ''}
+                        ${client.email ? `<p>✉️ ${client.email}</p>` : ''}
+                        ${client.adresse ? `<p>📍 ${client.adresse}${client.ville ? ', ' + client.ville : ''}${client.code_postal ? ' ' + client.code_postal : ''}</p>` : ''}
+                        ${client.type_chauffage ? `<p>🔥 ${client.type_chauffage}</p>` : ''}
+                        ${client.notes ? `<p>📝 ${client.notes}</p>` : ''}
+                    </div>
+                    <div class="item-meta">
+                        <span>Créé le ${new Date(client.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showAddClient() {
+            currentEditingClient = null;
+            document.getElementById('clientModalTitle').textContent = 'Nouveau Client';
+            document.getElementById('clientForm').reset();
+            document.getElementById('clientModal').classList.remove('hidden');
+        }
+        
+        function editClient(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+            
+            currentEditingClient = client;
+            document.getElementById('clientModalTitle').textContent = 'Modifier Client';
+            
+            document.getElementById('clientNom').value = client.nom;
+            document.getElementById('clientPrenom').value = client.prenom;
+            document.getElementById('clientTelephone').value = client.telephone;
+            document.getElementById('clientEmail').value = client.email;
+            document.getElementById('clientAdresse').value = client.adresse;
+            document.getElementById('clientVille').value = client.ville;
+            document.getElementById('clientCodePostal').value = client.code_postal;
+            document.getElementById('clientTypeChauffage').value = client.type_chauffage;
+            document.getElementById('clientNotes').value = client.notes;
+            
+            document.getElementById('clientModal').classList.remove('hidden');
+        }
+        
+        function hideClientModal() {
+            document.getElementById('clientModal').classList.add('hidden');
+            currentEditingClient = null;
+        }
+        
+        async function deleteClientConfirm(clientId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) return;
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`${BACKEND_URL}/api/clients/${clientId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showMessage('Client supprimé avec succès', 'success');
+                    loadClients();
+                } else {
+                    showMessage('Erreur lors de la suppression');
+                }
+            } catch (error) {
+                console.error('Erreur suppression client:', error);
+                showMessage('Erreur de connexion');
+            }
+        }
+        
+        // CALCULS PAC FUNCTIONS
+        let calculsPac = [];
+        let currentEditingCalcul = null;
+        
+        async function loadCalculsPac() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`${BACKEND_URL}/api/calculs-pac`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    calculsPac = await response.json();
+                    displayCalculsPac();
+                } else {
+                    showMessage('Erreur lors du chargement des calculs PAC');
+                }
+            } catch (error) {
+                console.error('Erreur calculs PAC:', error);
+                showMessage('Erreur de connexion');
+            }
+        }
+        
+        function displayCalculsPac() {
+            const container = document.getElementById('calculsPacList');
+            if (calculsPac.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucun calcul PAC trouvé. Créez votre premier calcul!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = calculsPac.map(calcul => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <h3 class="item-title">${calcul.nom}</h3>
+                        <div class="item-actions">
+                            <button class="btn-edit" onclick="editCalculPac('${calcul.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteCalculPacConfirm('${calcul.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <p><strong>Client:</strong> ${calcul.client_nom}</p>
+                        ${calcul.type_pac ? `<p><strong>Type PAC:</strong> ${calcul.type_pac.replace('_', '/')}</p>` : ''}
+                        ${calcul.surface_totale ? `<p><strong>Surface:</strong> ${calcul.surface_totale} m²</p>` : ''}
+                        ${calcul.puissance_calculee ? `<p><strong>Puissance:</strong> ${calcul.puissance_calculee} kW</p>` : ''}
+                        ${calcul.budget_estime ? `<p><strong>Budget:</strong> ${calcul.budget_estime} €</p>` : ''}
+                        ${calcul.notes ? `<p><strong>Notes:</strong> ${calcul.notes}</p>` : ''}
+                    </div>
+                    <div class="item-meta">
+                        <span>Créé le ${new Date(calcul.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function filterCalculsPac() {
+            const search = document.getElementById('searchCalculsPac').value.toLowerCase();
+            const filtered = calculsPac.filter(calcul => 
+                calcul.nom.toLowerCase().includes(search) ||
+                calcul.client_nom.toLowerCase().includes(search) ||
+                calcul.type_pac.toLowerCase().includes(search)
+            );
+            
+            const container = document.getElementById('calculsPacList');
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucun calcul trouvé pour cette recherche.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = filtered.map(calcul => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <h3 class="item-title">${calcul.nom}</h3>
+                        <div class="item-actions">
+                            <button class="btn-edit" onclick="editCalculPac('${calcul.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteCalculPacConfirm('${calcul.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <p><strong>Client:</strong> ${calcul.client_nom}</p>
+                        ${calcul.type_pac ? `<p><strong>Type PAC:</strong> ${calcul.type_pac.replace('_', '/')}</p>` : ''}
+                        ${calcul.surface_totale ? `<p><strong>Surface:</strong> ${calcul.surface_totale} m²</p>` : ''}
+                        ${calcul.puissance_calculee ? `<p><strong>Puissance:</strong> ${calcul.puissance_calculee} kW</p>` : ''}
+                        ${calcul.budget_estime ? `<p><strong>Budget:</strong> ${calcul.budget_estime} €</p>` : ''}
+                        ${calcul.notes ? `<p><strong>Notes:</strong> ${calcul.notes}</p>` : ''}
+                    </div>
+                    <div class="item-meta">
+                        <span>Créé le ${new Date(calcul.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showAddCalculPac() {
+            currentEditingCalcul = null;
+            document.getElementById('calculPacModalTitle').textContent = 'Nouveau Calcul PAC';
+            document.getElementById('calculPacForm').reset();
+            togglePacFields(); // Initialiser l'affichage des champs
+            document.getElementById('calculPacModal').classList.remove('hidden');
+        }
+        
+        function togglePacFields() {
+            const typePac = document.getElementById('calculTypePac').value;
+            const airEauFields = document.getElementById('airEauFields');
+            const airAirFields = document.getElementById('airAirFields');
+            
+            if (typePac === 'air_eau') {
+                airEauFields.classList.remove('hidden');
+                airAirFields.classList.add('hidden');
+            } else if (typePac === 'air_air') {
+                airEauFields.classList.add('hidden');
+                airAirFields.classList.remove('hidden');
+            } else {
+                airEauFields.classList.add('hidden');
+                airAirFields.classList.add('hidden');
+            }
+        }
+        
+        function toggleEcsFields() {
+            const productionEcs = document.getElementById('calculProductionEcs').value;
+            const ecsFields = document.getElementById('ecsFields');
+            
+            if (productionEcs === 'true') {
+                ecsFields.classList.remove('hidden');
+            } else {
+                ecsFields.classList.add('hidden');
+            }
+        }
+        
+        function hideCalculPacModal() {
+            document.getElementById('calculPacModal').classList.add('hidden');
+            currentEditingCalcul = null;
+        }
+        
+        // Client form submission
+        document.getElementById('clientForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const clientData = {
+                nom: document.getElementById('clientNom').value,
+                prenom: document.getElementById('clientPrenom').value,
+                telephone: document.getElementById('clientTelephone').value,
+                email: document.getElementById('clientEmail').value,
+                adresse: document.getElementById('clientAdresse').value,
+                ville: document.getElementById('clientVille').value,
+                code_postal: document.getElementById('clientCodePostal').value,
+                type_chauffage: document.getElementById('clientTypeChauffage').value,
+                notes: document.getElementById('clientNotes').value
+            };
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const url = currentEditingClient 
+                    ? `${BACKEND_URL}/api/clients/${currentEditingClient.id}`
+                    : `${BACKEND_URL}/api/clients`;
+                const method = currentEditingClient ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(clientData)
+                });
+                
+                if (response.ok) {
+                    const message = currentEditingClient ? 'Client modifié avec succès' : 'Client créé avec succès';
+                    showMessage(message, 'success');
+                    hideClientModal();
+                    loadClients();
+                } else {
+                    showMessage('Erreur lors de l\'enregistrement');
+                }
+            } catch (error) {
+                console.error('Erreur sauvegarde client:', error);
+                showMessage('Erreur de connexion');
+            }
+        });
+        
+        // Calcul PAC form submission
+        document.getElementById('calculPacForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const calculData = {
+                nom: document.getElementById('calculNom').value,
+                client_nom: document.getElementById('calculClientNom').value,
+                adresse: document.getElementById('calculAdresse').value,
+                type_pac: document.getElementById('calculTypePac').value,
+                surface_totale: document.getElementById('calculSurfaceTotale').value,
+                isolation: document.getElementById('calculIsolation').value,
+                zone_climatique: document.getElementById('calculZoneClimatique').value,
+                budget_estime: document.getElementById('calculBudgetEstime').value,
+                notes: document.getElementById('calculNotes').value,
+                temperature_exterieure_base: document.getElementById('calculTempExtBase').value,
+                temperature_interieure_souhaitee: document.getElementById('calculTempIntSouhaitee').value,
+                type_emetteur: document.getElementById('calculTypeEmetteur').value,
+                production_ecs: document.getElementById('calculProductionEcs').value === 'true',
+                volume_ballon_ecs: document.getElementById('calculVolumeBallonEcs').value,
+                puissance_calculee: document.getElementById('calculPuissanceCalculee').value,
+                type_installation: document.getElementById('calculTypeInstallation').value,
+                scop_estime: document.getElementById('calculScopEstime').value,
+                pieces: [] // TODO: Ajouter gestion des pièces
+            };
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const url = currentEditingCalcul 
+                    ? `${BACKEND_URL}/api/calculs-pac/${currentEditingCalcul.id}`
+                    : `${BACKEND_URL}/api/calculs-pac`;
+                const method = currentEditingCalcul ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(calculData)
+                });
+                
+                if (response.ok) {
+                    const message = currentEditingCalcul ? 'Calcul PAC modifié avec succès' : 'Calcul PAC créé avec succès';
+                    showMessage(message, 'success');
+                    hideCalculPacModal();
+                    loadCalculsPac();
+                } else {
+                    showMessage('Erreur lors de l\'enregistrement');
+                }
+            } catch (error) {
+                console.error('Erreur sauvegarde calcul PAC:', error);
+                showMessage('Erreur de connexion');
+            }
+        });
+
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 H2EAUX GESTION initialisée');
