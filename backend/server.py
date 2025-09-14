@@ -1068,7 +1068,7 @@ async def get_fiche_sdb(fiche_id: str, current_user: User = Depends(get_current_
     return FicheChantier(**fiche)
 
 @api_router.put("/fiches-sdb/{fiche_id}", response_model=FicheChantier)
-async def update_fiche_sdb(fiche_id: str, fiche_data: FicheChantierUpdate, current_user: User = Depends(get_current_user)):
+async def update_fiche_sdb(fiche_id: str, fiche_data: FicheSDBUpdate, current_user: User = Depends(get_current_user)):
     fiche = await db.fiches_chantier.find_one({"id": fiche_id})
     if not fiche:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fiche chantier not found")
