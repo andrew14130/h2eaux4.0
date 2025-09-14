@@ -2067,6 +2067,340 @@
         </div>
     </div>
 
+    <!-- MODULE CALENDRIER -->
+    <div id="calendrierScreen" class="module-screen hidden">
+        <div class="module-header">
+            <button onclick="showDashboard()" class="back-button">← Retour Dashboard</button>
+            <h2>📅 Planning Chantiers</h2>
+            <button onclick="showAddRendezVous()" class="add-button">+ Nouveau RDV</button>
+        </div>
+
+        <div class="calendar-controls">
+            <button onclick="previousMonth()" class="calendar-nav">◀ Mois précédent</button>
+            <h3 id="currentMonthYear">Janvier 2025</h3>
+            <button onclick="nextMonth()" class="calendar-nav">Mois suivant ▶</button>
+        </div>
+
+        <div class="view-controls">
+            <button onclick="setCalendarView('month')" id="viewMonth" class="view-btn active">Vue Mois</button>
+            <button onclick="setCalendarView('week')" id="viewWeek" class="view-btn">Vue Semaine</button>
+            <button onclick="setCalendarView('day')" id="viewDay" class="view-btn">Vue Jour</button>
+        </div>
+
+        <!-- Vue Mois -->
+        <div id="monthView" class="calendar-view">
+            <div class="calendar-grid">
+                <div class="calendar-header">
+                    <div class="day-header">Lun</div>
+                    <div class="day-header">Mar</div>
+                    <div class="day-header">Mer</div>
+                    <div class="day-header">Jeu</div>
+                    <div class="day-header">Ven</div>
+                    <div class="day-header">Sam</div>
+                    <div class="day-header">Dim</div>
+                </div>
+                <div id="calendarDays" class="calendar-days">
+                    <!-- Les jours seront générés ici -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Vue Semaine -->
+        <div id="weekView" class="calendar-view hidden">
+            <div class="week-grid">
+                <div class="time-column">
+                    <div class="time-slot">08:00</div>
+                    <div class="time-slot">09:00</div>
+                    <div class="time-slot">10:00</div>
+                    <div class="time-slot">11:00</div>
+                    <div class="time-slot">12:00</div>
+                    <div class="time-slot">13:00</div>
+                    <div class="time-slot">14:00</div>
+                    <div class="time-slot">15:00</div>
+                    <div class="time-slot">16:00</div>
+                    <div class="time-slot">17:00</div>
+                    <div class="time-slot">18:00</div>
+                </div>
+                <div id="weekDays" class="week-days">
+                    <!-- Les colonnes de jours seront générées ici -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Vue Jour -->
+        <div id="dayView" class="calendar-view hidden">
+            <div class="day-detail">
+                <h3 id="selectedDayTitle">Lundi 15 Janvier 2025</h3>
+                <div id="dayEvents" class="day-events">
+                    <!-- Les événements du jour seront affichés ici -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Ajout/Édition Rendez-vous -->
+        <div id="rendezVousModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="rendezVousModalTitle">📅 Nouveau Rendez-vous</h3>
+                    <button onclick="hideRendezVousModal()" class="close-button">×</button>
+                </div>
+                <form id="rendezVousForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Titre *</label>
+                            <input type="text" id="rdvTitre" required placeholder="Ex: Visite technique Villa Dupont">
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select id="rdvType">
+                                <option value="visite_technique">Visite technique</option>
+                                <option value="releve_chantier">Relevé chantier</option>
+                                <option value="installation">Installation</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="formation_client">Formation client</option>
+                                <option value="reunion">Réunion</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date *</label>
+                            <input type="date" id="rdvDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Heure de début *</label>
+                            <input type="time" id="rdvHeureDebut" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Durée (minutes)</label>
+                            <select id="rdvDuree">
+                                <option value="30">30 min</option>
+                                <option value="60" selected>1h</option>
+                                <option value="90">1h30</option>
+                                <option value="120">2h</option>
+                                <option value="180">3h</option>
+                                <option value="240">4h</option>
+                                <option value="480">Journée complète</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Heure de fin</label>
+                            <input type="time" id="rdvHeureFin" readonly style="background: #e8f5e8; color: #2d5a2d;">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Client</label>
+                            <input type="text" id="rdvClient" placeholder="Nom du client">
+                        </div>
+                        <div class="form-group">
+                            <label>Téléphone client</label>
+                            <input type="tel" id="rdvTelephone">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Adresse</label>
+                        <textarea id="rdvAdresse" rows="2" placeholder="Adresse du rendez-vous"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Chantier associé</label>
+                            <input type="text" id="rdvChantier" placeholder="Nom du chantier (optionnel)">
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="rdvStatus">
+                                <option value="planifie">Planifié</option>
+                                <option value="confirme">Confirmé</option>
+                                <option value="en_cours">En cours</option>
+                                <option value="termine">Terminé</option>
+                                <option value="annule">Annulé</option>
+                                <option value="reporte">Reporté</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="rdvNotes" rows="3" placeholder="Notes sur le rendez-vous..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rappel</label>
+                        <select id="rdvRappel">
+                            <option value="0">Pas de rappel</option>
+                            <option value="15">15 minutes avant</option>
+                            <option value="30">30 minutes avant</option>
+                            <option value="60">1 heure avant</option>
+                            <option value="1440">1 jour avant</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" onclick="hideRendezVousModal()">Annuler</button>
+                        <button type="submit">Enregistrer RDV</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE DOCUMENTS AVANCÉ (STOCKAGE HORS LIGNE) -->
+    <div id="documentsAvancesScreen" class="module-screen hidden">
+        <div class="module-header">
+            <button onclick="showDashboard()" class="back-button">← Retour Dashboard</button>
+            <h2>📁 Documents & Fichiers</h2>
+            <div class="header-actions">
+                <button onclick="showUploadDocument()" class="add-button">📤 Upload Fichier</button>
+                <button onclick="showAddDocument()" class="add-button">+ Nouveau Document</button>
+            </div>
+        </div>
+
+        <div class="storage-info">
+            <div class="storage-card">
+                <h4>💾 Stockage Hors Ligne</h4>
+                <div class="storage-bar">
+                    <div id="storageUsed" class="storage-used" style="width: 25%"></div>
+                </div>
+                <p><span id="storageUsedText">250 MB</span> / <span id="storageTotalText">1 GB</span> utilisés</p>
+            </div>
+        </div>
+
+        <div class="search-and-filters">
+            <div class="search-bar">
+                <input type="text" id="searchDocumentsAvances" placeholder="Rechercher documents..." onkeyup="filterDocumentsAvances()">
+            </div>
+            <div class="filters-bar">
+                <select id="filterTypeDocumentsAvances" onchange="filterDocumentsAvances()">
+                    <option value="">Tous types</option>
+                    <option value="devis">💰 Devis</option>
+                    <option value="facture">🧾 Facture</option>
+                    <option value="catalogue">📚 Catalogue fournisseur</option>
+                    <option value="fiche_technique">🔧 Fiche technique</option>
+                    <option value="plan">📐 Plan</option>
+                    <option value="photo">📷 Photo</option>
+                    <option value="autre">📄 Autre</option>
+                </select>
+                <select id="filterStatutDocuments" onchange="filterDocumentsAvances()">
+                    <option value="">Tous statuts</option>
+                    <option value="en_ligne">🌐 En ligne</option>
+                    <option value="hors_ligne">💾 Hors ligne</option>
+                    <option value="synchronisation">🔄 Synchronisation</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="documentsAvancesList" class="documents-grid">
+            <!-- Les documents seront chargés ici -->
+        </div>
+
+        <!-- Modal Upload Fichier -->
+        <div id="uploadModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📤 Upload Fichier (Max 100MB)</h3>
+                    <button onclick="hideUploadModal()" class="close-button">×</button>
+                </div>
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon">📁</div>
+                    <p>Glissez un fichier ici ou cliquez pour sélectionner</p>
+                    <p class="upload-info">PDF, Images, Docs - Max 100MB</p>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
+                </div>
+                <div id="uploadProgress" class="upload-progress hidden">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <p id="progressText">0%</p>
+                </div>
+                <div id="uploadedFiles" class="uploaded-files"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE MEG INTEGRATION -->
+    <div id="megIntegrationScreen" class="module-screen hidden">
+        <div class="module-header">
+            <button onclick="showDashboard()" class="back-button">← Retour Dashboard</button>
+            <h2>🔄 MEG Integration</h2>
+            <button onclick="showImportMeg()" class="add-button">📥 Import MEG</button>
+        </div>
+
+        <div class="meg-status">
+            <div class="status-card">
+                <div class="status-icon">🔗</div>
+                <div class="status-info">
+                    <h4>Statut Synchronisation</h4>
+                    <p id="megStatus">Prêt pour import</p>
+                    <small id="lastSync">Dernière sync: Jamais</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="meg-sections">
+            <!-- Section Clients -->
+            <div class="meg-section">
+                <h3>👥 Clients MEG → H2EAUX</h3>
+                <div class="meg-actions">
+                    <button onclick="importClientsMeg()" class="sync-btn">📥 Importer Clients MEG</button>
+                    <button onclick="exportClientsToMeg()" class="sync-btn">📤 Exporter vers MEG</button>
+                </div>
+                <div id="clientsSyncStatus" class="sync-status">
+                    <p>Clients H2EAUX: <span id="countClientsH2eaux">0</span></p>
+                    <p>Clients MEG disponibles: <span id="countClientsMeg">0</span></p>
+                </div>
+            </div>
+
+            <!-- Section Devis -->
+            <div class="meg-section">
+                <h3>💰 Devis & Factures</h3>
+                <div class="meg-actions">
+                    <button onclick="createDevisMeg()" class="sync-btn">📄 Créer Devis MEG</button>
+                    <button onclick="syncFacturesMeg()" class="sync-btn">🧾 Sync Factures</button>
+                </div>
+                <div class="sync-status">
+                    <p>Devis en attente: <span id="countDevisAttente">0</span></p>
+                    <p>Factures non syncées: <span id="countFacturesNonSync">0</span></p>
+                </div>
+            </div>
+
+            <!-- Section Configuration -->
+            <div class="meg-section">
+                <h3>⚙️ Configuration MEG</h3>
+                <div class="meg-config">
+                    <div class="form-group">
+                        <label>Dossier MEG</label>
+                        <input type="text" id="megDossier" placeholder="C:\MEG\Dossiers" readonly>
+                        <button onclick="selectMegFolder()" class="browse-btn">📁 Parcourir</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Format d'export</label>
+                        <select id="megExportFormat">
+                            <option value="csv">CSV (Compatible MEG)</option>
+                            <option value="xml">XML (Avancé)</option>
+                            <option value="json">JSON (Backup)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="megLog" class="meg-log">
+            <h4>📋 Journal des opérations</h4>
+            <div id="megLogContent" class="log-content">
+                <p class="log-entry">Application initialisée - Prêt pour MEG Integration</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         const BACKEND_URL = 'https://h2eaux-gestion-1.preview.emergentagent.com';
         
