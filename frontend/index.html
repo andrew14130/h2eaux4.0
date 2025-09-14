@@ -2030,6 +2030,77 @@
             }
         }
 
+        async function editCalculPac(calculId) {
+            const calcul = calculsPac.find(c => c.id === calculId);
+            if (!calcul) return;
+
+            currentEditingCalcul = calcul;
+            document.getElementById('calculPacModalTitle').textContent = 'Modifier Calcul PAC';
+            
+            // Fill form
+            document.getElementById('calculNom').value = calcul.nom || '';
+            document.getElementById('calculType').value = calcul.type_pac || '';
+            document.getElementById('calculClient').value = calcul.client_id || '';
+            document.getElementById('calculZone').value = calcul.zone_climatique || 'H2';
+            
+            updateCalculFields();
+            
+            // Fill type-specific fields
+            if (calcul.type_pac === 'air-eau') {
+                setTimeout(() => {
+                    document.getElementById('calculSurface').value = calcul.surface_totale || '';
+                    document.getElementById('calculHauteur').value = calcul.hauteur_plafond || '2.5';
+                    document.getElementById('calculIsolation').value = calcul.isolation || 'moyenne';
+                    document.getElementById('calculDeltaT').value = calcul.delta_t || '20';
+                }, 100);
+            } else if (calcul.type_pac === 'air-air' && calcul.pieces) {
+                setTimeout(() => {
+                    document.getElementById('calculNbPieces').value = calcul.pieces.length;
+                    generatePiecesFields();
+                    
+                    setTimeout(() => {
+                        calcul.pieces.forEach((piece, index) => {
+                            const i = index + 1;
+                            document.getElementById(`piece${i}Nom`).value = piece.nom || '';
+                            document.getElementById(`piece${i}Surface`).value = piece.surface || '';
+                        });
+                    }, 100);
+                }, 100);
+            }
+
+            loadClientsForSelect('calculClient');
+            document.getElementById('calculPacModal').classList.add('active');
+        }
+
+        async function exportCalculPdf(calculId) {
+            try {
+                const response = await fetch(`${BACKEND_URL}/calculs-pac/${calculId}/pdf`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur lors de l\'export PDF');
+                }
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `calcul-pac-${calculId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                showMessage('PDF exporté avec succès !', 'success');
+            } catch (error) {
+                console.error('Error exporting PDF:', error);
+                showMessage('Erreur lors de l\'export PDF: ' + error.message, 'error');
+            }
+        }
+
         // Chantiers Functions
         async function loadChantiers() {
             try {
