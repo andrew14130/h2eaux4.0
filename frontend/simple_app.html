@@ -818,53 +818,212 @@
             </div>
         </div>
 
-        <!-- Modal Ajout/Édition Calcul PAC -->
-        <div id="calculPacModal" class="modal hidden">
+        <!-- Modal Calcul Air/Eau -->
+        <div id="calculAirEauModal" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="calculPacModalTitle">Nouveau Calcul PAC</h3>
-                    <button onclick="hideCalculPacModal()" class="close-button">×</button>
+                    <h3 id="calculAirEauModalTitle">Nouveau Calcul PAC Air/Eau</h3>
+                    <button onclick="hideCalculAirEauModal()" class="close-button">×</button>
                 </div>
-                <form id="calculPacForm">
+                <form id="calculAirEauForm">
+                    <!-- Informations générales -->
                     <div class="form-row">
                         <div class="form-group">
                             <label>Nom du projet *</label>
-                            <input type="text" id="calculNom" required>
+                            <input type="text" id="airEauNom" required>
                         </div>
                         <div class="form-group">
-                            <label>Client</label>
-                            <input type="text" id="calculClientNom" required>
+                            <label>Client *</label>
+                            <input type="text" id="airEauClientNom" required>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label>Adresse du projet</label>
+                        <textarea id="airEauAdresse" rows="2"></textarea>
+                    </div>
                     
+                    <!-- Caractéristiques bâtiment -->
+                    <h4>🏠 Caractéristiques du bâtiment</h4>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Type PAC *</label>
-                            <select id="calculTypePac" onchange="togglePacFields()">
-                                <option value="air_eau">Air/Eau (Chauffage + ECS)</option>
-                                <option value="air_air">Air/Air (Climatisation réversible)</option>
-                                <option value="geothermie">Géothermie</option>
-                            </select>
+                            <label>Surface totale (m²)</label>
+                            <input type="number" id="airEauSurfaceTotale" step="0.1">
                         </div>
                         <div class="form-group">
-                            <label>Surface totale (m²)</label>
-                            <input type="number" id="calculSurfaceTotale" step="0.1">
+                            <label>Altitude (m)</label>
+                            <input type="number" id="airEauAltitude" value="200">
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
+                            <label>Zone climatique</label>
+                            <select id="airEauZoneClimatique">
+                                <option value="H1">H1 (Nord/Est - froid)</option>
+                                <option value="H2">H2 (Centre - tempéré)</option>
+                                <option value="H3">H3 (Sud - chaud)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>Isolation</label>
-                            <select id="calculIsolation">
+                            <select id="airEauIsolation">
                                 <option value="faible">Faible (avant 1975)</option>
                                 <option value="moyenne">Moyenne (1975-2000)</option>
                                 <option value="bonne">Bonne (après 2000)</option>
                                 <option value="rt2012">RT 2012+</option>
                             </select>
                         </div>
+                    </div>
+
+                    <!-- Émetteurs -->
+                    <h4>🌡️ Émetteurs de chaleur</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Type émetteur principal</label>
+                            <select id="airEauTypeEmetteur">
+                                <option value="plancher_chauffant">Plancher chauffant (35°C)</option>
+                                <option value="radiateurs_bt">Radiateurs BT (45°C)</option>
+                                <option value="radiateurs_ht">Radiateurs HT (65°C)</option>
+                                <option value="ventilo_convecteurs">Ventilo-convecteurs</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Température de départ (°C)</label>
+                            <input type="number" id="airEauTempDepart" value="35">
+                        </div>
+                    </div>
+
+                    <!-- ECS -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Production ECS</label>
+                            <select id="airEauProductionEcs" onchange="toggleEcsFieldsAirEau()">
+                                <option value="false">Non</option>
+                                <option value="true">Oui</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="ecsVolumeGroup">
+                            <label>Volume ballon ECS (L)</label>
+                            <input type="number" id="airEauVolumeBallonEcs" value="200">
+                        </div>
+                    </div>
+
+                    <!-- Gestion des pièces -->
+                    <div class="pieces-section">
+                        <div class="pieces-header">
+                            <h4>🏠 Gestion par pièces</h4>
+                            <button type="button" class="btn-add-piece" onclick="addPieceAirEau()">+ Ajouter pièce</button>
+                        </div>
+                        <div id="piecesAirEauContainer">
+                            <!-- Les pièces seront ajoutées ici -->
+                        </div>
+                        <div class="form-group">
+                            <label>Puissance totale calculée (kW)</label>
+                            <input type="number" id="airEauPuissanceTotale" readonly style="background: #e8f5e8; color: #2d5a2d;">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Budget estimé (€)</label>
+                            <input type="number" id="airEauBudgetEstime" step="100">
+                        </div>
+                        <div class="form-group">
+                            <label>COP estimé</label>
+                            <input type="number" id="airEauCopEstime" step="0.1" value="3.5">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="airEauNotes" rows="3"></textarea>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" onclick="hideCalculAirEauModal()">Annuler</button>
+                        <button type="submit">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Calcul Air/Air -->
+        <div id="calculAirAirModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="calculAirAirModalTitle">Nouveau Calcul PAC Air/Air</h3>
+                    <button onclick="hideCalculAirAirModal()" class="close-button">×</button>
+                </div>
+                <form id="calculAirAirForm">
+                    <!-- Informations générales -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nom du projet *</label>
+                            <input type="text" id="airAirNom" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Client *</label>
+                            <input type="text" id="airAirClientNom" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Adresse du projet</label>
+                        <textarea id="airAirAdresse" rows="2"></textarea>
+                    </div>
+                    
+                    <!-- Type installation -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Type installation</label>
+                            <select id="airAirTypeInstallation">
+                                <option value="mono_split">Mono-split</option>
+                                <option value="multi_split">Multi-split</option>
+                                <option value="gainable">Gainable (conduits)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Surface totale (m²)</label>
+                            <input type="number" id="airAirSurfaceTotale" step="0.1">
+                        </div>
+                    </div>
+
+                    <!-- Performance -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>SCOP (Chauffage)</label>
+                            <input type="number" id="airAirScopEstime" step="0.1" value="4.0">
+                        </div>
+                        <div class="form-group">
+                            <label>SEER (Refroidissement)</label>
+                            <input type="number" id="airAirSeerEstime" step="0.1" value="6.5">
+                        </div>
+                    </div>
+
+                    <!-- Gestion des pièces -->
+                    <div class="pieces-section">
+                        <div class="pieces-header">
+                            <h4>❄️ Unités intérieures par pièce</h4>
+                            <button type="button" class="btn-add-piece" onclick="addPieceAirAir()">+ Ajouter pièce</button>
+                        </div>
+                        <div id="piecesAirAirContainer">
+                            <!-- Les pièces seront ajoutées ici -->
+                        </div>
+                        <div class="form-group">
+                            <label>Puissance totale calculée (kW)</label>
+                            <input type="number" id="airAirPuissanceTotale" readonly style="background: #e8f5e8; color: #2d5a2d;">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Budget estimé (€)</label>
+                            <input type="number" id="airAirBudgetEstime" step="100">
+                        </div>
                         <div class="form-group">
                             <label>Zone climatique</label>
-                            <select id="calculZoneClimatique">
+                            <select id="airAirZoneClimatique">
                                 <option value="H1">H1 (Nord/Est - froid)</option>
                                 <option value="H2">H2 (Centre - tempéré)</option>
                                 <option value="H3">H3 (Sud - chaud)</option>
@@ -872,87 +1031,13 @@
                         </div>
                     </div>
 
-                    <div id="airEauFields">
-                        <h4>🌡️ Spécifique Air/Eau</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Température extérieure base (°C)</label>
-                                <input type="number" id="calculTempExtBase" value="-7">
-                            </div>
-                            <div class="form-group">
-                                <label>Température intérieure souhaitée (°C)</label>
-                                <input type="number" id="calculTempIntSouhaitee" value="20">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Type émetteur</label>
-                                <select id="calculTypeEmetteur">
-                                    <option value="plancher_chauffant">Plancher chauffant (35°C)</option>
-                                    <option value="radiateurs_bt">Radiateurs BT (45°C)</option>
-                                    <option value="radiateurs_ht">Radiateurs HT (65°C)</option>
-                                    <option value="ventilo_convecteurs">Ventilo-convecteurs</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Production ECS</label>
-                                <select id="calculProductionEcs" onchange="toggleEcsFields()">
-                                    <option value="false">Non</option>
-                                    <option value="true">Oui</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div id="ecsFields" class="hidden">
-                            <div class="form-group">
-                                <label>Volume ballon ECS (L)</label>
-                                <input type="number" id="calculVolumeBallonEcs" value="200">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="airAirFields" class="hidden">
-                        <h4>❄️ Spécifique Air/Air</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Type installation</label>
-                                <select id="calculTypeInstallation">
-                                    <option value="mono_split">Mono-split</option>
-                                    <option value="multi_split">Multi-split</option>
-                                    <option value="gainable">Gainable</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>SCOP estimé</label>
-                                <input type="number" id="calculScopEstime" step="0.1" value="4.0">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Budget estimé (€)</label>
-                            <input type="number" id="calculBudgetEstime" step="100">
-                        </div>
-                        <div class="form-group">
-                            <label>Puissance calculée (kW)</label>
-                            <input type="number" id="calculPuissanceCalculee" step="0.1" readonly style="background: #e8f5e8; color: #2d5a2d;">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Adresse</label>
-                        <textarea id="calculAdresse" rows="2"></textarea>
-                    </div>
-
                     <div class="form-group">
                         <label>Notes</label>
-                        <textarea id="calculNotes" rows="3"></textarea>
+                        <textarea id="airAirNotes" rows="3"></textarea>
                     </div>
 
                     <div class="modal-actions">
-                        <button type="button" onclick="hideCalculPacModal()">Annuler</button>
+                        <button type="button" onclick="hideCalculAirAirModal()">Annuler</button>
                         <button type="submit">Enregistrer</button>
                     </div>
                 </form>
