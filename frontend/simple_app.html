@@ -1580,8 +1580,8 @@
                     loadChantiers();
                     break;
                 case 'documents':
-                    showMessage('Module Documents en développement', 'success');
-                    showDashboard();
+                    document.getElementById('documentsScreen').classList.remove('hidden');
+                    loadDocuments();
                     break;
                 case 'fiches-sdb':
                     showMessage('Module Fiches SDB en développement', 'success');
