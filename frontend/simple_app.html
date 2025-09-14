@@ -1397,8 +1397,8 @@
                     loadCalculsPac();
                     break;
                 case 'chantiers':
-                    showMessage('Module Chantiers en développement', 'success');
-                    showDashboard();
+                    document.getElementById('chantiersScreen').classList.remove('hidden');
+                    loadChantiers();
                     break;
                 case 'documents':
                     showMessage('Module Documents en développement', 'success');
