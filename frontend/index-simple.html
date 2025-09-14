@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>H2EAUX GESTION - Application Professionnelle</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="H2EAUX GESTION">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/modules.css">
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="assets/logo.png" alt="H2EAUX GESTION" class="login-logo">
+                <h1>H2EAUX GESTION</h1>
+                <p>PLOMBERIE • CLIMATISATION • CHAUFFAGE</p>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="username">Nom d'utilisateur</label>
+                    <input type="text" id="username" name="username" required placeholder="admin" value="admin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required placeholder="admin123" value="admin123">
+                </div>
+                
+                <button type="submit" class="btn-login">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app" class="app" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <img src="assets/logo.png" alt="Logo" class="header-logo">
+                <div class="header-title">
+                    <h1>H2EAUX GESTION</h1>
+                    <span class="header-subtitle">PLOMBERIE • CLIMATISATION • CHAUFFAGE</span>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <span class="user-name" id="userName">Admin</span>
+                <button id="logoutBtn" class="btn-logout">Déconnexion</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="app-main">
+            <!-- Sidebar Navigation -->
+            <nav class="app-sidebar">
+                <div class="nav-list">
+                    <button class="nav-item active" data-module="dashboard">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-label">Dashboard</span>
+                    </button>
+                    <button class="nav-item" data-module="clients">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-label">Clients</span>
+                    </button>
+                    <button class="nav-item" data-module="chantiers">
+                        <span class="nav-icon">🏗️</span>
+                        <span class="nav-label">Chantiers</span>
+                    </button>
+                    <button class="nav-item" data-module="calculs-pac">
+                        <span class="nav-icon">🌡️</span>
+                        <span class="nav-label">Calculs PAC</span>
+                    </button>
+                    <button class="nav-item" data-module="fiches">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">Fiches Chantier</span>
+                    </button>
+                    <button class="nav-item" data-module="documents">
+                        <span class="nav-icon">📄</span>
+                        <span class="nav-label">Documents</span>
+                    </button>
+                    <button class="nav-item" data-module="calendrier">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-label">Calendrier</span>
+                    </button>
+                    <button class="nav-item" data-module="parametres">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-label">Paramètres</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Content Area -->
+            <main class="app-content">
+                
+                <!-- DASHBOARD MODULE -->
+                <div id="dashboardModule" class="module" style="display: block;">
+                    <div class="module-header">
+                        <h2>🏠 Dashboard</h2>
+                        <p>Vue d'ensemble de votre activité</p>
+                    </div>
+                    
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalClients">0</div>
+                                <div class="stat-label">Clients</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">🏗️</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalChantiers">0</div>
+                                <div class="stat-label">Chantiers</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">🌡️</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalCalculs">0</div>
+                                <div class="stat-label">Calculs PAC</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="chantiersEnCours">0</div>
+                                <div class="stat-label">En cours</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLIENTS MODULE -->
+                <div id="clientsModule" class="module">
+                    <div class="module-header">
+                        <h2>👥 Clients</h2>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="app.showAddClientModal()">+ Nouveau Client</button>
+                        </div>
+                    </div>
+                    
+                    <div id="clientsList" class="items-list">
+                        <!-- Clients will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- FICHES CHANTIER MODULE -->
+                <div id="fichesModule" class="module">
+                    <div class="module-header">
+                        <h2>📋 Fiches de Relevé Chantier</h2>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="app.showAddFicheModal()">+ Nouvelle Fiche</button>
+                        </div>
+                    </div>
+                    
+                    <div id="fichesList" class="items-list">
+                        <!-- Fiches will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- OTHER MODULES PLACEHOLDER -->
+                <div id="chantiersModule" class="module">
+                    <div class="module-header">
+                        <h2>🏗️ Chantiers</h2>
+                        <p>Module en cours de développement</p>
+                    </div>
+                </div>
+
+                <div id="calculs-pacModule" class="module">
+                    <div class="module-header">
+                        <h2>🌡️ Calculs PAC</h2>
+                        <p>Module en cours de développement</p>
+                    </div>
+                </div>
+
+                <div id="documentsModule" class="module">
+                    <div class="module-header">
+                        <h2>📄 Documents</h2>
+                        <p>Module en cours de développement</p>
+                    </div>
+                </div>
+
+                <div id="calendrierModule" class="module">
+                    <div class="module-header">
+                        <h2>📅 Calendrier</h2>
+                        <p>Module en cours de développement</p>
+                    </div>
+                </div>
+
+                <div id="parametresModule" class="module">
+                    <div class="module-header">
+                        <h2>⚙️ Paramètres</h2>
+                        <p>Module en cours de développement</p>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modals"></div>
+
+    <!-- Application Script -->
+    <script src="app-complete.js"></script>
+</body>
+</html>
