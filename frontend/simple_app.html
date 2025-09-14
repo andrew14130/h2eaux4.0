@@ -1964,10 +1964,15 @@
                         <h4>📐 Plan 2D (Style MagicPlan)</h4>
                         <div class="plan-container">
                             <div class="plan-toolbar">
-                                <button type="button" class="plan-btn" onclick="startDrawing()">✏️ Dessiner</button>
+                                <button type="button" class="plan-btn" onclick="setDrawMode('draw')">✏️ Dessiner</button>
+                                <button type="button" class="plan-btn" onclick="setDrawMode('select')">👆 Sélectionner</button>
+                                <button type="button" class="plan-btn" onclick="setDrawMode('move')">🔄 Déplacer</button>
+                                <button type="button" class="plan-btn" onclick="setDrawMode('resize')">↔️ Redimensionner</button>
                                 <button type="button" class="plan-btn" onclick="addRoom()">🏠 Ajouter pièce</button>
                                 <button type="button" class="plan-btn" onclick="addMeasure()">📏 Coter</button>
-                                <button type="button" class="plan-btn" onclick="clearPlan()">🗑️ Effacer</button>
+                                <button type="button" class="plan-btn" onclick="deleteSelected()">🗑️ Supprimer sélection</button>
+                                <button type="button" class="plan-btn" onclick="clearPlan()">🆕 Nouveau plan</button>
+                                <button type="button" class="plan-btn" onclick="undoLastAction()">↶ Annuler</button>
                                 <button type="button" class="plan-btn" onclick="savePlan()">💾 Sauvegarder</button>
                             </div>
                             <canvas id="planCanvas" width="800" height="600"></canvas>
