@@ -1,0 +1,17 @@
+{
+  "name": "h2eaux-gestion",
+  "version": "1.0.0",
+  "main": "simple_app.html",
+  "scripts": {
+    "start": "expo start",
+    "web": "expo start --web --tunnel",
+    "build": "expo build:web"
+  },
+  "dependencies": {
+    "expo": "~51.0.28",
+    "@expo/webpack-config": "^19.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.0"
+  }
+}
