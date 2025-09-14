@@ -4208,6 +4208,295 @@
             canvas.dispatchEvent(mouseEvent);
         }
 
+        // EXPORT PDF FUNCTIONS
+        function exportFicheToPDF() {
+            showMessage('Génération du PDF en cours...', 'success');
+            
+            const ficheData = {
+                // Général
+                nom: document.getElementById('ficheNom').value,
+                dateRendezVous: document.getElementById('ficheDateRendezVous').value,
+                typeIntervention: document.getElementById('ficheTypeIntervention').value,
+                statut: document.getElementById('ficheStatut').value,
+                
+                // Client
+                clientNom: document.getElementById('ficheClientNom').value,
+                clientTelephone: document.getElementById('ficheClientTelephone').value,
+                clientEmail: document.getElementById('ficheClientEmail').value,
+                clientAdresse: document.getElementById('ficheClientAdresse').value,
+                clientBudget: document.getElementById('ficheClientBudget').value,
+                
+                // Logement
+                logementType: document.getElementById('ficheLogementType').value,
+                logementSurface: document.getElementById('ficheLogementSurface').value,
+                logementAnnee: document.getElementById('ficheLogementAnnee').value,
+                
+                // Existant
+                existantEnergie: document.getElementById('ficheExistantEnergie').value,
+                existantChauffage: document.getElementById('ficheExistantChauffage').value,
+                
+                // Notes
+                notesRecommandation: document.getElementById('ficheNotesRecommandation').value,
+                notesEstimation: document.getElementById('ficheNotesEstimation').value,
+                
+                // Plan (canvas en base64)
+                planImage: canvas ? canvas.toDataURL() : null
+            };
+            
+            generatePDF('fiche-chantier', ficheData);
+        }
+        
+        function exportCalculAirEauToPDF() {
+            showMessage('Génération du PDF calcul Air/Eau...', 'success');
+            
+            const calculData = {
+                nom: document.getElementById('airEauNom').value,
+                clientNom: document.getElementById('airEauClientNom').value,
+                adresse: document.getElementById('airEauAdresse').value,
+                surfaceTotale: document.getElementById('airEauSurfaceTotale').value,
+                zoneClimatique: document.getElementById('airEauZoneClimatique').value,
+                isolation: document.getElementById('airEauIsolation').value,
+                typeEmetteur: document.getElementById('airEauTypeEmetteur').value,
+                productionEcs: document.getElementById('airEauProductionEcs').value,
+                puissanceTotale: document.getElementById('airEauPuissanceTotale').value,
+                budgetEstime: document.getElementById('airEauBudgetEstime').value,
+                notes: document.getElementById('airEauNotes').value,
+                
+                // Données des pièces
+                pieces: collectPiecesAirEauData()
+            };
+            
+            generatePDF('calcul-air-eau', calculData);
+        }
+        
+        function exportCalculAirAirToPDF() {
+            showMessage('Génération du PDF calcul Air/Air...', 'success');
+            
+            const calculData = {
+                nom: document.getElementById('airAirNom').value,
+                clientNom: document.getElementById('airAirClientNom').value,
+                adresse: document.getElementById('airAirAdresse').value,
+                surfaceTotale: document.getElementById('airAirSurfaceTotale').value,
+                typeInstallation: document.getElementById('airAirTypeInstallation').value,
+                scopEstime: document.getElementById('airAirScopEstime').value,
+                seerEstime: document.getElementById('airAirSeerEstime').value,
+                puissanceTotale: document.getElementById('airAirPuissanceTotale').value,
+                budgetEstime: document.getElementById('airAirBudgetEstime').value,
+                notes: document.getElementById('airAirNotes').value,
+                
+                // Données des pièces
+                pieces: collectPiecesAirAirData()
+            };
+            
+            generatePDF('calcul-air-air', calculData);
+        }
+        
+        function collectPiecesAirEauData() {
+            const pieces = [];
+            for (let i = 1; i <= piecesAirEauCounter; i++) {
+                const pieceElement = document.getElementById(`pieceAirEau${i}`);
+                if (pieceElement) {
+                    pieces.push({
+                        nom: document.getElementById(`pieceAirEauNom${i}`)?.value,
+                        longueur: document.getElementById(`pieceAirEauLongueur${i}`)?.value,
+                        largeur: document.getElementById(`pieceAirEauLargeur${i}`)?.value,
+                        surface: document.getElementById(`pieceAirEauSurface${i}`)?.value,
+                        coeffG: document.getElementById(`pieceAirEauCoeffG${i}`)?.value,
+                        deltaT: document.getElementById(`pieceAirEauDeltaT${i}`)?.value,
+                        puissance: document.getElementById(`pieceAirEauPuissance${i}`)?.value
+                    });
+                }
+            }
+            return pieces;
+        }
+        
+        function collectPiecesAirAirData() {
+            const pieces = [];
+            for (let i = 1; i <= piecesAirAirCounter; i++) {
+                const pieceElement = document.getElementById(`pieceAirAir${i}`);
+                if (pieceElement) {
+                    pieces.push({
+                        nom: document.getElementById(`pieceAirAirNom${i}`)?.value,
+                        longueur: document.getElementById(`pieceAirAirLongueur${i}`)?.value,
+                        largeur: document.getElementById(`pieceAirAirLargeur${i}`)?.value,
+                        surface: document.getElementById(`pieceAirAirSurface${i}`)?.value,
+                        volume: document.getElementById(`pieceAirAirVolume${i}`)?.value,
+                        puissance: document.getElementById(`pieceAirAirPuissance${i}`)?.value,
+                        typeUnite: document.getElementById(`pieceAirAirTypeUnite${i}`)?.value
+                    });
+                }
+            }
+            return pieces;
+        }
+        
+        function generatePDF(type, data) {
+            // Simulation de génération PDF - Dans un vrai environnement, vous utiliseriez jsPDF ou PDFKit
+            const pdfContent = createPDFContent(type, data);
+            
+            // Créer un blob et télécharger
+            const blob = new Blob([pdfContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${type}-${data.nom || 'document'}-${new Date().toISOString().slice(0,10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            showMessage('PDF généré et téléchargé', 'success');
+        }
+        
+        function createPDFContent(type, data) {
+            const date = new Date().toLocaleDateString('fr-FR');
+            let content = '';
+            
+            if (type === 'fiche-chantier') {
+                content = `
+═══════════════════════════════════════════════════════════════
+                    H2EAUX GESTION - FICHE DE RELEVÉ CHANTIER
+═══════════════════════════════════════════════════════════════
+
+Date du document: ${date}
+
+📋 INFORMATIONS GÉNÉRALES
+────────────────────────────────────────────────────────────────
+Nom de la fiche: ${data.nom}
+Date du rendez-vous: ${data.dateRendezVous ? new Date(data.dateRendezVous).toLocaleString('fr-FR') : 'Non définie'}
+Type d'intervention: ${data.typeIntervention}
+Statut: ${data.statut}
+
+👤 CLIENT
+────────────────────────────────────────────────────────────────
+Nom: ${data.clientNom}
+Téléphone: ${data.clientTelephone}
+Email: ${data.clientEmail}
+Adresse: ${data.clientAdresse}
+Budget indicatif: ${data.clientBudget} €
+
+🏠 LOGEMENT
+────────────────────────────────────────────────────────────────
+Type: ${data.logementType}
+Surface: ${data.logementSurface} m²
+Année construction: ${data.logementAnnee}
+
+🔧 INSTALLATION EXISTANTE
+────────────────────────────────────────────────────────────────
+Énergie actuelle: ${data.existantEnergie}
+Type de chauffage: ${data.existantChauffage}
+
+📝 CONCLUSIONS
+────────────────────────────────────────────────────────────────
+Solution recommandée:
+${data.notesRecommandation}
+
+Estimation budget: ${data.notesEstimation} €
+
+${data.planImage ? '📐 Plan 2D joint (image base64)' : '📐 Aucun plan joint'}
+
+────────────────────────────────────────────────────────────────
+Document généré par H2EAUX GESTION - ${date}
+                `;
+            } else if (type === 'calcul-air-eau') {
+                content = `
+═══════════════════════════════════════════════════════════════
+                H2EAUX GESTION - CALCUL PAC AIR/EAU
+═══════════════════════════════════════════════════════════════
+
+Date du document: ${date}
+
+📋 PROJET
+────────────────────────────────────────────────────────────────
+Nom: ${data.nom}
+Client: ${data.clientNom}
+Adresse: ${data.adresse}
+
+🏠 CARACTÉRISTIQUES BÂTIMENT
+────────────────────────────────────────────────────────────────
+Surface totale: ${data.surfaceTotale} m²
+Zone climatique: ${data.zoneClimatique}
+Isolation: ${data.isolation}
+Type émetteur: ${data.typeEmetteur}
+Production ECS: ${data.productionEcs}
+
+⚙️ CALCULS PAR PIÈCE
+────────────────────────────────────────────────────────────────`;
+
+                data.pieces.forEach((piece, index) => {
+                    content += `
+Pièce ${index + 1}: ${piece.nom}
+- Dimensions: ${piece.longueur} × ${piece.largeur} m
+- Surface: ${piece.surface} m²
+- Coefficient G: ${piece.coeffG}
+- Delta T: ${piece.deltaT} °C  
+- Puissance: ${piece.puissance} W
+`;
+                });
+
+                content += `
+💰 SYNTHÈSE
+────────────────────────────────────────────────────────────────
+Puissance totale calculée: ${data.puissanceTotale} kW
+Budget estimé: ${data.budgetEstime} €
+
+Notes:
+${data.notes}
+
+────────────────────────────────────────────────────────────────
+Document généré par H2EAUX GESTION - ${date}
+                `;
+            } else if (type === 'calcul-air-air') {
+                content = `
+═══════════════════════════════════════════════════════════════
+                H2EAUX GESTION - CALCUL PAC AIR/AIR
+═══════════════════════════════════════════════════════════════
+
+Date du document: ${date}
+
+📋 PROJET
+────────────────────────────────────────────────────────────────
+Nom: ${data.nom}
+Client: ${data.clientNom}
+Adresse: ${data.adresse}
+
+❄️ CARACTÉRISTIQUES INSTALLATION
+────────────────────────────────────────────────────────────────
+Surface totale: ${data.surfaceTotale} m²
+Type installation: ${data.typeInstallation}
+SCOP: ${data.scopEstime}
+SEER: ${data.seerEstime}
+
+⚙️ UNITÉS PAR PIÈCE
+────────────────────────────────────────────────────────────────`;
+
+                data.pieces.forEach((piece, index) => {
+                    content += `
+Pièce ${index + 1}: ${piece.nom}
+- Dimensions: ${piece.longueur} × ${piece.largeur} m
+- Surface: ${piece.surface} m²
+- Volume: ${piece.volume} m³
+- Type unité: ${piece.typeUnite}
+- Puissance: ${piece.puissance} W
+`;
+                });
+
+                content += `
+💰 SYNTHÈSE
+────────────────────────────────────────────────────────────────
+Puissance totale calculée: ${data.puissanceTotale} kW
+Budget estimé: ${data.budgetEstime} €
+
+Notes:
+${data.notes}
+
+────────────────────────────────────────────────────────────────
+Document généré par H2EAUX GESTION - ${date}
+                `;
+            }
+            
+            return content;
+        }
+
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 H2EAUX GESTION initialisée');
