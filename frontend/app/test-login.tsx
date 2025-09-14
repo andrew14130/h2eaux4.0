@@ -14,7 +14,8 @@ export default function TestLoginScreen() {
     setResult('Test en cours...');
     
     try {
-      const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+      // For Expo web, we need to use the hardcoded URL since process.env is not available in browser
+      const BACKEND_URL = 'https://h2eaux-gestion-1.preview.emergentagent.com';
       console.log('Backend URL:', BACKEND_URL);
       
       const response = await axios.post(`${BACKEND_URL}/api/auth/login`, {
