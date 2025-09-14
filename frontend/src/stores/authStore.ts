@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// Web-compatible storage (localStorage instead of AsyncStorage)
 import axios from 'axios';
 
 export interface User {
