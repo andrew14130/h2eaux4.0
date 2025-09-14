@@ -77,14 +77,16 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
       storage: {
         getItem: (name) => {
-          const value = AsyncStorage.getItem(name);
-          return value;
+          const value = localStorage.getItem(name);
+          return value ? Promise.resolve(value) : Promise.resolve(null);
         },
         setItem: (name, value) => {
-          AsyncStorage.setItem(name, value);
+          localStorage.setItem(name, value);
+          return Promise.resolve();
         },
         removeItem: (name) => {
-          AsyncStorage.removeItem(name);
+          localStorage.removeItem(name);
+          return Promise.resolve();
         },
       },
     }
