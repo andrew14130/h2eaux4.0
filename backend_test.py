@@ -33,6 +33,74 @@ UPDATE_CLIENT_DATA = {
     "notes": "Client modifié lors des tests"
 }
 
+# Test data for Chantiers
+TEST_CHANTIER_DATA = {
+    "nom": "Installation PAC Villa Test",
+    "adresse": "456 Avenue des Tests",
+    "ville": "Lyon",
+    "code_postal": "69000",
+    "client_nom": "Dubois Jean-Pierre",
+    "client_telephone": "06 12 34 56 78",
+    "type_travaux": "installation_pac",
+    "statut": "en_attente",
+    "date_debut": "2025-02-01",
+    "date_fin_prevue": "2025-02-15",
+    "budget_estime": "15000",
+    "description": "Installation PAC Air/Eau 12kW avec plancher chauffant"
+}
+
+# Test data for Documents
+TEST_DOCUMENT_DATA = {
+    "nom": "Devis PAC Test",
+    "type": "devis",
+    "client_nom": "Dubois Jean-Pierre",
+    "chantier_nom": "Installation PAC Villa Test",
+    "description": "Devis pour installation PAC Air/Eau",
+    "tags": "pac, devis, test"
+}
+
+# Test data for PAC Calculations
+TEST_CALCUL_PAC_DATA = {
+    "nom": "Calcul PAC Villa Test",
+    "client_nom": "Dubois Jean-Pierre",
+    "adresse": "456 Avenue des Tests, Lyon 69000",
+    "type_pac": "air_eau",
+    "surface_totale": "120",
+    "isolation": "moyenne",
+    "zone_climatique": "H2",
+    "budget_estime": "15000",
+    "pieces": [
+        {
+            "id": "piece1",
+            "nom": "Salon",
+            "type": "salon",
+            "surface": "30",
+            "hauteur_plafond": "2.5",
+            "orientation": "sud",
+            "nombre_facades_exterieures": "1",
+            "isolation_murs": "moyenne",
+            "type_vitrage": "double",
+            "surface_vitree": "10",
+            "puissance_necessaire": "2.5",
+            "type_unite_interieure": "murale",
+            "temperature_depart": "35"
+        }
+    ],
+    "notes": "Test calcul PAC Air/Eau",
+    "temperature_exterieure_base": "-5",
+    "temperature_interieure_souhaitee": "20",
+    "altitude": "200",
+    "type_emetteur": "plancher_chauffant",
+    "production_ecs": True,
+    "volume_ballon_ecs": "200",
+    "puissance_calculee": "12",
+    "cop_estime": "3.5",
+    "type_installation": "",
+    "puissance_totale_calculee": "",
+    "scop_estime": "",
+    "seer_estime": ""
+}
+
 class TestResults:
     def __init__(self):
         self.passed = 0
