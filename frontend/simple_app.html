@@ -1490,29 +1490,62 @@
             document.getElementById('pacAirEauSection').classList.add('hidden');
         }
         
-        function displayCalculsPac() {
-            const container = document.getElementById('calculsPacList');
-            if (calculsPac.length === 0) {
-                container.innerHTML = '<div class="item-card"><p>Aucun calcul PAC trouvé. Créez votre premier calcul!</p></div>';
+        function displayAirEau() {
+            const container = document.getElementById('airEauList');
+            if (calculsPacAirEau.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucun calcul Air/Eau trouvé. Créez votre premier calcul!</p></div>';
                 return;
             }
             
-            container.innerHTML = calculsPac.map(calcul => `
+            container.innerHTML = calculsPacAirEau.map(calcul => `
                 <div class="item-card">
                     <div class="item-header">
-                        <h3 class="item-title">${calcul.nom}</h3>
+                        <h3 class="item-title">🌡️ ${calcul.nom}</h3>
                         <div class="item-actions">
-                            <button class="btn-edit" onclick="editCalculPac('${calcul.id}')">Modifier</button>
-                            <button class="btn-delete" onclick="deleteCalculPacConfirm('${calcul.id}')">Supprimer</button>
+                            <button class="btn-edit" onclick="editCalculAirEau('${calcul.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteCalculConfirm('${calcul.id}')">Supprimer</button>
                         </div>
                     </div>
                     <div class="item-details">
                         <p><strong>Client:</strong> ${calcul.client_nom}</p>
-                        ${calcul.type_pac ? `<p><strong>Type PAC:</strong> ${calcul.type_pac.replace('_', '/')}</p>` : ''}
                         ${calcul.surface_totale ? `<p><strong>Surface:</strong> ${calcul.surface_totale} m²</p>` : ''}
-                        ${calcul.puissance_calculee ? `<p><strong>Puissance:</strong> ${calcul.puissance_calculee} kW</p>` : ''}
+                        ${calcul.type_emetteur ? `<p><strong>Émetteurs:</strong> ${calcul.type_emetteur.replace('_', ' ')}</p>` : ''}
+                        ${calcul.puissance_calculee ? `<p><strong>Puissance:</strong> <span class="calculated-value">${calcul.puissance_calculee} kW</span></p>` : ''}
+                        ${calcul.production_ecs ? `<p><strong>ECS:</strong> ${calcul.volume_ballon_ecs}L</p>` : ''}
                         ${calcul.budget_estime ? `<p><strong>Budget:</strong> ${calcul.budget_estime} €</p>` : ''}
-                        ${calcul.notes ? `<p><strong>Notes:</strong> ${calcul.notes}</p>` : ''}
+                        ${calcul.pieces && calcul.pieces.length ? `<p><strong>Pièces:</strong> ${calcul.pieces.length} pièce(s)</p>` : ''}
+                    </div>
+                    <div class="item-meta">
+                        <span>Créé le ${new Date(calcul.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayAirAir() {
+            const container = document.getElementById('airAirList');
+            if (calculsPacAirAir.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucun calcul Air/Air trouvé. Créez votre premier calcul!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = calculsPacAirAir.map(calcul => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <h3 class="item-title">❄️ ${calcul.nom}</h3>
+                        <div class="item-actions">
+                            <button class="btn-edit" onclick="editCalculAirAir('${calcul.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteCalculConfirm('${calcul.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <p><strong>Client:</strong> ${calcul.client_nom}</p>
+                        ${calcul.surface_totale ? `<p><strong>Surface:</strong> ${calcul.surface_totale} m²</p>` : ''}
+                        ${calcul.type_installation ? `<p><strong>Installation:</strong> ${calcul.type_installation.replace('_', '-')}</p>` : ''}
+                        ${calcul.puissance_totale_calculee ? `<p><strong>Puissance:</strong> <span class="calculated-value">${calcul.puissance_totale_calculee} kW</span></p>` : ''}
+                        ${calcul.scop_estime ? `<p><strong>SCOP:</strong> ${calcul.scop_estime}</p>` : ''}
+                        ${calcul.budget_estime ? `<p><strong>Budget:</strong> ${calcul.budget_estime} €</p>` : ''}
+                        ${calcul.pieces && calcul.pieces.length ? `<p><strong>Unités:</strong> ${calcul.pieces.length} unité(s)</p>` : ''}
                     </div>
                     <div class="item-meta">
                         <span>Créé le ${new Date(calcul.created_at).toLocaleDateString('fr-FR')}</span>
