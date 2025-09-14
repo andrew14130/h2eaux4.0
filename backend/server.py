@@ -956,10 +956,10 @@ async def update_fiche_sdb(fiche_id: str, fiche_data: FicheSDBUpdate, current_us
 
 @api_router.delete("/fiches-sdb/{fiche_id}")
 async def delete_fiche_sdb(fiche_id: str, current_user: User = Depends(get_current_user)):
-    result = await db.fiches_chantier.delete_one({"id": fiche_id})
+    result = await db.fiches_sdb.delete_one({"id": fiche_id})
     if result.deleted_count == 0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fiche chantier not found")
-    return {"message": "Fiche chantier deleted successfully"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fiche not found")
+    return {"message": "Fiche deleted successfully"}
 
 # Calcul PAC routes - Version étendue
 @api_router.get("/calculs-pac", response_model=List[CalculPACExtended])
