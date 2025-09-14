@@ -2427,6 +2427,71 @@
             }
         }
 
+        function filterCalculs() {
+            const searchTerm = document.getElementById('calculSearch')?.value.toLowerCase() || '';
+            const typeFilter = document.getElementById('calculFilter')?.value || '';
+            
+            let filteredCalculs = calculsPac;
+            
+            if (searchTerm) {
+                filteredCalculs = filteredCalculs.filter(calcul => 
+                    calcul.nom.toLowerCase().includes(searchTerm) ||
+                    (calcul.client_nom && calcul.client_nom.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            if (typeFilter) {
+                filteredCalculs = filteredCalculs.filter(calcul => calcul.type_pac === typeFilter);
+            }
+
+            // Temporarily replace array for display
+            const originalCalculs = calculsPac;
+            calculsPac = filteredCalculs;
+            displayCalculsPac();
+            calculsPac = originalCalculs;
+        }
+
+        function filterChantiers() {
+            const searchTerm = document.getElementById('chantierSearch')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('chantierStatusFilter')?.value || '';
+            
+            let filteredChantiers = chantiers;
+            
+            if (searchTerm) {
+                filteredChantiers = filteredChantiers.filter(chantier => 
+                    chantier.nom.toLowerCase().includes(searchTerm) ||
+                    (chantier.client_nom && chantier.client_nom.toLowerCase().includes(searchTerm)) ||
+                    (chantier.adresse && chantier.adresse.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            if (statusFilter) {
+                filteredChantiers = filteredChantiers.filter(chantier => chantier.statut === statusFilter);
+            }
+
+            // Temporarily replace array for display
+            const originalChantiers = chantiers;
+            chantiers = filteredChantiers;
+            displayChantiers();
+            chantiers = originalChantiers;
+        }
+
+        function editCalculPac(calculId) {
+            showMessage('Fonction de modification des calculs PAC - À implémenter');
+        }
+
+        function exportCalculPdf(calculId) {
+            showMessage('Export PDF en cours de développement - Fonctionnalité à venir');
+        }
+
+        function editChantier(chantierId) {
+            showMessage('Fonction de modification des chantiers - À implémenter');
+        }
+
+        function viewChantierDetails(chantierId) {
+            showMessage('Vue détaillée du chantier - À implémenter');
+        }
+
         // Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Hide loading screen after delay
