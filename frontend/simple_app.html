@@ -1442,7 +1442,11 @@
         
         // CALCULS PAC FUNCTIONS
         let calculsPac = [];
+        let calculsPacAirEau = [];
+        let calculsPacAirAir = [];
         let currentEditingCalcul = null;
+        let piecesAirEauCounter = 0;
+        let piecesAirAirCounter = 0;
         
         async function loadCalculsPac() {
             try {
@@ -1456,7 +1460,13 @@
                 
                 if (response.ok) {
                     calculsPac = await response.json();
-                    displayCalculsPac();
+                    
+                    // Séparer Air/Eau et Air/Air
+                    calculsPacAirEau = calculsPac.filter(calc => calc.type_pac === 'air_eau');
+                    calculsPacAirAir = calculsPac.filter(calc => calc.type_pac === 'air_air');
+                    
+                    displayAirEau();
+                    displayAirAir();
                 } else {
                     showMessage('Erreur lors du chargement des calculs PAC');
                 }
@@ -1464,6 +1474,20 @@
                 console.error('Erreur calculs PAC:', error);
                 showMessage('Erreur de connexion');
             }
+        }
+
+        function showPacAirEau() {
+            document.getElementById('btnAirEau').classList.add('active');
+            document.getElementById('btnAirAir').classList.remove('active');
+            document.getElementById('pacAirEauSection').classList.remove('hidden');
+            document.getElementById('pacAirAirSection').classList.add('hidden');
+        }
+
+        function showPacAirAir() {
+            document.getElementById('btnAirAir').classList.add('active');
+            document.getElementById('btnAirEau').classList.remove('active');
+            document.getElementById('pacAirAirSection').classList.remove('hidden');
+            document.getElementById('pacAirEauSection').classList.add('hidden');
         }
         
         function displayCalculsPac() {
