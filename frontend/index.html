@@ -274,6 +274,129 @@
                     </div>
                 </div>
 
+                <!-- FICHES CHANTIER MODULE -->
+                <div id="fichesModule" class="module">
+                    <div class="module-header">
+                        <h2>📋 Fiches de Relevé Chantier</h2>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="fiches.showAddModal()">+ Nouvelle Fiche</button>
+                            <button class="btn-secondary" onclick="fiches.exportPDF()">📄 Export PDF</button>
+                        </div>
+                    </div>
+                    
+                    <div class="module-filters">
+                        <input type="text" id="ficheSearch" placeholder="Rechercher une fiche..." onkeyup="fiches.filter()">
+                        <select id="ficheType" onchange="fiches.filterByType()">
+                            <option value="">Tous les types</option>
+                            <option value="visite_technique">Visite Technique</option>
+                            <option value="releve_existant">Relevé Existant</option>
+                            <option value="installation">Installation</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    
+                    <div id="fichesList" class="items-list">
+                        <!-- Fiches will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- DOCUMENTS MODULE -->
+                <div id="documentsModule" class="module">
+                    <div class="module-header">
+                        <h2>📄 Documents</h2>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="documents.showAddModal()">+ Ajouter Document</button>
+                            <button class="btn-secondary" onclick="documents.exportPDF()">📄 Export PDF</button>
+                        </div>
+                    </div>
+                    
+                    <div class="module-filters">
+                        <input type="text" id="documentSearch" placeholder="Rechercher un document..." onkeyup="documents.filter()">
+                        <select id="documentType" onchange="documents.filterByType()">
+                            <option value="">Tous les types</option>
+                            <option value="facture">Facture</option>
+                            <option value="devis">Devis</option>
+                            <option value="contrat">Contrat</option>
+                            <option value="fiche_technique">Fiche Technique</option>
+                            <option value="rapport">Rapport</option>
+                        </select>
+                    </div>
+                    
+                    <div id="documentsList" class="items-list">
+                        <!-- Documents will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- CALENDRIER MODULE -->
+                <div id="calendrierModule" class="module">
+                    <div class="module-header">
+                        <h2>📅 Calendrier Planning</h2>
+                        <div class="module-actions">
+                            <button class="btn-primary" onclick="calendrier.showAddEventModal()">+ Nouveau RDV</button>
+                            <div class="view-selector">
+                                <button class="view-btn active" data-view="month" onclick="calendrier.changeView('month')">Mois</button>
+                                <button class="view-btn" data-view="week" onclick="calendrier.changeView('week')">Semaine</button>
+                                <button class="view-btn" data-view="day" onclick="calendrier.changeView('day')">Jour</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="calendrierView" class="calendar-container">
+                        <!-- Calendar will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- MEG INTEGRATION MODULE -->
+                <div id="megModule" class="module">
+                    <div class="module-header">
+                        <h2>🔄 MEG Integration</h2>
+                        <p>Synchronisation avec votre logiciel de comptabilité MEG</p>
+                    </div>
+                    
+                    <div class="meg-sections">
+                        <div class="meg-section">
+                            <h3>📥 Import depuis MEG</h3>
+                            <div class="import-area">
+                                <input type="file" id="megImportFile" accept=".csv,.xml,.txt" onchange="meg.handleImport()">
+                                <button class="btn-primary" onclick="document.getElementById('megImportFile').click()">
+                                    Sélectionner fichier MEG
+                                </button>
+                                <p>Formats supportés: CSV, XML, TXT</p>
+                            </div>
+                        </div>
+                        
+                        <div class="meg-section">
+                            <h3>📤 Export vers MEG</h3>
+                            <div class="export-options">
+                                <button class="btn-secondary" onclick="meg.exportClients()">Exporter Clients</button>
+                                <button class="btn-secondary" onclick="meg.exportChantiers()">Exporter Chantiers</button>
+                                <button class="btn-secondary" onclick="meg.exportAll()">Export Complet</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHAT MODULE -->
+                <div id="chatModule" class="module">
+                    <div class="module-header">
+                        <h2>💬 Chat Équipe</h2>
+                        <div class="chat-status">
+                            <div class="status-indicator offline" id="chatStatus"></div>
+                            <span id="chatStatusText">Hors ligne</span>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- Messages will appear here -->
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" id="chatInput" placeholder="Tapez votre message..." onkeypress="chat.handleKeyPress(event)">
+                            <button class="btn-primary" onclick="chat.sendMessage()">Envoyer</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- PARAMETRES MODULE -->
                 <div id="parametresModule" class="module">
                     <div class="module-header">
