@@ -2822,6 +2822,240 @@
             }
         });
 
+        // DOCUMENTS FUNCTIONS
+        let documents = [];
+        let currentEditingDocument = null;
+        
+        async function loadDocuments() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`${BACKEND_URL}/api/documents`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    documents = await response.json();
+                    displayDocuments();
+                } else {
+                    showMessage('Erreur lors du chargement des documents');
+                }
+            } catch (error) {
+                console.error('Erreur documents:', error);
+                showMessage('Erreur de connexion');
+            }
+        }
+        
+        function displayDocuments() {
+            const container = document.getElementById('documentsList');
+            if (documents.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucun document trouvé. Ajoutez votre premier document!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = documents.map(document => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <h3 class="item-title">${getDocumentIcon(document.type)} ${document.nom}</h3>
+                        <div class="item-actions">
+                            <button class="btn-edit" onclick="editDocument('${document.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteDocumentConfirm('${document.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <p><strong>Type:</strong> ${getDocumentTypeText(document.type)}</p>
+                        ${document.client_nom ? `<p><strong>Client:</strong> ${document.client_nom}</p>` : ''}
+                        ${document.chantier_nom ? `<p><strong>Chantier:</strong> ${document.chantier_nom}</p>` : ''}
+                        ${document.description ? `<p><strong>Description:</strong> ${document.description}</p>` : ''}
+                        ${document.tags ? `<p><strong>Tags:</strong> ${document.tags}</p>` : ''}
+                        ${document.file_path ? `<p><strong>Fichier:</strong> ${document.file_path}</p>` : ''}
+                        ${document.file_size ? `<p><strong>Taille:</strong> ${formatFileSize(document.file_size)}</p>` : ''}
+                    </div>
+                    <div class="item-meta">
+                        <span>Créé le ${new Date(document.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getDocumentIcon(type) {
+            const icons = {
+                'facture': '🧾',
+                'devis': '💰',
+                'contrat': '📝',
+                'fiche_technique': '🔧',
+                'rapport': '📊',
+                'autre': '📄'
+            };
+            return icons[type] || '📄';
+        }
+        
+        function getDocumentTypeText(type) {
+            const types = {
+                'facture': 'Facture',
+                'devis': 'Devis',
+                'contrat': 'Contrat',
+                'fiche_technique': 'Fiche technique',
+                'rapport': 'Rapport',
+                'autre': 'Autre'
+            };
+            return types[type] || type;
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
+            return Math.round(bytes / (1024 * 1024)) + ' MB';
+        }
+        
+        function filterDocuments() {
+            const search = document.getElementById('searchDocuments').value.toLowerCase();
+            const typeFilter = document.getElementById('filterTypeDocuments').value;
+            
+            const filtered = documents.filter(document => {
+                const matchSearch = document.nom.toLowerCase().includes(search) ||
+                                  document.client_nom.toLowerCase().includes(search) ||
+                                  document.chantier_nom.toLowerCase().includes(search) ||
+                                  document.tags.toLowerCase().includes(search);
+                
+                const matchType = !typeFilter || document.type === typeFilter;
+                
+                return matchSearch && matchType;
+            });
+            
+            const container = document.getElementById('documentsList');
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="item-card"><p>Aucun document trouvé pour ces critères.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = filtered.map(document => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <h3 class="item-title">${getDocumentIcon(document.type)} ${document.nom}</h3>
+                        <div class="item-actions">
+                            <button class="btn-edit" onclick="editDocument('${document.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteDocumentConfirm('${document.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <p><strong>Type:</strong> ${getDocumentTypeText(document.type)}</p>
+                        ${document.client_nom ? `<p><strong>Client:</strong> ${document.client_nom}</p>` : ''}
+                        ${document.chantier_nom ? `<p><strong>Chantier:</strong> ${document.chantier_nom}</p>` : ''}
+                        ${document.description ? `<p><strong>Description:</strong> ${document.description}</p>` : ''}
+                        ${document.tags ? `<p><strong>Tags:</strong> ${document.tags}</p>` : ''}
+                    </div>
+                    <div class="item-meta">
+                        <span>Créé le ${new Date(document.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showAddDocument() {
+            currentEditingDocument = null;
+            document.getElementById('documentModalTitle').textContent = '📄 Nouveau Document';
+            document.getElementById('documentForm').reset();
+            document.getElementById('documentModal').classList.remove('hidden');
+        }
+        
+        function editDocument(documentId) {
+            const document = documents.find(d => d.id === documentId);
+            if (!document) return;
+            
+            currentEditingDocument = document;
+            document.getElementById('documentModalTitle').textContent = '📄 Modifier Document';
+            
+            document.getElementById('documentNom').value = document.nom;
+            document.getElementById('documentType').value = document.type;
+            document.getElementById('documentClientNom').value = document.client_nom;
+            document.getElementById('documentChantierNom').value = document.chantier_nom;
+            document.getElementById('documentDescription').value = document.description;
+            document.getElementById('documentTags').value = document.tags;
+            document.getElementById('documentFilePath').value = document.file_path;
+            document.getElementById('documentFileSize').value = document.file_size;
+            document.getElementById('documentMimeType').value = document.mime_type;
+            
+            document.getElementById('documentModal').classList.remove('hidden');
+        }
+        
+        function hideDocumentModal() {
+            document.getElementById('documentModal').classList.add('hidden');
+            currentEditingDocument = null;
+        }
+        
+        async function deleteDocumentConfirm(documentId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) return;
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`${BACKEND_URL}/api/documents/${documentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showMessage('Document supprimé avec succès', 'success');
+                    loadDocuments();
+                } else {
+                    showMessage('Erreur lors de la suppression');
+                }
+            } catch (error) {
+                console.error('Erreur suppression document:', error);
+                showMessage('Erreur de connexion');
+            }
+        }
+        
+        // Document form submission
+        document.getElementById('documentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const documentData = {
+                nom: document.getElementById('documentNom').value,
+                type: document.getElementById('documentType').value,
+                client_nom: document.getElementById('documentClientNom').value,
+                chantier_nom: document.getElementById('documentChantierNom').value,
+                description: document.getElementById('documentDescription').value,
+                tags: document.getElementById('documentTags').value,
+                file_path: document.getElementById('documentFilePath').value,
+                file_size: parseInt(document.getElementById('documentFileSize').value) || 0,
+                mime_type: document.getElementById('documentMimeType').value
+            };
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const url = currentEditingDocument 
+                    ? `${BACKEND_URL}/api/documents/${currentEditingDocument.id}`
+                    : `${BACKEND_URL}/api/documents`;
+                const method = currentEditingDocument ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(documentData)
+                });
+                
+                if (response.ok) {
+                    const message = currentEditingDocument ? 'Document modifié avec succès' : 'Document créé avec succès';
+                    showMessage(message, 'success');
+                    hideDocumentModal();
+                    loadDocuments();
+                } else {
+                    showMessage('Erreur lors de l\'enregistrement');
+                }
+            } catch (error) {
+                console.error('Erreur sauvegarde document:', error);
+                showMessage('Erreur de connexion');
+            }
+        });
+
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 H2EAUX GESTION initialisée');
