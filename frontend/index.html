@@ -2260,6 +2260,79 @@
             }
         }
 
+        async function editChantier(chantierId) {
+            const chantier = chantiers.find(c => c.id === chantierId);
+            if (!chantier) return;
+
+            currentEditingChantier = chantier;
+            document.getElementById('chantierModalTitle').textContent = 'Modifier Chantier';
+            
+            // Fill form
+            document.getElementById('chantierNom').value = chantier.nom || '';
+            document.getElementById('chantierClient').value = chantier.client_id || '';
+            document.getElementById('chantierDescription').value = chantier.description || '';
+            document.getElementById('chantierDateDebut').value = chantier.date_debut || '';
+            document.getElementById('chantierDateFin').value = chantier.date_fin_prevue || '';
+            document.getElementById('chantierBudget').value = chantier.budget_estime || '';
+            document.getElementById('chantierStatut').value = chantier.statut || 'en_attente';
+            document.getElementById('chantierAdresse').value = chantier.adresse || '';
+
+            loadClientsForSelect('chantierClient');
+            document.getElementById('chantierModal').classList.add('active');
+        }
+
+        function viewChantierDetails(chantierId) {
+            const chantier = chantiers.find(c => c.id === chantierId);
+            if (!chantier) return;
+
+            let details = `📋 Détails du chantier: ${chantier.nom}\n\n`;
+            
+            if (chantier.client_nom) details += `👤 Client: ${chantier.client_nom}\n`;
+            if (chantier.adresse) details += `📍 Adresse: ${chantier.adresse}\n`;
+            if (chantier.description) details += `📝 Description: ${chantier.description}\n`;
+            if (chantier.date_debut) details += `📅 Date début: ${formatDate(chantier.date_debut)}\n`;
+            if (chantier.date_fin_prevue) details += `🏁 Date fin prévue: ${formatDate(chantier.date_fin_prevue)}\n`;
+            if (chantier.budget_estime) details += `💰 Budget: ${formatCurrency(chantier.budget_estime)}\n`;
+            details += `📊 Statut: ${getStatusLabel(chantier.statut)}\n`;
+            details += `📅 Créé le: ${formatDate(chantier.created_at)}`;
+
+            alert(details);
+        }
+
+        function filterChantiers() {
+            const searchTerm = document.getElementById('chantierSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('chantierStatusFilter').value;
+            
+            const filteredChantiers = chantiers.filter(chantier => {
+                const matchesSearch = chantier.nom.toLowerCase().includes(searchTerm) ||
+                    (chantier.client_nom && chantier.client_nom.toLowerCase().includes(searchTerm)) ||
+                    (chantier.adresse && chantier.adresse.toLowerCase().includes(searchTerm)) ||
+                    (chantier.description && chantier.description.toLowerCase().includes(searchTerm));
+                
+                const matchesStatus = !statusFilter || chantier.statut === statusFilter;
+                
+                return matchesSearch && matchesStatus;
+            });
+
+            const chantiersList = document.getElementById('chantiersList');
+            
+            if (filteredChantiers.length === 0) {
+                chantiersList.innerHTML = `
+                    <div class="text-center" style="padding: 2rem; color: var(--text-secondary);">
+                        <div style="font-size: 2rem; margin-bottom: 1rem;">🔍</div>
+                        <div>Aucun chantier trouvé</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Temporarily replace chantiers array for display
+            const originalChantiers = chantiers;
+            chantiers = filteredChantiers;
+            displayChantiers();
+            chantiers = originalChantiers;
+        }
+
         // Utility Functions
         async function loadClientsForSelect(selectId) {
             try {
