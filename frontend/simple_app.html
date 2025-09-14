@@ -530,6 +530,109 @@
         .status-termine { background-color: #00D4AA; color: white; }
         .status-annule { background-color: #E74C3C; color: white; }
 
+        /* PAC TYPE BUTTONS */
+        .pac-type-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pac-type-btn {
+            padding: 8px 16px;
+            border: 2px solid #444;
+            background-color: #2a2a2a;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .pac-type-btn:hover {
+            border-color: #007AFF;
+        }
+
+        .pac-type-btn.active {
+            background-color: #007AFF;
+            border-color: #007AFF;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+        }
+
+        .section-header h3 {
+            margin: 0;
+            color: #007AFF;
+        }
+
+        /* PIECES MANAGEMENT */
+        .pieces-section {
+            background-color: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .pieces-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .pieces-header h4 {
+            margin: 0;
+            color: #00D4AA;
+        }
+
+        .piece-card {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #444;
+        }
+
+        .piece-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .piece-name {
+            font-weight: 600;
+            color: #007AFF;
+        }
+
+        .piece-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .calculated-value {
+            color: #00D4AA;
+            font-weight: 600;
+        }
+
+        .btn-add-piece {
+            background-color: #00D4AA;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 768px) {
             .form-row {
@@ -545,6 +648,16 @@
             .item-header {
                 flex-direction: column;
                 gap: 12px;
+            }
+
+            .pac-type-buttons {
+                flex-direction: column;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
             }
         }
     </style>
