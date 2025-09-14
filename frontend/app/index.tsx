@@ -235,6 +235,10 @@ const styles = StyleSheet.create({
   loginButtonDisabled: {
     opacity: 0.6,
   },
+  loginButtonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
+  },
   loginButtonText: {
     color: '#fff',
     fontSize: 18,
