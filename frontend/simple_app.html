@@ -2023,9 +2023,11 @@
             const pieceHtml = `
                 <div class="piece-card" id="pieceAirAir${piecesAirAirCounter}">
                     <div class="piece-header">
-                        <span class="piece-name">Unité ${piecesAirAirCounter}</span>
+                        <span class="piece-name">❄️ Unité ${piecesAirAirCounter}</span>
                         <button type="button" class="btn-delete" onclick="removePieceAirAir(${piecesAirAirCounter})">Supprimer</button>
                     </div>
+                    
+                    <!-- Informations pièce -->
                     <div class="form-row">
                         <div class="form-group">
                             <label>Nom de la pièce</label>
@@ -2034,26 +2036,68 @@
                         <div class="form-group">
                             <label>Type unité intérieure</label>
                             <select id="pieceAirAirTypeUnite${piecesAirAirCounter}">
-                                <option value="murale">Murale</option>
-                                <option value="cassette">Cassette</option>
-                                <option value="gainable">Gainable</option>
-                                <option value="console">Console</option>
+                                <option value="murale">Murale (split mural)</option>
+                                <option value="cassette">Cassette (plafond)</option>
+                                <option value="gainable">Gainable (conduits)</option>
+                                <option value="console">Console (au sol)</option>
                             </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Dimensions avec calculs automatiques IDENTIQUES à Air/Eau -->
+                    <h5>📐 Dimensions (calculs automatiques identiques Air/Eau)</h5>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Longueur (m)</label>
+                            <input type="number" id="pieceAirAirLongueur${piecesAirAirCounter}" step="0.1" onchange="calculateFullAirAir(${piecesAirAirCounter})" placeholder="0.0">
+                        </div>
+                        <div class="form-group">
+                            <label>Largeur (m)</label>
+                            <input type="number" id="pieceAirAirLargeur${piecesAirAirCounter}" step="0.1" onchange="calculateFullAirAir(${piecesAirAirCounter})" placeholder="0.0">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Surface (m²)</label>
-                            <input type="number" id="pieceAirAirSurface${piecesAirAirCounter}" step="0.1" onchange="calculatePuissanceAirAir(${piecesAirAirCounter})">
+                            <label>Surface calculée (m²)</label>
+                            <input type="number" id="pieceAirAirSurface${piecesAirAirCounter}" step="0.1" readonly class="technical-calc">
                         </div>
                         <div class="form-group">
-                            <label>Puissance nécessaire (kW)</label>
-                            <input type="number" id="pieceAirAirPuissance${piecesAirAirCounter}" step="0.1" readonly style="background: #e8f5e8; color: #2d5a2d;">
+                            <label>Hauteur plafond (m)</label>
+                            <input type="number" id="pieceAirAirHauteur${piecesAirAirCounter}" value="2.5" step="0.1" onchange="calculateFullAirAir(${piecesAirAirCounter})">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Commentaires</label>
-                        <textarea id="pieceAirAirCommentaires${piecesAirAirCounter}" rows="2"></textarea>
+                        <label>Volume calculé (m³)</label>
+                        <input type="number" id="pieceAirAirVolume${piecesAirAirCounter}" readonly class="technical-calc">
+                    </div>
+                    
+                    <!-- Calculs techniques automatiques MÊMES FORMULES que Air/Eau -->
+                    <h5>⚙️ Calculs techniques automatiques</h5>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Coefficient G (selon isolation)</label>
+                            <input type="number" id="pieceAirAirCoeffG${piecesAirAirCounter}" step="0.1" readonly class="technical-calc">
+                        </div>
+                        <div class="form-group">
+                            <label>Delta T (°C)</label>
+                            <input type="number" id="pieceAirAirDeltaT${piecesAirAirCounter}" readonly class="technical-calc">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ratio norme énergétique</label>
+                            <input type="number" id="pieceAirAirRatio${piecesAirAirCounter}" step="0.1" readonly class="technical-calc">
+                        </div>
+                        <div class="form-group">
+                            <label>Puissance calculée (W)</label>
+                            <input type="number" id="pieceAirAirPuissance${piecesAirAirCounter}" readonly class="technical-calc">
+                        </div>
+                    </div>
+                    
+                    <!-- Commentaires -->
+                    <div class="form-group">
+                        <label>Commentaires techniques</label>
+                        <textarea id="pieceAirAirCommentaires${piecesAirAirCounter}" rows="2" placeholder="Observations, contraintes particulières..."></textarea>
                     </div>
                 </div>
             `;
