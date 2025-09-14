@@ -34,12 +34,16 @@ export default function LoginScreen() {
   }, [isAuthenticated, user]);
 
   const handleLogin = async () => {
+    console.log('🚀 handleLogin called!', { username, password: password ? '***' : 'empty' });
+    
     if (!username.trim() || !password.trim()) {
+      console.log('❌ Empty credentials');
       Alert.alert('Erreur', 'Veuillez saisir votre nom d\'utilisateur et mot de passe');
       return;
     }
 
     setLoading(true);
+    console.log('🔄 Loading state set to true');
     
     try {
       console.log('🔄 Tentative de connexion avec:', username);
@@ -72,6 +76,7 @@ export default function LoginScreen() {
       Alert.alert('Erreur de connexion', `${errorMessage}\n\nIdentifiants de test:\n• admin / admin123\n• employe1 / employe123`);
     } finally {
       setLoading(false);
+      console.log('🔄 Loading state set to false');
     }
   };
 
