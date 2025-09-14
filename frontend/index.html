@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>H2EAUX GESTION - Application Tablette</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="H2EAUX GESTION">
+    
+    <!-- Styles optimisés tablette -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #007AFF;
+            --secondary: #00D4AA;
+            --background: #1a1a1a;
+            --surface: #2a2a2a;
+            --text: #ffffff;
+            --text-secondary: #999999;
+            --error: #E74C3C;
+            --success: #00D4AA;
+            --border: #444444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* LOADING SCREEN */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--surface);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 1rem 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* SCREENS */
+        .screen {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* LOGIN SCREEN */
+        .login-screen {
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--background) 0%, #2d2d2d 100%);
+        }
+
+        .login-container {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .login-logo {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-version {
+            color: var(--success);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            background: var(--background);
+            color: var(--text);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 56px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .credentials-info {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .credentials-title {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .credential-item {
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        /* HEADER */
+        .app-header {
+            background: var(--surface);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .header-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .user-badge.admin {
+            background: var(--error);
+        }
+
+        .btn-logout {
+            background: var(--error);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* DASHBOARD */
+        .dashboard-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .module-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(0, 122, 255, 0.2);
+        }
+
+        .module-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .module-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .module-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* MODULE SCREENS */
+        .module-header {
+            background: var(--surface);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .module-title-header {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .module-subtitle {
+            color: var(--text-secondary);
+        }
+
+        .module-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-btn {
+            background: var(--surface);
+            color: var(--text);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: var(--border);
+        }
+
+        /* CLIENTS MODULE */
+        .clients-toolbar {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .btn-add {
+            background: var(--success);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .clients-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .client-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .client-card:hover {
+
+            border-color: var(--primary);
+        }
+
+        .client-header {
+            display: flex;
+            justify-content: between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .client-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .client-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .client-detail {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .client-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 6px;
+        }
+
+        .btn-edit {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--error);
+            color: white;
+        }
+
+        /* MODAL */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .btn-close:hover {
+            background: var(--background);
+            color: var(--text);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        /* STATUS SECTION */
+        .status-section {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .status-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .app-header {
+                padding: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .dashboard-content,
+            .module-content {
+                padding: 1rem;
+            }
+
+            .login-container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .clients-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .modal-content {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* UTILITIES */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-2 {
+            margin-top: 1rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 1rem;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .gap-1 {
+            gap: 0.5rem;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        /* ANIMATIONS */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- LOADING SCREEN -->
+        <div id="loadingScreen" class="loading-screen">
+            <div class="loading-logo">H2EAUX GESTION</div>
+            <div class="spinner"></div>
+            <div class="loading-text">Chargement de l'application...</div>
+            <div class="loading-text" style="font-size: 0.9rem; margin-top: 0.5rem;">Application Tablette Professionnelle</div>
+        </div>
+
+        <!-- LOGIN SCREEN -->
+        <div id="loginScreen" class="screen login-screen">
+            <form id="loginForm" class="login-container fade-in">
+                <div class="login-header">
+                    <div class="login-logo">H2EAUX GESTION</div>
+                    <div class="login-subtitle">PLOMBERIE • CLIMATISATION • CHAUFFAGE</div>
+                    <div class="login-version">Application Tablette v1.0</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nom d'utilisateur</label>
+                    <input type="text" id="username" class="form-input" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" id="password" class="form-input" required autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <span id="loginBtnText">Se connecter</span>
+                    <div id="loginSpinner" class="spinner" style="width: 20px; height: 20px; margin: 0; display: none;"></div>
+                </button>
+
+                <div class="credentials-info">
+                    <div class="credentials-title">Identifiants de test</div>
+                    <div class="credential-item">👤 Admin: <strong>admin</strong> / <strong>admin123</strong></div>
+                    <div class="credential-item">👤 Employé: <strong>employe1</strong> / <strong>employe123</strong></div>
+                </div>
+            </form>
+        </div>
+
+        <!-- DASHBOARD SCREEN -->
+        <div id="dashboardScreen" class="screen">
+            <header class="app-header">
+                <div class="header-content">
+                    <div>
+                        <div class="header-title">H2EAUX GESTION</div>
+                        <div class="header-subtitle">Application Tablette Professionnelle</div>
+                    </div>
+                    <div class="user-info">
+                        <div id="userBadge" class="user-badge">Utilisateur</div>
+                        <button class="btn btn-logout" onclick="logout()">Déconnexion</button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="dashboard-content">
+                <h1 class="dashboard-title">Modules Professionnels</h1>
+
+                <div class="modules-grid" id="modulesGrid">
+                    <!-- Modules will be loaded here -->
+                </div>
+
+                <div class="status-section">
+                    <div class="status-title">📊 Statut Application H2EAUX GESTION</div>
+                    <div class="status-grid">
+                        <div class="status-item">✅ Backend API opérationnel</div>
+                        <div class="status-item">✅ Authentification sécurisée</div>
+                        <div class="status-item">✅ Interface tablette optimisée</div>
+                        <div class="status-item">✅ Base de données connectée</div>
+                        <div class="status-item">✅ PWA installable</div>
+                        <div class="status-item">✅ Mode hors-ligne</div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- CLIENTS SCREEN -->
+        <div id="clientsScreen" class="screen">
+            <header class="app-header">
+                <div class="header-content">
+                    <div>
+                        <div class="header-title">👥 Gestion Clients</div>
+                        <div class="header-subtitle">Base clients MEG synchronisée</div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="module-content">
+                <button class="btn back-btn" onclick="showDashboard()">
+                    ← Retour Dashboard
+                </button>
+
+                <div class="clients-toolbar">
+                    <div class="search-box">
+                        <input type="text" id="clientSearch" class="form-input" placeholder="Rechercher un client..." onkeyup="filterClients()">
+                    </div>
+                    <button class="btn btn-add" onclick="showAddClientModal()">
+                        + Nouveau Client
+                    </button>
+                </div>
+
+                <div id="clientsList" class="clients-list">
+                    <!-- Clients will be loaded here -->
+                </div>
+            </main>
+        </div>
+
+        <!-- MODAL CLIENT -->
+        <div id="clientModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="clientModalTitle">Nouveau Client</h3>
+                    <button class="btn-close" onclick="hideClientModal()">&times;</button>
+                </div>
+
+                <form id="clientForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nom *</label>
+                            <input type="text" id="clientNom" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Prénom</label>
+                            <input type="text" id="clientPrenom" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="clientEmail" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Téléphone</label>
+                            <input type="tel" id="clientTelephone" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Adresse</label>
+                        <input type="text" id="clientAdresse" class="form-input">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Code Postal</label>
+                            <input type="text" id="clientCodePostal" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ville</label>
+                            <input type="text" id="clientVille" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="hideClientModal()">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Service Worker -->
+    <script>
+        // Configuration
+        const BACKEND_URL = 'https://h2eaux-dashboard.preview.emergentagent.com/api';
+        let currentUser = null;
+        let currentEditingClient = null;
+        let clients = [];
+
+        // Application State
+        const AppState = {
+            isLoading: true,
+            isLoggedIn: false,
+            currentScreen: 'login'
+        };
+
+        // Modules Configuration
+        const modules = [
+            {
+                id: 'clients',
+                title: 'Clients',
+                icon: '👥',
+                description: 'Gestion complète des clients MEG avec synchronisation',
+                permission: 'clients'
+            },
+            {
+                id: 'chantiers',
+                title: 'Chantiers',
+                icon: '🏗️',
+                description: 'Gestion des chantiers et projets en cours',
+                permission: 'chantiers'
+            },
+            {
+                id: 'documents',
+                title: 'Documents',
+                icon: '📄',
+                description: 'Bibliothèque de documents PDF hors-ligne',
+                permission: 'documents'
+            },
+            {
+                id: 'fiches',
+                title: 'Fiches Chantier',
+                icon: '📋',
+                description: 'Relevés détaillés avec plans 2D éditables',
+                permission: 'catalogues'
+            },
+            {
+                id: 'calculs',
+                title: 'Calculs PAC',
+                icon: '🌡️',
+                description: 'Calculs automatiques PAC Air/Eau & Air/Air',
+                permission: 'calculs_pac'
+            },
+            {
+                id: 'meg',
+                title: 'MEG Integration',
+                icon: '🔄',
+                description: 'Synchronisation comptabilité MEG',
+                permission: 'clients'
+            },
+            {
+                id: 'calendrier',
+                title: 'Calendrier',
+                icon: '📅',
+                description: 'Planning des rendez-vous et interventions',
+                permission: 'chantiers'
+            },
+            {
+                id: 'chat',
+                title: 'Chat Équipe',
+                icon: '💬',
+                description: 'Communication interne temps réel',
+                permission: 'chat'
+            }
+        ];
+
+        // Utility Functions
+        function showMessage(message, type = 'info') {
+            const alertType = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            alert(message);
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('fr-FR');
+        }
+
+        function formatPhone(phone) {
+            if (!phone) return '';
+            return phone.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1.$2.$3.$4.$5');
+        }
+
+        // API Functions
+        async function apiCall(endpoint, options = {}) {
+            const token = localStorage.getItem('token');
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` })
+                }
+            };
+
+            const finalOptions = {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...options.headers
+                }
+            };
+
+            try {
+                const response = await fetch(`${BACKEND_URL}${endpoint}`, finalOptions);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Erreur API');
+                }
+
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Authentication Functions
+        async function login(username, password) {
+            const data = await apiCall('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ username, password })
+            });
+
+            localStorage.setItem('token', data.access_token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            currentUser = data.user;
+            AppState.isLoggedIn = true;
+
+            return data;
+        }
+
+        function logout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                currentUser = null;
+                AppState.isLoggedIn = false;
+                showScreen('login');
+            }
+        }
+
+        function checkAuthStatus() {
+            const token = localStorage.getItem('token');
+            const userData = localStorage.getItem('user');
+
+            if (token && userData) {
+                try {
+                    currentUser = JSON.parse(userData);
+                    AppState.isLoggedIn = true;
+                    return true;
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                }
+            }
+
+            return false;
+        }
+
+        // Screen Management
+        function showScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            // Show target screen
+            const targetScreen = document.getElementById(screenId + 'Screen');
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                AppState.currentScreen = screenId;
+            }
+        }
+
+        function showDashboard() {
+            showScreen('dashboard');
+            loadDashboard();
+        }
+
+        function showModule(moduleId) {
+            const module = modules.find(m => m.id === moduleId);
+            if (!module) return;
+
+            // Check permissions
+            if (currentUser && !currentUser.permissions[module.permission]) {
+                showMessage('Vous n\'avez pas les permissions pour accéder à ce module.');
+                return;
+            }
+
+            switch (moduleId) {
+                case 'clients':
+                    showScreen('clients');
+                    loadClients();
+                    break;
+                default:
+                    showMessage(`Module ${module.title} - Interface en développement.\n\nCe module sera bientôt disponible avec toutes les fonctionnalités métier.`);
+            }
+        }
+
+        // Dashboard Functions
+        function loadDashboard() {
+            if (!currentUser) return;
+
+            // Update user badge
+            const userBadge = document.getElementById('userBadge');
+            userBadge.textContent = `${currentUser.username} (${currentUser.role === 'admin' ? 'Admin' : 'Employé'})`;
+            userBadge.className = `user-badge ${currentUser.role === 'admin' ? 'admin' : ''}`;
+
+            // Load modules
+            const modulesGrid = document.getElementById('modulesGrid');
+            modulesGrid.innerHTML = '';
+
+            modules.forEach(module => {
+                // Check if user has permission
+                if (currentUser.permissions[module.permission]) {
+                    const moduleCard = document.createElement('div');
+                    moduleCard.className = 'module-card';
+                    moduleCard.onclick = () => showModule(module.id);
+                    moduleCard.innerHTML = `
+                        <div class="module-icon">${module.icon}</div>
+                        <div class="module-title">${module.title}</div>
+                        <div class="module-description">${module.description}</div>
+                    `;
+                    modulesGrid.appendChild(moduleCard);
+                }
+            });
+
+            // Add admin module if admin
+            if (currentUser.permissions.parametres) {
+                const adminCard = document.createElement('div');
+                adminCard.className = 'module-card';
+                adminCard.onclick = () => showMessage('Module Paramètres - Interface d\'administration en développement.');
+                adminCard.innerHTML = `
+                    <div class="module-icon">⚙️</div>
+                    <div class="module-title">Paramètres</div>
+                    <div class="module-description">Gestion utilisateurs & permissions</div>
+                `;
+                modulesGrid.appendChild(adminCard);
+            }
+        }
+
+        // Client Management Functions
+        async function loadClients() {
+            try {
+                clients = await apiCall('/clients');
+                displayClients();
+            } catch (error) {
+                console.error('Error loading clients:', error);
+                showMessage('Erreur lors du chargement des clients: ' + error.message, 'error');
+            }
+        }
+
+        function displayClients() {
+            const clientsList = document.getElementById('clientsList');
+            
+            if (clients.length === 0) {
+                clientsList.innerHTML = `
+                    <div class="text-center" style="padding: 3rem; color: var(--text-secondary);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                        <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">Aucun client trouvé</div>
+                        <div>Cliquez sur "Nouveau Client" pour ajouter votre premier client</div>
+                    </div>
+                `;
+                return;
+            }
+
+            clientsList.innerHTML = clients.map(client => `
+                <div class="client-card">
+                    <div class="client-header">
+                        <div class="client-name">${client.nom} ${client.prenom || ''}</div>
+                        <div class="client-actions">
+                            <button class="btn btn-small btn-edit" onclick="editClient('${client.id}')">Modifier</button>
+                            <button class="btn btn-small btn-delete" onclick="deleteClient('${client.id}', '${client.nom}')">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="client-info">
+                        ${client.email ? `<div class="client-detail">📧 ${client.email}</div>` : ''}
+                        ${client.telephone ? `<div class="client-detail">📞 ${formatPhone(client.telephone)}</div>` : ''}
+                        ${client.adresse ? `<div class="client-detail">📍 ${client.adresse}</div>` : ''}
+                        ${client.code_postal && client.ville ? `<div class="client-detail">🏢 ${client.code_postal} ${client.ville}</div>` : ''}
+                    </div>
+                    <div class="client-detail" style="margin-top: 0.5rem; font-size: 0.8rem;">
+                        Créé le ${formatDate(client.created_at)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterClients() {
+            const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
+            const filteredClients = clients.filter(client => 
+                client.nom.toLowerCase().includes(searchTerm) ||
+                (client.prenom && client.prenom.toLowerCase().includes(searchTerm)) ||
+                (client.email && client.email.toLowerCase().includes(searchTerm)) ||
+                (client.telephone && client.telephone.includes(searchTerm)) ||
+                (client.ville && client.ville.toLowerCase().includes(searchTerm))
+            );
+
+            const clientsList = document.getElementById('clientsList');
+            
+            if (filteredClients.length === 0) {
+                clientsList.innerHTML = `
+                    <div class="text-center" style="padding: 2rem; color: var(--text-secondary);">
+                        <div style="font-size: 2rem; margin-bottom: 1rem;">🔍</div>
+                        <div>Aucun client trouvé pour "${searchTerm}"</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Temporarily replace clients array for display
+            const originalClients = clients;
+            clients = filteredClients;
+            displayClients();
+            clients = originalClients;
+        }
+
+        function showAddClientModal() {
+            currentEditingClient = null;
+            document.getElementById('clientModalTitle').textContent = 'Nouveau Client';
+            document.getElementById('clientForm').reset();
+            document.getElementById('clientModal').classList.add('active');
+        }
+
+        function editClient(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+
+            currentEditingClient = client;
+            document.getElementById('clientModalTitle').textContent = 'Modifier Client';
+            
+            // Fill form
+            document.getElementById('clientNom').value = client.nom || '';
+            document.getElementById('clientPrenom').value = client.prenom || '';
+            document.getElementById('clientEmail').value = client.email || '';
+            document.getElementById('clientTelephone').value = client.telephone || '';
+            document.getElementById('clientAdresse').value = client.adresse || '';
+            document.getElementById('clientCodePostal').value = client.code_postal || '';
+            document.getElementById('clientVille').value = client.ville || '';
+
+            document.getElementById('clientModal').classList.add('active');
+        }
+
+        function hideClientModal() {
+            document.getElementById('clientModal').classList.remove('active');
+            currentEditingClient = null;
+        }
+
+        async function handleClientForm(event) {
+            event.preventDefault();
+
+            const formData = {
+                nom: document.getElementById('clientNom').value.trim(),
+                prenom: document.getElementById('clientPrenom').value.trim(),
+                email: document.getElementById('clientEmail').value.trim(),
+                telephone: document.getElementById('clientTelephone').value.trim(),
+                adresse: document.getElementById('clientAdresse').value.trim(),
+                code_postal: document.getElementById('clientCodePostal').value.trim(),
+                ville: document.getElementById('clientVille').value.trim()
+            };
+
+            if (!formData.nom) {
+                showMessage('Le nom du client est obligatoire.', 'error');
+                return;
+            }
+
+            try {
+                if (currentEditingClient) {
+                    // Update existing client
+                    await apiCall(`/clients/${currentEditingClient.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('Client modifié avec succès !', 'success');
+                } else {
+                    // Create new client
+                    await apiCall('/clients', {
+                        method: 'POST',
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('Client créé avec succès !', 'success');
+                }
+
+                hideClientModal();
+                loadClients();
+            } catch (error) {
+                console.error('Error saving client:', error);
+                showMessage('Erreur lors de la sauvegarde: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteClient(clientId, clientName) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer le client "${clientName}" ?\n\nCette action est irréversible.`)) {
+                return;
+            }
+
+            try {
+                await apiCall(`/clients/${clientId}`, {
+                    method: 'DELETE'
+                });
+                showMessage('Client supprimé avec succès !', 'success');
+                loadClients();
+            } catch (error) {
+                console.error('Error deleting client:', error);
+                showMessage('Erreur lors de la suppression: ' + error.message, 'error');
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading screen after delay
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+                AppState.isLoading = false;
+
+                // Check auth status
+                if (checkAuthStatus()) {
+                    showDashboard();
+                } else {
+                    showScreen('login');
+                }
+            }, 2000);
+
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+                const loginBtn = document.getElementById('loginBtn');
+                const loginBtnText = document.getElementById('loginBtnText');
+                const loginSpinner = document.getElementById('loginSpinner');
+
+                if (!username || !password) {
+                    showMessage('Veuillez saisir votre nom d\'utilisateur et mot de passe.', 'error');
+                    return;
+                }
+
+                // Show loading state
+                loginBtn.disabled = true;
+                loginBtnText.style.display = 'none';
+                loginSpinner.style.display = 'block';
+
+                try {
+                    await login(username, password);
+                    showMessage('Connexion réussie !', 'success');
+                    showDashboard();
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showMessage('Erreur de connexion: ' + error.message, 'error');
+                } finally {
+                    // Hide loading state
+                    loginBtn.disabled = false;
+                    loginBtnText.style.display = 'inline';
+                    loginSpinner.style.display = 'none';
+                }
+            });
+
+            // Client form
+            document.getElementById('clientForm').addEventListener('submit', handleClientForm);
+
+            // Close modal on outside click
+            document.getElementById('clientModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideClientModal();
+                }
+            });
+        });
+
+        // PWA Installation
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install banner after login
+            if (AppState.isLoggedIn) {
+                setTimeout(() => {
+                    if (confirm('Voulez-vous installer H2EAUX GESTION sur votre tablette pour un accès hors-ligne ?')) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            if (choiceResult.outcome === 'accepted') {
+                                console.log('User accepted the A2HS prompt');
+                            }
+                            deferredPrompt = null;
+                        });
+                    }
+                }, 3000);
+            }
+        });
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
