@@ -792,8 +792,86 @@ window.fiches = {
     },
 
     loadFormData(fiche) {
-        // Load existing fiche data into form fields
-        // This will populate all form fields with existing data
+        // Load existing fiche data into form fields for all 8 tabs
+        if (!fiche) return;
+        
+        // Onglet 1: Général
+        if (document.getElementById('ficheNom')) document.getElementById('ficheNom').value = fiche.nom || '';
+        if (document.getElementById('ficheDate')) document.getElementById('ficheDate').value = fiche.date_rdv || '';
+        if (document.getElementById('ficheType')) document.getElementById('ficheType').value = fiche.type_intervention || fiche.type_sdb || 'visite_technique';
+        if (document.getElementById('ficheStatut')) document.getElementById('ficheStatut').value = fiche.statut || 'planifie';
+        
+        // Onglet 2: Client
+        if (document.getElementById('clientNom')) document.getElementById('clientNom').value = fiche.client_nom || '';
+        if (document.getElementById('clientAdresse')) document.getElementById('clientAdresse').value = fiche.adresse || '';
+        if (document.getElementById('clientTelephone')) document.getElementById('clientTelephone').value = fiche.telephone || '';
+        if (document.getElementById('clientEmail')) document.getElementById('clientEmail').value = fiche.email || '';
+        if (document.getElementById('budgetIndicatif')) document.getElementById('budgetIndicatif').value = fiche.budget_estime || '';
+        if (document.getElementById('nbPersonnes')) document.getElementById('nbPersonnes').value = fiche.nb_personnes || 1;
+        
+        // Onglet 3: Logement
+        if (document.getElementById('typeLogement')) document.getElementById('typeLogement').value = fiche.type_logement || 'maison';
+        if (document.getElementById('anneeConstruction')) document.getElementById('anneeConstruction').value = fiche.annee_construction || 2000;
+        if (document.getElementById('surfaceHabitable')) document.getElementById('surfaceHabitable').value = fiche.surface || '';
+        if (document.getElementById('typeIsolation')) document.getElementById('typeIsolation').value = fiche.isolation || 'moyenne';
+        if (document.getElementById('typeMenuiseries')) document.getElementById('typeMenuiseries').value = fiche.menuiseries || 'double';
+        
+        // Onglet 4: Existant
+        if (document.getElementById('chauffageActuel')) document.getElementById('chauffageActuel').value = fiche.chauffage_actuel || '';
+        if (document.getElementById('etatGeneral')) document.getElementById('etatGeneral').value = fiche.etat_general || 'bon';
+        if (document.getElementById('productionECS')) document.getElementById('productionECS').value = fiche.production_ecs || 'chaudiere';
+        if (document.getElementById('observationsExistant')) document.getElementById('observationsExistant').value = fiche.observations_existant || '';
+        
+        // Onglet 5: Besoins
+        this.loadBesoins(fiche.besoins);
+        if (document.getElementById('priorite')) document.getElementById('priorite').value = fiche.priorite || 'moyenne';
+        if (document.getElementById('delaiSouhaite')) document.getElementById('delaiSouhaite').value = fiche.delai_souhaite || 'moyen';
+        if (document.getElementById('contraintes')) document.getElementById('contraintes').value = fiche.contraintes || '';
+        
+        // Onglet 6: Technique
+        if (document.getElementById('compteurElectrique')) document.getElementById('compteurElectrique').value = fiche.compteur_electrique || '';
+        if (document.getElementById('arriveeGaz')) document.getElementById('arriveeGaz').value = fiche.arrivee_gaz || 'non';
+        if (document.getElementById('evacuationEaux')) document.getElementById('evacuationEaux').value = fiche.evacuation_eaux || '';
+        if (document.getElementById('accesMateriel')) document.getElementById('accesMateriel').value = fiche.acces_materiel || 'facile';
+        if (document.getElementById('contraintesToechniques')) document.getElementById('contraintesToechniques').value = fiche.contraintes_techniques || '';
+        
+        // Onglet 7: Plan 2D
+        if (fiche.plan_data) {
+            try {
+                this.planData = JSON.parse(fiche.plan_data);
+            } catch (e) {
+                console.error('Error parsing plan data:', e);
+                this.planData = {
+                    elements: [],
+                    measurements: [],
+                    rooms: [],
+                    scale: 1,
+                    gridSize: 20,
+                    currentTool: 'select'
+                };
+            }
+        }
+        
+        // Onglet 8: Notes
+        if (document.getElementById('solutionRecommandee')) document.getElementById('solutionRecommandee').value = fiche.solution_recommandee || '';
+        if (document.getElementById('pointsAttention')) document.getElementById('pointsAttention').value = fiche.points_attention || '';
+        if (document.getElementById('budgetFinal')) document.getElementById('budgetFinal').value = fiche.budget_final || '';
+        if (document.getElementById('delaiRealisation')) document.getElementById('delaiRealisation').value = fiche.delai_realisation || '';
+        if (document.getElementById('notesComplementaires')) document.getElementById('notesComplementaires').value = fiche.notes || '';
+    },
+
+    loadBesoins(besoinsString) {
+        if (!besoinsString) return;
+        
+        try {
+            const besoins = JSON.parse(besoinsString);
+            besoins.forEach(besoin => {
+                const checkbox = document.querySelector(`input[name="besoins"][value="${besoin}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        } catch (e) {
+            console.error('Error parsing besoins:', e);
+        }
     },
 
     // ===== CRUD OPERATIONS =====
