@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Restaurer et corriger l'application H2EAUX GESTION avec backend fonctionnel, frontend avec navigation Expo Router corrigée, et tous les modules opérationnels. L'application est techniquement avancée avec authentification JWT, gestion des clients, et nombreux modules développés."
+user_problem_statement: "Reprendre le projet H2EAUX GESTION exactement là où il s'était arrêté via le dépôt GitHub https://github.com/andrew14130/h2eaux-2.0.git et proposer une version test fonctionnelle pour continuer à avancer. Application React Native/Expo avec backend FastAPI complet, authentification JWT, 6 modules métier (Clients, Chantiers, Documents, Fiches SDB, Calculs PAC, etc.), stores Zustand et interface mobile professionnelle."
 
 backend:
   - task: "Backend H2EAUX GESTION complet"
