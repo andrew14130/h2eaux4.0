@@ -88,7 +88,8 @@ interface CalculPACState {
   deleteCalcul: (id: string) => Promise<void>;
 }
 
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+// For Expo web, we need to use the hardcoded URL since process.env is not available in browser
+const BACKEND_URL = 'https://h2eaux-gestion-1.preview.emergentagent.com';
 
 export const useCalculPACStore = create<CalculPACState>((set, get) => ({
   calculs: [],
