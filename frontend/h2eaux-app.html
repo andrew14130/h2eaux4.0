@@ -1321,6 +1321,120 @@
                 this.currentFiche = null;
             }
 
+            async loadCalculsPAC() {
+                try {
+                    const calculs = await this.apiCall('/calculs-pac');
+                    this.data.calculsPAC = calculs;
+                    this.renderCalculsPAC();
+                } catch (error) {
+                    console.error('Error loading calculs PAC:', error);
+                    this.showMessage('❌ Erreur lors du chargement des calculs PAC', 'error');
+                    this.renderCalculsPAC();
+                }
+            }
+
+            renderCalculsPAC() {
+                const container = document.getElementById('calculsPACList');
+                
+                if (!this.data.calculsPAC || this.data.calculsPAC.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🌡️</div>
+                            <h3>Aucun calcul PAC</h3>
+                            <p>Créez votre premier dimensionnement de pompe à chaleur</p>
+                            <button class="btn-primary" onclick="app.showCalculPACModal()">+ Nouveau Calcul</button>
+                            <button class="btn-secondary" onclick="app.openCalculPACAdvanced()">🧮 Module Avancé</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.data.calculsPAC.map(calcul => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div class="item-title">🌡️ ${calcul.nom}</div>
+                            <div class="item-actions">
+                                <button class="btn-view" onclick="app.viewCalculPAC('${calcul.id}')">Voir</button>
+                                <button class="btn-edit" onclick="app.editCalculPAC('${calcul.id}')">Modifier</button>
+                                <button class="btn-delete" onclick="app.deleteCalculPAC('${calcul.id}')">Supprimer</button>
+                            </div>
+                        </div>
+                        <div class="item-info">
+                            <div class="item-detail">👤 Client: ${calcul.client_nom || 'N/A'}</div>
+                            <div class="item-detail">🏠 Type: ${calcul.type_pac === 'air_eau' ? 'Air/Eau' : 'Air/Air'}</div>
+                            <div class="item-detail">📐 Surface: ${calcul.surface_totale}m²</div>
+                            <div class="item-detail">🌡️ Zone: ${calcul.zone_climatique}</div>
+                            <div class="item-detail">⚡ Puissance: ${calcul.puissance_calculee || 'À calculer'}</div>
+                            <div class="item-detail">📅 Créé le ${this.formatDate(calcul.created_at)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            showCalculPACModal() {
+                const modal = `
+                    <div class="modal" style="display: block;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2>🌡️ Nouveau Calcul PAC</h2>
+                                <button class="btn-close" onclick="app.closeModal()">&times;</button>
+                            </div>
+                            <form id="calculPACForm" onsubmit="app.createCalculPAC(event)">
+                                <div class="form-group">
+                                    <label>Nom du projet</label>
+                                    <input type="text" name="nom" required placeholder="Ex: PAC Maison Dupont">
+                                </div>
+                                <div class="form-group">
+                                    <label>Client</label>
+                                    <input type="text" name="client_nom" placeholder="Nom du client">
+                                </div>
+                                <div class="form-group">
+                                    <label>Type de PAC</label>
+                                    <select name="type_pac">
+                                        <option value="air_eau">PAC Air/Eau (Chauffage + ECS)</option>
+                                        <option value="air_air">PAC Air/Air (Climatisation réversible)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Surface totale (m²)</label>
+                                    <input type="number" name="surface_totale" placeholder="150">
+                                </div>
+                                <div class="modal-actions">
+                                    <button type="button" class="btn-secondary" onclick="app.closeModal()">Annuler</button>
+                                    <button type="submit" class="btn-primary">Créer le calcul</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('modals').innerHTML = modal;
+            }
+
+            async createCalculPAC(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const calculData = Object.fromEntries(formData.entries());
+                
+                try {
+                    const newCalcul = await this.apiCall('/calculs-pac', {
+                        method: 'POST',
+                        body: JSON.stringify(calculData)
+                    });
+                    
+                    this.showMessage('✅ Calcul PAC créé avec succès', 'success');
+                    this.closeModal();
+                    this.loadCalculsPAC();
+                } catch (error) {
+                    console.error('Error creating calcul PAC:', error);
+                    this.showMessage('❌ Erreur lors de la création: ' + error.message, 'error');
+                }
+            }
+
+            openCalculPACAdvanced() {
+                // Ouvrir le module avancé dans un nouvel onglet
+                window.open('calculs-pac-advanced.html', '_blank');
+            }
+
             formatDate(dateString) {
                 if (!dateString) return 'Date inconnue';
                 try {
