@@ -197,3 +197,5 @@ test_plan:
 agent_communication:
   - agent: "testing"
     message: "Comprehensive backend testing completed successfully. All 14 test cases passed including health check, authentication (admin & employee), full client CRUD operations with realistic French data, and security validation. API is fully operational and ready for production use. Backend URL: https://h2eaux-gestion-1.preview.emergentagent.com/api"
+  - agent: "main"
+    message: "✅ PROJET H2EAUX RÉCUPÉRÉ ET CONFIGURÉ - Dépôt GitHub cloné avec succès, backend FastAPI H2EAUX démarré (authentification JWT fonctionnelle admin/admin123 + employe1/employe123), frontend Expo configuré pour mode web sur port 3000, stores Zustand adaptés, navigation Expo Router corrigée. Application ready pour tests E2E. URL: https://h2eaux-gestion-1.preview.emergentagent.com (frontend port 3000, backend port 8001/api)"
