@@ -642,6 +642,258 @@
             display: none !important;
         }
 
+        /* PAC CALCULATIONS STYLES */
+        .pac-types-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .pac-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .pac-type-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .pac-type-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(0, 122, 255, 0.2);
+        }
+
+        .pac-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .pac-type-card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .pac-type-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .pac-features {
+            text-align: left;
+        }
+
+        .feature {
+            color: var(--text);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .calculs-toolbar {
+            margin-bottom: 2rem;
+        }
+
+        .calculs-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .calculs-actions .form-input {
+            min-width: 200px;
+        }
+
+        .calculs-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .calcul-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .calcul-card:hover {
+            border-color: var(--primary);
+        }
+
+        .calcul-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .calcul-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .calcul-type {
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .calcul-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .calcul-detail {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* CHANTIERS STYLES */
+        .chantiers-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 1rem;
+            flex: 1;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-left .form-input {
+            min-width: 200px;
+        }
+
+        .chantiers-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .chantiers-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .chantier-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .chantier-card:hover {
+            border-color: var(--primary);
+        }
+
+        .chantier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .chantier-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .chantier-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-en-attente {
+            background: #FFA500;
+            color: white;
+        }
+
+        .status-en-cours {
+            background: var(--primary);
+            color: white;
+        }
+
+        .status-termine {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-facture {
+            background: #6B7280;
+            color: white;
+        }
+
+        .chantier-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .chantier-detail {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .chantier-budget {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--success);
+        }
+
         .text-center {
             text-align: center;
         }
