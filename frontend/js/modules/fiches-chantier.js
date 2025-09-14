@@ -826,19 +826,69 @@ window.fiches = {
     },
 
     collectFicheData() {
-        // Collect all form data from all tabs
+        // Collect all form data from all 8 tabs
         const formData = {
+            // Onglet 1: Général
             nom: document.getElementById('ficheNom')?.value || '',
+            date_rdv: document.getElementById('ficheDate')?.value || '',
+            type_intervention: document.getElementById('ficheType')?.value || 'visite_technique',
+            statut: document.getElementById('ficheStatut')?.value || 'planifie',
+            
+            // Onglet 2: Client
             client_nom: document.getElementById('clientNom')?.value || '',
             adresse: document.getElementById('clientAdresse')?.value || '',
-            type_sdb: document.getElementById('ficheType')?.value || 'visite_technique',
+            telephone: document.getElementById('clientTelephone')?.value || '',
+            email: document.getElementById('clientEmail')?.value || '',
+            budget_estime: document.getElementById('budgetIndicatif')?.value || '',
+            nb_personnes: parseInt(document.getElementById('nbPersonnes')?.value) || 1,
+            
+            // Onglet 3: Logement
+            type_logement: document.getElementById('typeLogement')?.value || 'maison',
+            annee_construction: parseInt(document.getElementById('anneeConstruction')?.value) || 2000,
             surface: document.getElementById('surfaceHabitable')?.value || '',
+            isolation: document.getElementById('typeIsolation')?.value || 'moyenne',
+            menuiseries: document.getElementById('typeMenuiseries')?.value || 'double',
+            
+            // Onglet 4: Existant
+            chauffage_actuel: document.getElementById('chauffageActuel')?.value || '',
+            etat_general: document.getElementById('etatGeneral')?.value || 'bon',
+            production_ecs: document.getElementById('productionECS')?.value || 'chaudiere',
+            observations_existant: document.getElementById('observationsExistant')?.value || '',
+            
+            // Onglet 5: Besoins
+            besoins: this.collectBesoins(),
+            priorite: document.getElementById('priorite')?.value || 'moyenne',
+            delai_souhaite: document.getElementById('delaiSouhaite')?.value || 'moyen',
+            contraintes: document.getElementById('contraintes')?.value || '',
+            
+            // Onglet 6: Technique
+            compteur_electrique: document.getElementById('compteurElectrique')?.value || '',
+            arrivee_gaz: document.getElementById('arriveeGaz')?.value || 'non',
+            evacuation_eaux: document.getElementById('evacuationEaux')?.value || '',
+            acces_materiel: document.getElementById('accesMateriel')?.value || 'facile',
+            contraintes_techniques: document.getElementById('contraintesToechniques')?.value || '',
+            
+            // Onglet 7: Plan 2D
+            plan_data: JSON.stringify(this.planData),
+            
+            // Onglet 8: Notes
+            solution_recommandee: document.getElementById('solutionRecommandee')?.value || '',
+            points_attention: document.getElementById('pointsAttention')?.value || '',
+            budget_final: document.getElementById('budgetFinal')?.value || '',
+            delai_realisation: document.getElementById('delaiRealisation')?.value || '',
             notes: document.getElementById('notesComplementaires')?.value || '',
-            // Add plan data
-            plan_data: JSON.stringify(this.planData)
+            
+            // Legacy SDB compatibility
+            type_sdb: document.getElementById('ficheType')?.value || 'visite_technique'
         };
         
         return formData;
+    },
+
+    collectBesoins() {
+        const checkboxes = document.querySelectorAll('input[name="besoins"]:checked');
+        const besoins = Array.from(checkboxes).map(cb => cb.value);
+        return JSON.stringify(besoins);
     },
 
     closeFicheEditor() {
