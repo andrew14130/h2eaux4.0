@@ -803,14 +803,14 @@ window.fiches = {
             
             if (this.currentEdit) {
                 // Update existing
-                await app.apiCall(`/fiches-chantier/${this.currentEdit.id}`, {
+                await app.apiCall(`/fiches-sdb/${this.currentEdit.id}`, {
                     method: 'PUT',
                     body: JSON.stringify(ficheData)
                 });
                 app.showMessage('Fiche mise à jour avec succès', 'success');
             } else {
                 // Create new
-                await app.apiCall('/fiches-chantier', {
+                await app.apiCall('/fiches-sdb', {
                     method: 'POST',
                     body: JSON.stringify(ficheData)
                 });
