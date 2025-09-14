@@ -2101,6 +2101,39 @@
             }
         }
 
+        function filterCalculs() {
+            const searchTerm = document.getElementById('calculSearch').value.toLowerCase();
+            const typeFilter = document.getElementById('calculFilter').value;
+            
+            const filteredCalculs = calculsPac.filter(calcul => {
+                const matchesSearch = calcul.nom.toLowerCase().includes(searchTerm) ||
+                    (calcul.client_nom && calcul.client_nom.toLowerCase().includes(searchTerm)) ||
+                    (calcul.zone_climatique && calcul.zone_climatique.toLowerCase().includes(searchTerm));
+                
+                const matchesType = !typeFilter || calcul.type_pac === typeFilter;
+                
+                return matchesSearch && matchesType;
+            });
+
+            const calculsList = document.getElementById('calculsList');
+            
+            if (filteredCalculs.length === 0) {
+                calculsList.innerHTML = `
+                    <div class="text-center" style="padding: 2rem; color: var(--text-secondary);">
+                        <div style="font-size: 2rem; margin-bottom: 1rem;">🔍</div>
+                        <div>Aucun calcul trouvé</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Temporarily replace calculsPac array for display
+            const originalCalculs = calculsPac;
+            calculsPac = filteredCalculs;
+            displayCalculsPac();
+            calculsPac = originalCalculs;
+        }
+
         // Chantiers Functions
         async function loadChantiers() {
             try {
