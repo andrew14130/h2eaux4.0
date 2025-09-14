@@ -741,6 +741,8 @@ class FicheSDBCreate(BaseModel):
     nom: str
     client_nom: str
     adresse: str = ""
+    telephone: str = ""
+    email: str = ""
     type_sdb: str = "complete"
     surface: str = ""
     carrelage_mur: str = ""
@@ -752,6 +754,34 @@ class FicheSDBCreate(BaseModel):
     eclairage: str = ""
     budget_estime: str = ""
     notes: str = ""
+    
+    # Extended fields for chantier support
+    date_rdv: str = ""
+    type_intervention: str = ""
+    statut: str = ""
+    nb_personnes: int = 1
+    type_logement: str = ""
+    annee_construction: int = 0
+    isolation: str = ""
+    menuiseries: str = ""
+    chauffage_actuel: str = ""
+    etat_general: str = ""
+    production_ecs: str = ""
+    observations_existant: str = ""
+    besoins: str = ""
+    priorite: str = ""
+    delai_souhaite: str = ""
+    contraintes: str = ""
+    compteur_electrique: str = ""
+    arrivee_gaz: str = ""
+    evacuation_eaux: str = ""
+    acces_materiel: str = ""
+    contraintes_techniques: str = ""
+    plan_data: str = ""
+    solution_recommandee: str = ""
+    points_attention: str = ""
+    budget_final: str = ""
+    delai_realisation: str = ""
 
 class FicheSDBUpdate(BaseModel):
     nom: Optional[str] = None
