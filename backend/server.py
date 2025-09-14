@@ -684,13 +684,17 @@ async def delete_user(user_id: str, current_user: User = Depends(get_current_use
         )
     return {"message": "User deleted successfully"}
 
-# Fiche SDB Models
+# Fiche SDB Models - Extended for Chantier functionality
 class FicheSDB(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     nom: str
     client_nom: str
     adresse: str = ""
-    type_sdb: str = "complete"  # complete, douche, wc, mixte
+    telephone: str = ""
+    email: str = ""
+    
+    # SDB original fields
+    type_sdb: str = "complete"  # complete, douche, wc, mixte, visite_technique, releve_existant, installation, maintenance
     surface: str = ""
     carrelage_mur: str = ""
     carrelage_sol: str = ""
@@ -701,6 +705,35 @@ class FicheSDB(BaseModel):
     eclairage: str = ""
     budget_estime: str = ""
     notes: str = ""
+    
+    # Extended Chantier fields (8 tabs support)
+    date_rdv: str = ""
+    type_intervention: str = ""
+    statut: str = ""
+    nb_personnes: int = 1
+    type_logement: str = ""
+    annee_construction: int = 0
+    isolation: str = ""
+    menuiseries: str = ""
+    chauffage_actuel: str = ""
+    etat_general: str = ""
+    production_ecs: str = ""
+    observations_existant: str = ""
+    besoins: str = ""
+    priorite: str = ""
+    delai_souhaite: str = ""
+    contraintes: str = ""
+    compteur_electrique: str = ""
+    arrivee_gaz: str = ""
+    evacuation_eaux: str = ""
+    acces_materiel: str = ""
+    contraintes_techniques: str = ""
+    plan_data: str = ""  # JSON string for 2D plan data
+    solution_recommandee: str = ""
+    points_attention: str = ""
+    budget_final: str = ""
+    delai_realisation: str = ""
+    
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
