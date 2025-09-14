@@ -2110,11 +2110,57 @@
             calculateTotalPuissanceAirAir();
         }
 
-        function calculatePuissanceAirAir(pieceId) {
-            const surface = parseFloat(document.getElementById(`pieceAirAirSurface${pieceId}`).value) || 0;
+        // CALCULS AUTOMATIQUES AIR/AIR (MÊMES FORMULES que Air/Eau)
+        function calculateFullAirAir(pieceId) {
+            const longueur = parseFloat(document.getElementById(`pieceAirAirLongueur${pieceId}`).value) || 0;
+            const largeur = parseFloat(document.getElementById(`pieceAirAirLargeur${pieceId}`).value) || 0;
+            const hauteur = parseFloat(document.getElementById(`pieceAirAirHauteur${pieceId}`).value) || 2.5;
             
-            // Calcul puissance approximative (100W/m² pour clim réversible)
-            const puissance = (surface * 0.1).toFixed(1);
+            // 1. Surface = Longueur × Largeur (auto-calculée)
+            const surface = longueur * largeur;
+            document.getElementById(`pieceAirAirSurface${pieceId}`).value = surface.toFixed(1);
+            
+            // 2. Volume = Surface × Hauteur (pour Air/Air c'est important)
+            const volume = surface * hauteur;
+            document.getElementById(`pieceAirAirVolume${pieceId}`).value = volume.toFixed(1);
+            
+            // 3. Coefficient G selon isolation générale (IDENTIQUE Air/Eau)
+            const isolationGenerale = document.getElementById('airAirIsolation').value;
+            let coeffG = 1.8; // par défaut moyenne
+            switch(isolationGenerale) {
+                case 'faible': coeffG = 2.5; break;
+                case 'moyenne': coeffG = 1.8; break;
+                case 'bonne': coeffG = 1.2; break;
+                case 'rt2012': coeffG = 0.8; break;
+            }
+            document.getElementById(`pieceAirAirCoeffG${pieceId}`).value = coeffG;
+            
+            // 4. Delta T selon zone climatique (IDENTIQUE Air/Eau)
+            const zoneClimatique = document.getElementById('airAirZoneClimatique').value;
+            let deltaT = 25; // par défaut H2
+            switch(zoneClimatique) {
+                case 'H1': deltaT = 27; break; // -7°C à 20°C
+                case 'H2': deltaT = 25; break; // -5°C à 20°C  
+                case 'H3': deltaT = 23; break; // -3°C à 20°C
+            }
+            document.getElementById(`pieceAirAirDeltaT${pieceId}`).value = deltaT;
+            
+            // 5. Ratio norme énergétique (IDENTIQUE Air/Eau)
+            const anneeConstruction = parseInt(document.getElementById('airAirAnneeConstruction').value) || 1990;
+            const altitude = parseFloat(document.getElementById('airAirAltitude').value) || 200;
+            
+            let ratio = 1.0;
+            if (anneeConstruction < 1975) ratio = 1.3;
+            else if (anneeConstruction < 2000) ratio = 1.1;
+            else if (anneeConstruction >= 2012) ratio = 0.9;
+            
+            // Correction altitude (+ 10% par 300m)
+            if (altitude > 300) ratio += (altitude - 300) / 3000;
+            
+            document.getElementById(`pieceAirAirRatio${pieceId}`).value = ratio.toFixed(2);
+            
+            // 6. FORMULE FINALE IDENTIQUE : Puissance = Surface × Coeff G × ΔT × Ratio
+            const puissance = Math.round(surface * coeffG * deltaT * ratio);
             document.getElementById(`pieceAirAirPuissance${pieceId}`).value = puissance;
             
             calculateTotalPuissanceAirAir();
