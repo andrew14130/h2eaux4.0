@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "buildDate": "2025-09-14",
+  "features": [
+    "Application PWA complète",
+    "Gestion clients avec export PDF",
+    "Gestion chantiers avec statuts",
+    "Calculs PAC Air/Eau et Air/Air",
+    "Système de paramètres complet",
+    "Gestion utilisateurs et permissions",
+    "Export PDF avec logo personnalisé",
+    "Mode hors-ligne avec service worker",
+    "Mise à jour automatique",
+    "Interface optimisée tablette"
+  ],
+  "changelog": {
+    "2.0.0": [
+      "Application entièrement refondue",
+      "Architecture modulaire professionnelle",
+      "PWA installable avec service worker",
+      "Export PDF complet avec en-têtes personnalisés",
+      "Système de paramètres avec upload de logo",
+      "Gestion complète des utilisateurs",
+      "Interface optimisée pour tablette Android",
+      "Calculs PAC automatiques",
+      "Mode hors-ligne intelligent",
+      "Système de mise à jour automatique"
+    ]
+  }
+}
