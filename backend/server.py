@@ -930,7 +930,16 @@ async def get_fiches_sdb(current_user: User = Depends(get_current_user)):
 
 @api_router.post("/fiches-sdb", response_model=FicheSDB)
 async def create_fiche_sdb(fiche_data: FicheSDBCreate, current_user: User = Depends(get_current_user)):
+    # Debug: Log received data
+    print(f"DEBUG - Received data keys: {list(fiche_data.dict().keys())}")
+    print(f"DEBUG - Non-empty fields: {[(k,v) for k,v in fiche_data.dict().items() if v]}")
+    
     new_fiche = FicheSDB(**fiche_data.dict())
+    
+    # Debug: Log what will be saved
+    print(f"DEBUG - Model fields: {list(new_fiche.dict().keys())}")
+    print(f"DEBUG - Non-empty model fields: {[(k,v) for k,v in new_fiche.dict().items() if v]}")
+    
     await db.fiches_sdb.insert_one(new_fiche.dict())
     return new_fiche
 
