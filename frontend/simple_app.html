@@ -2168,15 +2168,34 @@
 
         function calculateTotalPuissanceAirAir() {
             let totalPuissance = 0;
+            let nombreUnites = 0;
+            
             for (let i = 1; i <= piecesAirAirCounter; i++) {
                 const pieceElement = document.getElementById(`pieceAirAir${i}`);
                 if (pieceElement) {
                     const puissance = parseFloat(document.getElementById(`pieceAirAirPuissance${i}`).value) || 0;
                     totalPuissance += puissance;
+                    if (puissance > 0) nombreUnites++;
                 }
             }
-            document.getElementById('airAirPuissanceTotale').value = totalPuissance.toFixed(1);
+            
+            const totalKw = (totalPuissance / 1000).toFixed(1);
+            document.getElementById('airAirPuissanceTotale').value = totalKw;
+            document.getElementById('airAirNombreUnites').value = nombreUnites;
         }
+
+        // Mise à jour automatique des températures de départ selon émetteur
+        document.addEventListener('change', function(e) {
+            if (e.target.id === 'airEauTypeEmetteur') {
+                const tempDepartField = document.getElementById('airEauTempDepart');
+                switch(e.target.value) {
+                    case 'plancher_chauffant': tempDepartField.value = 35; break;
+                    case 'radiateurs_bt': tempDepartField.value = 45; break;
+                    case 'radiateurs_ht': tempDepartField.value = 65; break;
+                    case 'ventilo_convecteurs': tempDepartField.value = 40; break;
+                }
+            }
+        });
         
         // Client form submission
         document.getElementById('clientForm').addEventListener('submit', async function(e) {
