@@ -778,9 +778,12 @@
         <div id="clientsScreen" class="screen">
             <header class="app-header">
                 <div class="header-content">
-                    <div>
-                        <div class="header-title">👥 Gestion Clients</div>
-                        <div class="header-subtitle">Base clients MEG synchronisée</div>
+                    <div class="header-left">
+                        <img id="clientsLogo" src="logo.png" alt="Logo Entreprise" style="height: 40px; margin-right: 1rem; display: none;" onerror="this.style.display='none'">
+                        <div>
+                            <div class="header-title">👥 Gestion Clients</div>
+                            <div class="header-subtitle">Base clients MEG synchronisée</div>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -801,6 +804,130 @@
 
                 <div id="clientsList" class="clients-list">
                     <!-- Clients will be loaded here -->
+                </div>
+            </main>
+        </div>
+
+        <!-- CALCULS PAC SCREEN -->
+        <div id="calculsPacScreen" class="screen">
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <img id="calculsPacLogo" src="logo.png" alt="Logo Entreprise" style="height: 40px; margin-right: 1rem; display: none;" onerror="this.style.display='none'">
+                        <div>
+                            <div class="header-title">🌡️ Calculs PAC</div>
+                            <div class="header-subtitle">Calculs automatiques Air/Eau & Air/Air</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="module-content">
+                <button class="btn back-btn" onclick="showDashboard()">
+                    ← Retour Dashboard
+                </button>
+
+                <div class="pac-types-section">
+                    <h2 class="section-title">Types de PAC Disponibles</h2>
+                    <div class="pac-types-grid">
+                        <div class="pac-type-card" onclick="showPacType('air-eau')">
+                            <div class="pac-icon">🌡️</div>
+                            <h3>PAC Air/Eau</h3>
+                            <p>Pompe à chaleur air-eau pour chauffage central</p>
+                            <div class="pac-features">
+                                <div class="feature">✅ Calcul automatique de puissance</div>
+                                <div class="feature">✅ Zones climatiques H1/H2/H3</div>
+                                <div class="feature">✅ Coefficients isolation</div>
+                            </div>
+                        </div>
+                        
+                        <div class="pac-type-card" onclick="showPacType('air-air')">
+                            <div class="pac-icon">❄️</div>
+                            <h3>PAC Air/Air</h3>
+                            <p>Pompe à chaleur air-air pour climatisation</p>
+                            <div class="pac-features">
+                                <div class="feature">✅ Calcul par pièce</div>
+                                <div class="feature">✅ BTU automatiques</div>
+                                <div class="feature">✅ Performance énergétique</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculs-toolbar">
+                    <h2 class="section-title">Mes Calculs PAC</h2>
+                    <div class="calculs-actions">
+                        <input type="text" id="calculSearch" class="form-input" placeholder="Rechercher un calcul..." onkeyup="filterCalculs()">
+                        <select id="calculFilter" class="form-input" onchange="filterCalculs()">
+                            <option value="">Tous les types</option>
+                            <option value="air-eau">Air/Eau</option>
+                            <option value="air-air">Air/Air</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="calculsList" class="calculs-list">
+                    <!-- Calculs will be loaded here -->
+                </div>
+            </main>
+        </div>
+
+        <!-- CHANTIERS SCREEN -->
+        <div id="chantiersScreen" class="screen">
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <img id="chantiersLogo" src="logo.png" alt="Logo Entreprise" style="height: 40px; margin-right: 1rem; display: none;" onerror="this.style.display='none'">
+                        <div>
+                            <div class="header-title">🏗️ Gestion Chantiers</div>
+                            <div class="header-subtitle">Projets et interventions</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="module-content">
+                <button class="btn back-btn" onclick="showDashboard()">
+                    ← Retour Dashboard
+                </button>
+
+                <div class="chantiers-toolbar">
+                    <div class="toolbar-left">
+                        <input type="text" id="chantierSearch" class="form-input" placeholder="Rechercher un chantier...">
+                        <select id="chantierStatusFilter" class="form-input" onchange="filterChantiers()">
+                            <option value="">Tous les statuts</option>
+                            <option value="en_attente">En attente</option>
+                            <option value="en_cours">En cours</option>
+                            <option value="termine">Terminé</option>
+                            <option value="facture">Facturé</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-add" onclick="showAddChantierModal()">
+                        + Nouveau Chantier
+                    </button>
+                </div>
+
+                <div class="chantiers-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="chantiersEnCours">0</div>
+                        <div class="stat-label">En cours</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="chantiersEnAttente">0</div>
+                        <div class="stat-label">En attente</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="chantiersTermines">0</div>
+                        <div class="stat-label">Terminés</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="chantiersBudgetTotal">0€</div>
+                        <div class="stat-label">Budget total</div>
+                    </div>
+                </div>
+
+                <div id="chantiersList" class="chantiers-list">
+                    <!-- Chantiers will be loaded here -->
                 </div>
             </main>
         </div>
